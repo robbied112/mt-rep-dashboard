@@ -1568,8 +1568,8 @@ const newWins = [
 
 const placementSummary = [
   {name:'Breakthru FL - River',st:'FL',newA:13,reEngageA:52,net:-39},
-  {name:'Republic National Di',st:'TX',newA:2,reEngageA:37,net:-35},
   {name:'Tryon Distributing -',st:'NC',newA:0,reEngageA:35,net:-35},
+  {name:'Republic National Di',st:'TX',newA:2,reEngageA:37,net:-35},
   {name:'Republic National Di',st:'TX',newA:0,reEngageA:32,net:-32},
   {name:'Fedway NJ',st:'NJ',newA:11,reEngageA:25,net:-14},
   {name:'Breakthru FL - Miram',st:'FL',newA:21,reEngageA:34,net:-13},
@@ -1579,9 +1579,9 @@ const placementSummary = [
   {name:'Breakthru NV - Las V',st:'NV',newA:1,reEngageA:8,net:-7},
   {name:'Tryon Co NC',st:'NC',newA:3,reEngageA:9,net:-6},
   {name:'Breakthru NV - Reno ',st:'NV',newA:0,reEngageA:3,net:-3},
+  {name:'Breakthru CT / CDI, ',st:'CT',newA:2,reEngageA:4,net:-2},
   {name:'QUAIL DISTRIBUTING -',st:'AZ',newA:7,reEngageA:9,net:-2},
   {name:'Republic National Di',st:'GA',newA:23,reEngageA:25,net:-2},
-  {name:'Breakthru CT / CDI, ',st:'CT',newA:2,reEngageA:4,net:-2},
   {name:'Breakthru SC / Ben A',st:'SC',newA:9,reEngageA:5,net:4},
 ];
 
@@ -2609,8 +2609,8 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
                     <td>${renderMomentum(d.momentum)}</td>
                     <td>${d.w4.toFixed(1)}</td>
                     <td>${renderMomentum(d.w4trend)}</td>
-                    <td>${d.oh}</td>
-                    <td>${d.doh}</td>
+                    <td>${d.oh.toFixed(1)}</td>
+                    <td>${Math.round(d.doh)}</td>
                     <td>${d.net}</td>
                     <td>${renderStage(d.conLabel)}</td>
                 </tr>`;
@@ -2767,7 +2767,7 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
             const avgDOH = (data.reduce((sum, d) => sum + d.doh, 0) / data.length).toFixed(0);
             const reorderCount = data.filter(d => d.status === 'Reorder Opportunity').length;
 
-            document.getElementById('kpi-inv-oh').textContent = totalOH;
+            document.getElementById('kpi-inv-oh').textContent = totalOH.toFixed(1);
             document.getElementById('kpi-inv-doh').textContent = avgDOH;
             document.getElementById('kpi-inv-reorder').textContent = reorderCount;
             document.getElementById('kpi-inv-reviewed').textContent = data.length;
@@ -2851,12 +2851,12 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
                 tableHtml += `<tr>
                     <td>${d.name}</td>
                     <td>${d.st}</td>
-                    <td>${d.oh}</td>
+                    <td>${d.oh.toFixed(1)}</td>
                     <td>${d.rate.toFixed(2)}</td>
-                    <td>${d.doh}</td>
+                    <td>${Math.round(d.doh)}</td>
                     <td>${d.dep90.toFixed(1)}</td>
                     <td>${renderInventoryStatus(d.status)}</td>
-                    <td>${d.proj}</td>
+                    <td>${d.proj.toFixed(1)}</td>
                 </tr>`;
             });
             document.getElementById('inventoryDetailBody').innerHTML = tableHtml;
@@ -2915,10 +2915,10 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
                     <td>${a.dist}</td>
                     <td>${a.st}</td>
                     <td>${a.ch}</td>
-                    <td>${a.nov}</td>
-                    <td>${a.dec}</td>
-                    <td>${a.jan}</td>
-                    <td>${a.feb}</td>
+                    <td>${a.nov ? a.nov.toFixed(1) : '-'}</td>
+                    <td>${a.dec ? a.dec.toFixed(1) : '-'}</td>
+                    <td>${a.jan ? a.jan.toFixed(1) : '-'}</td>
+                    <td>${a.feb ? a.feb.toFixed(1) : '-'}</td>
                     <td>${a.total.toFixed(1)}</td>
                     <td>${renderTrend(a.trend)}</td>
                     <td>${a.growthPotential > 0 ? '+' + a.growthPotential.toFixed(1) + ' CE' : '—'}</td>
@@ -2949,7 +2949,7 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
 
             document.getElementById('kpi-opp-reeng').textContent = reEngAccounts;
             document.getElementById('kpi-opp-wins').textContent = newWinsCount;
-            document.getElementById('kpi-opp-doors').textContent = netDoors;
+            document.getElementById('kpi-opp-doors').textContent = Math.round(netDoors);
             document.getElementById('kpi-opp-ce').textContent = totalOppCE;
 
             // Re-engagement table
@@ -3078,10 +3078,10 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
                     <td>${r.st}</td>
                     <td>${r.ch}</td>
                     <td>${r.ce.toFixed(1)}</td>
-                    <td>${r.purch}</td>
-                    <td>${r.cycle}</td>
+                    <td>${r.purch.toFixed(1)}</td>
+                    <td>${Math.round(r.cycle)}</td>
                     <td>${r.last}</td>
-                    <td>${r.days}</td>
+                    <td>${Math.round(r.days)}</td>
                     <td>${renderReorderStatus(r.status)}</td>
                 </tr>`;
             });
