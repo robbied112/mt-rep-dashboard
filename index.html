@@ -938,6 +938,14 @@
                 <div class="table-header">
                     <div class="table-title">Inventory Details by Distributor</div>
                     <div class="table-controls">
+                        <select id="invSkuFilter" class="dropdown-select" style="margin-right:8px;min-width:140px;" onchange="renderInventory()">
+                            <option value="all">All Wines</option>
+                            <option value="Still Red">Still Red</option>
+                            <option value="Still White">Still White</option>
+                            <option value="Still Rose">Still Rose</option>
+                            <option value="Sparkling White">Sparkling White</option>
+                            <option value="Sparkling Rose">Sparkling Rose</option>
+                        </select>
                         <button class="btn btn-secondary btn-small" onclick="exportTableToExcel('inventoryDetailTable', 'Inventory_Details')">Export to Excel</button>
                     </div>
                 </div>
@@ -1125,6 +1133,14 @@
                 <div class="table-header">
                     <div class="table-title">Priority Reorder Forecast</div>
                     <div class="table-controls">
+                        <select id="reorderSkuFilter" class="dropdown-select" style="margin-right:8px;min-width:140px;" onchange="renderReorderTable(null)">
+                            <option value="all">All Wines</option>
+                            <option value="Still Red">Still Red</option>
+                            <option value="Still White">Still White</option>
+                            <option value="Still Rose">Still Rose</option>
+                            <option value="Sparkling White">Sparkling White</option>
+                            <option value="Sparkling Rose">Sparkling Rose</option>
+                        </select>
                         <input type="text" class="search-input" id="reorderSearch" placeholder="Search accounts...">
                         <div class="toggle-group">
                             <button class="toggle-btn active" onclick="toggleReorderView('top')">Top 20</button>
@@ -1323,25 +1339,25 @@ const distScorecard = [
 ];
 
 const inventoryData = [
-  {name:'Fedway Associates - Kearny, NJ',st:'NJ',oh:332.7,rate:0.9,doh:370,dep90:80.8,status:'Review Needed',proj:-241.8},
-  {name:'Republic National Dist - Atlanta, GA',st:'GA',oh:330.6,rate:0.19,doh:1706,dep90:17.4,status:'Review Needed',proj:-330.6},
-  {name:'Republic National Dist - Houston, TX',st:'TX',oh:138.2,rate:0.39,doh:350,dep90:35.5,status:'Overstocked',proj:-138.2},
-  {name:'Republic National Dist - San Antonio, TX',st:'TX',oh:129.6,rate:0.13,doh:974,dep90:12.0,status:'Review Needed',proj:-129.6},
-  {name:'Republic National Dist - Dallas/ FTW, TX',st:'TX',oh:115.5,rate:0.41,doh:279,dep90:37.2,status:'Overstocked',proj:-115.5},
-  {name:'Breakthru FL - Riverview, FL',st:'FL',oh:74.0,rate:0.64,doh:115,dep90:58.0,status:'Healthy',proj:-55.4},
-  {name:'Breakthru CT / CDI, CT',st:'CT',oh:68.7,rate:0.09,doh:747,dep90:8.3,status:'Review Needed',proj:-60.3},
-  {name:'Pine State Trading Co, ME',st:'ME',oh:63.0,rate:0.05,doh:1149,dep90:4.9,status:'Review Needed',proj:-63.0},
-  {name:'Tryon Distributing - Durham, NC',st:'NC',oh:41.8,rate:0.27,doh:153,dep90:24.6,status:'Healthy',proj:1874.5},
-  {name:'Breakthru FL - Miramar, FL',st:'FL',oh:40.2,rate:0.69,doh:58,dep90:62.3,status:'Reorder Opportunity',proj:4.2},
-  {name:'Shangy Inc., PA',st:'PA',oh:39.1,rate:0.54,doh:72,dep90:48.6,status:'Reorder Opportunity',proj:108.8},
-  {name:'Breakthru SC / Ben Arnold (Sunbelt), SC',st:'SC',oh:32.8,rate:0.05,doh:683,dep90:4.3,status:'Review Needed',proj:-31.4},
-  {name:'Breakthru NV - Las Vegas (Wine&Spirits), NV',st:'NV',oh:30.6,rate:0.1,doh:307,dep90:9.0,status:'Overstocked',proj:-28.0},
-  {name:'QUAIL DISTRIBUTING - AZ, AZ',st:'AZ',oh:30.5,rate:0.2,doh:154,dep90:17.8,status:'Healthy',proj:-19.1},
-  {name:'Breakthru NV - Reno (Sparks), NV',st:'NV',oh:14.8,rate:0.04,doh:420,dep90:3.2,status:'Review Needed',proj:-14.8},
-  {name:'Tryon Distributing Co, NC',st:'NC',oh:14.3,rate:0.14,doh:103,dep90:12.4,status:'Healthy',proj:142.2},
-  {name:'Republic National Dist - Corpus Christi, TX',st:'TX',oh:12.7,rate:0.0,doh:1141,dep90:0.0,status:'Review Needed',proj:0.0},
-  {name:'Republic National Dist - Lubbock, TX',st:'TX',oh:12.7,rate:0.0,doh:1141,dep90:0.0,status:'Review Needed',proj:0.0},
-  {name:'Republic National Dist - El Paso, TX',st:'TX',oh:9.5,rate:0.0,doh:856,dep90:0.0,status:'Review Needed',proj:0.0},
+  {name:'Fedway Associates - Kearny, NJ',st:'NJ',oh:332.7,rate:0.9,doh:370,dep90:80.8,status:'Review Needed',proj:-241.8,skus:[{w:'Still Red',oh:34.9,rate:0.41,doh:84,status:'Reorder Opportunity'},{w:'Still White',oh:83.2,rate:0.13,doh:639,status:'Review Needed'},{w:'Still Rose',oh:92.1,rate:0.14,doh:649,status:'Review Needed'},{w:'Sparkling White',oh:61.7,rate:0.11,doh:579,status:'Review Needed'},{w:'Sparkling Rose',oh:60.8,rate:0.11,doh:575,status:'Review Needed'}]},
+  {name:'Republic National Dist - Atlanta, GA',st:'GA',oh:330.6,rate:0.19,doh:1706,dep90:17.4,status:'Review Needed',proj:-330.6,skus:[{w:'Still Red',oh:65.0,rate:0.05,doh:1253,status:'Review Needed'},{w:'Still White',oh:66.7,rate:0.03,doh:2004,status:'Review Needed'},{w:'Still Rose',oh:67.5,rate:0.02,doh:3001,status:'Review Needed'},{w:'Sparkling White',oh:64.0,rate:0.06,doh:1055,status:'Review Needed'},{w:'Sparkling Rose',oh:67.4,rate:0.03,doh:2648,status:'Review Needed'}]},
+  {name:'Republic National Dist - Houston, TX',st:'TX',oh:138.2,rate:0.39,doh:350,dep90:35.5,status:'Overstocked',proj:-138.2,skus:[{w:'Still Red',oh:32.1,rate:0.08,doh:406,status:'Review Needed'},{w:'Still White',oh:38.1,rate:0.01,doh:2598,status:'Review Needed'},{w:'Still Rose',oh:32.4,rate:0.09,doh:356,status:'Overstocked'},{w:'Sparkling White',oh:15.8,rate:0.08,doh:202,status:'Overstocked'},{w:'Sparkling Rose',oh:19.6,rate:0.13,doh:150,status:'Healthy'}]},
+  {name:'Republic National Dist - San Antonio, TX',st:'TX',oh:129.6,rate:0.13,doh:974,dep90:12.0,status:'Review Needed',proj:-129.6,skus:[{w:'Still Red',oh:34.8,rate:0.01,doh:2735,status:'Review Needed'},{w:'Still White',oh:32.7,rate:0.01,doh:2568,status:'Review Needed'},{w:'Still Rose',oh:30.6,rate:0.02,doh:1249,status:'Review Needed'},{w:'Sparkling White',oh:21.0,rate:0.01,doh:1655,status:'Review Needed'},{w:'Sparkling Rose',oh:10.6,rate:0.07,doh:150,status:'Healthy'}]},
+  {name:'Republic National Dist - Dallas/ FTW, TX',st:'TX',oh:115.5,rate:0.41,doh:279,dep90:37.2,status:'Overstocked',proj:-115.5,skus:[{w:'Still Red',oh:27.2,rate:0.08,doh:339,status:'Overstocked'},{w:'Still White',oh:30.8,rate:0.06,doh:553,status:'Review Needed'},{w:'Still Rose',oh:30.2,rate:0.06,doh:506,status:'Review Needed'},{w:'Sparkling White',oh:14.2,rate:0.09,doh:165,status:'Healthy'},{w:'Sparkling Rose',oh:13.1,rate:0.13,doh:99,status:'Healthy'}]},
+  {name:'Breakthru FL - Riverview, FL',st:'FL',oh:74.0,rate:0.64,doh:115,dep90:58.0,status:'Healthy',proj:-55.4,skus:[{w:'Still Red',oh:0.0,rate:0.19,doh:0,status:'Review Needed'},{w:'Still White',oh:20.1,rate:0.13,doh:150,status:'Healthy'},{w:'Still Rose',oh:11.6,rate:0.07,doh:170,status:'Healthy'},{w:'Sparkling White',oh:19.0,rate:0.12,doh:165,status:'Healthy'},{w:'Sparkling Rose',oh:23.2,rate:0.14,doh:169,status:'Healthy'}]},
+  {name:'Breakthru CT / CDI, CT',st:'CT',oh:68.7,rate:0.09,doh:747,dep90:8.3,status:'Review Needed',proj:-60.3,skus:[{w:'Still Red',oh:6.3,rate:0.05,doh:120,status:'Healthy'},{w:'Still White',oh:15.8,rate:0.01,doh:1080,status:'Review Needed'},{w:'Still Rose',oh:26.4,rate:0.0,doh:2378,status:'Review Needed'},{w:'Sparkling Rose',oh:20.1,rate:0.02,doh:821,status:'Review Needed'}]},
+  {name:'Pine State Trading Co, ME',st:'ME',oh:63.0,rate:0.05,doh:1149,dep90:4.9,status:'Review Needed',proj:-63.0,skus:[{w:'Still Red',oh:13.2,rate:0.02,doh:794,status:'Review Needed'},{w:'Still White',oh:13.8,rate:0.01,doh:1285,status:'Review Needed'},{w:'Sparkling White',oh:9.3,rate:0.03,doh:353,status:'Overstocked'},{w:'Sparkling Rose',oh:26.6,rate:0.0,doh:27180,status:'Review Needed'}]},
+  {name:'Tryon Distributing - Durham, NC',st:'NC',oh:41.8,rate:0.27,doh:153,dep90:24.6,status:'Healthy',proj:1874.5,skus:[{w:'Still Red',oh:10.9,rate:0.05,doh:207,status:'Overstocked'},{w:'Still White',oh:6.3,rate:0.1,doh:64,status:'Reorder Opportunity'},{w:'Sparkling White',oh:10.4,rate:0.05,doh:193,status:'Overstocked'},{w:'Sparkling Rose',oh:14.2,rate:0.07,doh:210,status:'Overstocked'}]},
+  {name:'Breakthru FL - Miramar, FL',st:'FL',oh:40.2,rate:0.69,doh:58,dep90:62.3,status:'Reorder Opportunity',proj:4.2,skus:[{w:'Still Red',oh:1.1,rate:0.23,doh:5,status:'Reorder Opportunity'},{w:'Still White',oh:8.5,rate:0.17,doh:51,status:'Reorder Opportunity'},{w:'Still Rose',oh:12.7,rate:0.1,doh:128,status:'Healthy'},{w:'Sparkling White',oh:9.5,rate:0.09,doh:110,status:'Healthy'},{w:'Sparkling Rose',oh:8.5,rate:0.11,doh:77,status:'Reorder Opportunity'}]},
+  {name:'Shangy Inc., PA',st:'PA',oh:39.1,rate:0.54,doh:72,dep90:48.6,status:'Reorder Opportunity',proj:108.8,skus:[{w:'Still Red',oh:0.0,rate:0.28,doh:0,status:'Review Needed'},{w:'Still White',oh:6.3,rate:0.11,doh:60,status:'Reorder Opportunity'},{w:'Still Rose',oh:9.5,rate:0.01,doh:810,status:'Review Needed'},{w:'Sparkling White',oh:5.3,rate:0.08,doh:64,status:'Reorder Opportunity'},{w:'Sparkling Rose',oh:18.0,rate:0.06,doh:306,status:'Overstocked'}]},
+  {name:'Breakthru SC / Ben Arnold (Sunbelt), SC',st:'SC',oh:32.8,rate:0.05,doh:683,dep90:4.3,status:'Review Needed',proj:-31.4,skus:[{w:'Still Red',oh:9.5,rate:0.01,doh:1620,status:'Review Needed'},{w:'Still White',oh:7.4,rate:0.03,doh:291,status:'Overstocked'},{w:'Still Rose',oh:6.3,rate:0.01,doh:432,status:'Review Needed'},{w:'Sparkling Rose',oh:9.5,rate:0.0,doh:4860,status:'Review Needed'}]},
+  {name:'Breakthru NV - Las Vegas (Wine&Spirits), NV',st:'NV',oh:30.6,rate:0.1,doh:307,dep90:9.0,status:'Overstocked',proj:-28.0,skus:[{w:'Still Red',oh:7.4,rate:0.08,doh:97,status:'Healthy'},{w:'Still White',oh:8.5,rate:0.01,doh:1440,status:'Review Needed'},{w:'Sparkling White',oh:6.3,rate:0.02,doh:360,status:'Overstocked'},{w:'Sparkling Rose',oh:8.5,rate:0.0,doh:761,status:'Review Needed'}]},
+  {name:'QUAIL DISTRIBUTING - AZ, AZ',st:'AZ',oh:30.5,rate:0.2,doh:154,dep90:17.8,status:'Healthy',proj:-19.1,skus:[{w:'Still Red',oh:7.9,rate:0.04,doh:213,status:'Overstocked'},{w:'Still White',oh:5.0,rate:0.05,doh:93,status:'Healthy'},{w:'Still Rose',oh:5.3,rate:0.0,doh:1350,status:'Review Needed'},{w:'Sparkling White',oh:2.1,rate:0.08,doh:27,status:'Reorder Opportunity'},{w:'Sparkling Rose',oh:10.1,rate:0.02,doh:414,status:'Review Needed'}]},
+  {name:'Breakthru NV - Reno (Sparks), NV',st:'NV',oh:14.8,rate:0.04,doh:420,dep90:3.2,status:'Review Needed',proj:-14.8,skus:[{w:'Still Red',oh:8.5,rate:0.04,doh:240,status:'Overstocked'},{w:'Still White',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Sparkling White',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}]},
+  {name:'Tryon Distributing Co, NC',st:'NC',oh:14.3,rate:0.14,doh:103,dep90:12.4,status:'Healthy',proj:142.2,skus:[{w:'Still Red',oh:3.9,rate:0.02,doh:198,status:'Overstocked'},{w:'Still White',oh:5.1,rate:0.05,doh:100,status:'Healthy'},{w:'Sparkling Rose',oh:5.3,rate:0.07,doh:78,status:'Reorder Opportunity'}]},
+  {name:'Republic National Dist - Corpus Christi, TX',st:'TX',oh:12.7,rate:0.0,doh:1141,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still White',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still Rose',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Sparkling White',oh:1.1,rate:0.0,doh:95,status:'Healthy'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}]},
+  {name:'Republic National Dist - Lubbock, TX',st:'TX',oh:12.7,rate:0.0,doh:1141,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still White',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still Rose',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Sparkling White',oh:1.1,rate:0.0,doh:95,status:'Healthy'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}]},
+  {name:'Republic National Dist - El Paso, TX',st:'TX',oh:9.5,rate:0.0,doh:856,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Still White',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}]},
 ];
 
 // ==================== RE-ENGAGEMENT OPPORTUNITIES ====================
@@ -1579,9 +1595,9 @@ const placementSummary = [
   {name:'Breakthru NV - Las V',st:'NV',newA:1,reEngageA:8,net:-7},
   {name:'Tryon Co NC',st:'NC',newA:3,reEngageA:9,net:-6},
   {name:'Breakthru NV - Reno ',st:'NV',newA:0,reEngageA:3,net:-3},
+  {name:'Republic National Di',st:'GA',newA:23,reEngageA:25,net:-2},
   {name:'QUAIL DISTRIBUTING -',st:'AZ',newA:7,reEngageA:9,net:-2},
   {name:'Breakthru CT / CDI, ',st:'CT',newA:2,reEngageA:4,net:-2},
-  {name:'Republic National Di',st:'GA',newA:23,reEngageA:25,net:-2},
   {name:'Breakthru SC / Ben A',st:'SC',newA:9,reEngageA:5,net:4},
 ];
 
@@ -2845,19 +2861,65 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
                 }
             });
 
-            // Inventory Details Table
+            // Inventory Details Table (with SKU filter)
+            const skuFilter = document.getElementById('invSkuFilter') ? document.getElementById('invSkuFilter').value : 'all';
             let tableHtml = '';
-            data.forEach(d => {
-                tableHtml += `<tr>
-                    <td>${d.name}</td>
-                    <td>${d.st}</td>
-                    <td>${d.oh.toFixed(1)}</td>
-                    <td>${d.rate.toFixed(2)}</td>
-                    <td>${Math.round(d.doh)}</td>
-                    <td>${d.dep90.toFixed(1)}</td>
-                    <td>${renderInventoryStatus(d.status)}</td>
-                    <td>${d.proj.toFixed(1)}</td>
-                </tr>`;
+            data.forEach((d, idx) => {
+                if (skuFilter !== 'all') {
+                    // Show only the selected SKU's data for this distributor
+                    const sku = (d.skus || []).find(s => s.w === skuFilter);
+                    if (!sku) return; // skip if this dist doesn't have this SKU
+                    tableHtml += `<tr>
+                        <td>${d.name}</td>
+                        <td>${d.st}</td>
+                        <td>${sku.oh.toFixed(1)}</td>
+                        <td>${sku.rate.toFixed(2)}</td>
+                        <td>${Math.round(sku.doh)}</td>
+                        <td>-</td>
+                        <td>${renderInventoryStatus(sku.status)}</td>
+                        <td>-</td>
+                    </tr>`;
+                } else {
+                    // Show distributor total with expandable SKU rows
+                    const hasSkus = d.skus && d.skus.length > 0;
+                    const expId = 'inv-sku-' + idx;
+                    const expIcon = hasSkus ? `<span class="sku-toggle" onclick="toggleSkuRow('${expId}')" style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show wine breakdown">&#9654;</span>` : '';
+                    tableHtml += `<tr>
+                        <td>${expIcon}${d.name}</td>
+                        <td>${d.st}</td>
+                        <td>${d.oh.toFixed(1)}</td>
+                        <td>${d.rate.toFixed(2)}</td>
+                        <td>${Math.round(d.doh)}</td>
+                        <td>${d.dep90.toFixed(1)}</td>
+                        <td>${renderInventoryStatus(d.status)}</td>
+                        <td>${d.proj.toFixed(1)}</td>
+                    </tr>`;
+                    if (hasSkus) {
+                        tableHtml += `<tr id="${expId}" style="display:none;"><td colspan="8" style="padding:0;">
+                            <table style="width:100%;background:#f8f9fa;border:none;margin:0;">
+                                <thead style="font-size:11px;color:#7f8c8d;"><tr>
+                                    <th style="padding:6px 10px;border:none;">Wine</th>
+                                    <th style="padding:6px 10px;border:none;"></th>
+                                    <th style="padding:6px 10px;border:none;">On Hand</th>
+                                    <th style="padding:6px 10px;border:none;">Daily Rate</th>
+                                    <th style="padding:6px 10px;border:none;">DOH</th>
+                                    <th style="padding:6px 10px;border:none;"></th>
+                                    <th style="padding:6px 10px;border:none;">Status</th>
+                                    <th style="padding:6px 10px;border:none;"></th>
+                                </tr></thead><tbody>
+                                ${d.skus.map(s => `<tr style="font-size:12px;">
+                                    <td style="padding:4px 10px;border:none;font-weight:500;">${s.w}</td>
+                                    <td style="padding:4px 10px;border:none;"></td>
+                                    <td style="padding:4px 10px;border:none;">${s.oh.toFixed(1)}</td>
+                                    <td style="padding:4px 10px;border:none;">${s.rate.toFixed(2)}</td>
+                                    <td style="padding:4px 10px;border:none;">${Math.round(s.doh)}</td>
+                                    <td style="padding:4px 10px;border:none;"></td>
+                                    <td style="padding:4px 10px;border:none;">${renderInventoryStatus(s.status)}</td>
+                                    <td style="padding:4px 10px;border:none;"></td>
+                                </tr>`).join('')}
+                            </tbody></table></td></tr>`;
+                    }
+                }
             });
             document.getElementById('inventoryDetailBody').innerHTML = tableHtml;
             initTableSorting('inventoryDetailTable');
@@ -3066,11 +3128,38 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
             renderReorderTable(reorderWithStatus);
         }
 
+        let _lastReorderData = [];
         function renderReorderTable(data) {
-            const displayData = reorderViewMode === 'top' ? data.slice(0, 20) : data;
+            if (data) _lastReorderData = data;
+            else data = _lastReorderData;
+            const skuFilter = document.getElementById('reorderSkuFilter') ? document.getElementById('reorderSkuFilter').value : 'all';
+            let filteredData = data;
+            if (skuFilter !== 'all') {
+                filteredData = data.filter(r => r.skus && r.skus.some(s => s.w === skuFilter));
+            }
+            const displayData = reorderViewMode === 'top' ? filteredData.slice(0, 20) : filteredData;
 
             let tableHtml = '';
             displayData.forEach((r, idx) => {
+                if (skuFilter !== 'all') {
+                    const sku = r.skus.find(s => s.w === skuFilter);
+                    if (!sku) return;
+                    const skuStatus = sku.days > sku.cycle && sku.cycle > 0 ? 'Overdue' : sku.days >= sku.cycle - 7 && sku.cycle > 0 ? 'Due Soon' : 'On Track';
+                    tableHtml += `<tr>
+                        <td>${idx+1}</td>
+                        <td>${r.acct}</td>
+                        <td>${r.dist}</td>
+                        <td>${r.st}</td>
+                        <td>${r.ch}</td>
+                        <td>${sku.ce.toFixed(1)}</td>
+                        <td>${sku.purch}</td>
+                        <td>${sku.cycle}</td>
+                        <td>${sku.last}</td>
+                        <td>${sku.days}</td>
+                        <td>${renderReorderStatus(skuStatus)}</td>
+                    </tr>`;
+                    return;
+                }
                 const hasSkus = r.skus && r.skus.length > 0;
                 const expandId = 'sku-expand-' + idx;
                 const expandIcon = hasSkus ? `<span class="sku-toggle" onclick="toggleSkuRow('${expandId}')" style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show SKU breakdown">&#9654;</span>` : '';
