@@ -919,6 +919,8 @@
                 </div>
             </div>
 
+            <div id="warehousePanel" class="table-container" style="margin-bottom:20px;"></div>
+
             <div class="charts-row">
                 <div class="chart-container">
                     <div class="chart-title">Inventory Status Distribution</div>
@@ -1595,9 +1597,9 @@ const placementSummary = [
   {name:'Breakthru NV - Las V',st:'NV',newA:1,reEngageA:8,net:-7},
   {name:'Tryon Co NC',st:'NC',newA:3,reEngageA:9,net:-6},
   {name:'Breakthru NV - Reno ',st:'NV',newA:0,reEngageA:3,net:-3},
-  {name:'Breakthru CT / CDI, ',st:'CT',newA:2,reEngageA:4,net:-2},
-  {name:'Republic National Di',st:'GA',newA:23,reEngageA:25,net:-2},
   {name:'QUAIL DISTRIBUTING -',st:'AZ',newA:7,reEngageA:9,net:-2},
+  {name:'Republic National Di',st:'GA',newA:23,reEngageA:25,net:-2},
+  {name:'Breakthru CT / CDI, ',st:'CT',newA:2,reEngageA:4,net:-2},
   {name:'Breakthru SC / Ben A',st:'SC',newA:9,reEngageA:5,net:4},
 ];
 
@@ -2287,22 +2289,42 @@ const distHealth = [
 
 // ==================== QB DISTRIBUTOR ORDERS ====================
 const qbDistOrders = {
-  'Breakthru CT / CDI, CT':{date:'12/09/24',num:'100099',total:17590,items:'Red x28, Rose x28, Spark Rose x33, White x28',orders:1},
-  'Breakthru FL - Miramar, FL':{date:'01/15/26',num:'100691',total:2289,items:'Red x182',orders:10},
-  'Breakthru FL - Riverview, FL':{date:'12/26/25',num:'100651',total:4088,items:'Spark White x11, Spark Rose x14',orders:11},
-  'Breakthru NV - Las Vegas (Wine&Spirits), NV':{date:'12/31/25',num:'100676',total:1144,items:'Red x91',orders:4},
-  'Breakthru NV - Reno (Sparks), NV':{date:'12/31/25',num:'100676',total:1144,items:'Red x91',orders:4},
-  'Breakthru SC / Ben Arnold (Sunbelt), SC':{date:'11/24/25',num:'100603',total:2696,items:'Spark Rose x117, White x117',orders:2},
-  'Fedway Associates - Kearny, NJ':{date:'03/26/25',num:'100189',total:77552,items:'Red x112, Spark Rose x88, Spark White x88, Rose x112, White x112',orders:1},
-  'Pine State Trading Co, ME':{date:'10/09/25',num:'100455',total:0,items:'Red x3, White x3, Rose x3, Spark Rose x3, Spark White x3',orders:2},
-  'QUAIL DISTRIBUTING - AZ, AZ':{date:'02/10/26',num:'100740',total:1552,items:'White x3, Spark White x7',orders:5},
-  'Republic National Dist - Atlanta, GA':{date:'07/29/25',num:'100336',total:50325,items:'Red x858, Rose x858, White x858, Spark Rose x858, Spark White x858',orders:1},
-  'Republic National Dist - Dallas/ FTW, TX':{date:'01/15/26',num:'100688',total:6317,items:'Spark White x143, Red x143, Rose x130, White x130',orders:9},
-  'Republic National Dist - Houston, TX':{date:'01/15/26',num:'100688',total:6317,items:'Spark White x143, Red x143, Rose x130, White x130',orders:9},
-  'Republic National Dist - San Antonio, TX':{date:'01/15/26',num:'100688',total:6317,items:'Spark White x143, Red x143, Rose x130, White x130',orders:9},
-  'Shangy Inc., PA':{date:'02/19/26',num:'100748',total:7625,items:'Red x20, White x20, Spark White x10',orders:5},
-  'Tryon Distributing - Durham, NC':{date:'02/19/26',num:'100749',total:2488,items:'Red x91, White x7',orders:6},
-  'Tryon Distributing Co, NC':{date:'02/19/26',num:'100749',total:2488,items:'Red x91, White x7',orders:6},
+  'Breakthru CT / CDI, CT':{date:'12/09/24',num:'100099',total:17590,items:'Red x28, Rose x28, Spark Rose x33, White x28',orders:1,label:'Classic',classicCases:117,contemporaryCases:0},
+  'Breakthru FL - Miramar, FL':{date:'01/15/26',num:'100691',total:2289,items:'Red x182',orders:10,label:'Both',classicCases:288,contemporaryCases:47},
+  'Breakthru FL - Riverview, FL':{date:'12/26/25',num:'100651',total:4088,items:'Spark White x11, Spark Rose x14',orders:11,label:'Both',classicCases:356,contemporaryCases:28},
+  'Breakthru NV - Las Vegas (Wine&Spirits), NV':{date:'12/31/25',num:'100676',total:1144,items:'Red x91',orders:4,label:'Both',classicCases:44,contemporaryCases:14},
+  'Breakthru NV - Reno (Sparks), NV':{date:'12/31/25',num:'100676',total:1144,items:'Red x91',orders:4,label:'Both',classicCases:44,contemporaryCases:14},
+  'Breakthru SC / Ben Arnold (Sunbelt), SC':{date:'11/24/25',num:'100603',total:2696,items:'Spark Rose x117, White x117',orders:2,label:'Both',classicCases:56,contemporaryCases:18},
+  'Fedway Associates - Kearny, NJ':{date:'03/26/25',num:'100189',total:77552,items:'Red x112, Spark Rose x88, Spark White x88, Rose x112, White x112',orders:1,label:'Classic',classicCases:512,contemporaryCases:0},
+  'Pine State Trading Co, ME':{date:'10/09/25',num:'100455',total:0,items:'Red x3, White x3, Rose x3, Spark Rose x3, Spark White x3',orders:2,label:'Contemporary',classicCases:0,contemporaryCases:64},
+  'QUAIL DISTRIBUTING - AZ, AZ':{date:'02/10/26',num:'100740',total:1552,items:'White x3, Spark White x7',orders:5,label:'Both',classicCases:65,contemporaryCases:11},
+  'Republic National Dist - Atlanta, GA':{date:'07/29/25',num:'100336',total:50325,items:'Red x858, Rose x858, White x858, Spark Rose x858, Spark White x858',orders:1,label:'Contemporary',classicCases:0,contemporaryCases:1122},
+  'Republic National Dist - Dallas/ FTW, TX':{date:'01/15/26',num:'100688',total:6317,items:'Spark White x143, Red x143, Rose x130, White x130',orders:9,label:'Contemporary',classicCases:0,contemporaryCases:895},
+  'Republic National Dist - Houston, TX':{date:'01/15/26',num:'100688',total:6317,items:'Spark White x143, Red x143, Rose x130, White x130',orders:9,label:'Contemporary',classicCases:0,contemporaryCases:895},
+  'Republic National Dist - San Antonio, TX':{date:'01/15/26',num:'100688',total:6317,items:'Spark White x143, Red x143, Rose x130, White x130',orders:9,label:'Contemporary',classicCases:0,contemporaryCases:895},
+  'Shangy Inc., PA':{date:'02/19/26',num:'100748',total:7625,items:'Red x20, White x20, Spark White x10',orders:5,label:'Classic',classicCases:270,contemporaryCases:0},
+  'Tryon Distributing - Durham, NC':{date:'02/19/26',num:'100749',total:2488,items:'Red x91, White x7',orders:6,label:'Both',classicCases:152,contemporaryCases:21},
+  'Tryon Distributing Co, NC':{date:'02/19/26',num:'100749',total:2488,items:'Red x91, White x7',orders:6,label:'Both',classicCases:152,contemporaryCases:21},
+};
+
+// ==================== WAREHOUSE INVENTORY ====================
+const warehouseInventory = {
+  classic: {
+    'K+D Liquor, NY':{sw:20,sr:46,rd:2,spw:35,spr:40,total:142},
+    'Zephyr Express, CA Batch 1':{sw:0,sr:56,rd:0,spw:0,spr:627,total:683},
+    'Zephyr Express, CA Batch 2':{sw:1697,sr:0,rd:0,spw:570,spr:634,total:2901},
+    'Zephyr Total':{sw:1697,sr:51,rd:0,spw:570,spr:1261,total:3579},
+    'SDX Long Island':{sw:0,sr:142,rd:36,spw:22,spr:182,total:382},
+    'Warehouse Total':{sw:1717,sr:244,rd:38,spw:627,spr:1483,total:4108},
+  },
+  contemporary: {
+    'K+D Liquor, NY':{sw:60,sr:0,rd:20,spw:35,spr:35,total:150},
+    'Zephyr Express, CA':{sw:1103,sr:788,rd:1216,spw:1331,spr:1741,total:6179},
+    'CT (FOR QVC)':{sw:112,sr:112,rd:112,spw:0,spr:0,total:336},
+    'Warehouse Total':{sw:1275,sr:900,rd:1348,spw:1366,spr:1776,total:6665},
+  },
+  grandTotal:{sw:2880,sr:1032,rd:1274,spw:1994,spr:3259,total:10437},
+  batch4Est:{sw:3882,sr:2000,rd:5425,spw:0,spr:0,total:11307},
 };
 
 // ==================== BUILD METADATA ====================
@@ -2432,7 +2454,20 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
             if (typeof qbDistOrders === 'undefined') return '';
             const order = qbDistOrders[distName];
             if (!order) return '';
-            return `<div style="font-size:11px;color:#6B7280;margin-top:2px;" title="QB Invoice #${order.num} - ${order.items}">Last QB Order: ${order.date} | $${order.total.toLocaleString()}${order.items ? ' | ' + order.items : ''}</div>`;
+            let labelBadge = '';
+            if (order.label === 'Classic') labelBadge = '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;margin-left:4px;">Classic</span>';
+            else if (order.label === 'Contemporary') labelBadge = '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;margin-left:4px;">Contemporary</span>';
+            else if (order.label === 'Both') labelBadge = '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;margin-left:4px;">Classic</span><span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;margin-left:2px;">Contemporary</span>';
+            return `<div style="font-size:11px;color:#6B7280;margin-top:2px;" title="QB Invoice #${order.num} - ${order.items}">Last QB Order: ${order.date} | $${order.total.toLocaleString()}${order.items ? ' | ' + order.items : ''}${labelBadge}</div>`;
+        }
+        function getLabelBadgeOnly(distName) {
+            if (typeof qbDistOrders === 'undefined') return '';
+            const order = qbDistOrders[distName];
+            if (!order) return '';
+            if (order.label === 'Classic') return '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;">Classic</span>';
+            if (order.label === 'Contemporary') return '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;">Contemporary</span>';
+            if (order.label === 'Both') return '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;">Classic</span> <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;">Contemporary</span>';
+            return '';
         }
 
         function exportTableToExcel(tableId, fileName) {
@@ -2948,6 +2983,54 @@ const dataThrough = '2/8/2026 thru 2/14/2026';
             });
             document.getElementById('inventoryDetailBody').innerHTML = tableHtml;
             initTableSorting('inventoryDetailTable');
+            renderWarehousePanel();
+        }
+
+        function renderWarehousePanel() {
+            const panel = document.getElementById('warehousePanel');
+            if (!panel) return;
+            if (typeof warehouseInventory === 'undefined' || !warehouseInventory) { panel.style.display='none'; return; }
+            const wh = warehouseInventory;
+            const ct = wh.classic['Warehouse Total'] || {};
+            const nt = wh.contemporary['Warehouse Total'] || {};
+            const gt = wh.grandTotal || {};
+            const wines = ['sw','sr','rd','spw','spr'];
+            const wineNames = ['Still White','Still Rose','Red','Spark White','Spark Rose'];
+            let html = '<div class="table-header"><div class="table-title">Company Warehouse Inventory (by Label Type)</div></div>';
+            const classicSpr = ct.spr || 0;
+            if (classicSpr > 0) {
+                html += '<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#991B1B;">Note: Classic Sparkling Rose (' + classicSpr + ' cases) includes Batch 1 sequestered inventory with known quality issues (hard-to-open bottles). Not suitable for normal distribution.</div>';
+            }
+            html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
+            html += '<div><div style="font-weight:600;margin-bottom:6px;"><span style="display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;background:#F3E8FF;color:#7C3AED;margin-right:6px;">Classic</span> Batch 1+2</div>';
+            html += '<table style="width:100%;font-size:12px;border-collapse:collapse;"><thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:4px 6px;">Location</th>';
+            wineNames.forEach(w => html += '<th style="text-align:right;padding:4px 6px;">' + w + '</th>');
+            html += '<th style="text-align:right;padding:4px 6px;font-weight:700;">Total</th></tr></thead><tbody>';
+            for (const [loc, vals] of Object.entries(wh.classic)) {
+                const bold = (loc === 'Warehouse Total' || loc === 'Zephyr Total') ? 'font-weight:700;border-top:1px solid #e5e7eb;' : '';
+                html += '<tr style="' + bold + '"><td style="padding:3px 6px;">' + loc + '</td>';
+                wines.forEach(w => { const v = vals[w] || 0; html += '<td style="text-align:right;padding:3px 6px;' + (w==='spr' && v > 0 ? 'color:#DC2626;' : '') + '">' + v.toLocaleString() + '</td>'; });
+                html += '<td style="text-align:right;padding:3px 6px;font-weight:600;">' + (vals.total||0).toLocaleString() + '</td></tr>';
+            }
+            html += '</tbody></table></div>';
+            html += '<div><div style="font-weight:600;margin-bottom:6px;"><span style="display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;background:#DBEAFE;color:#2563EB;margin-right:6px;">Contemporary</span> Batch 3+</div>';
+            html += '<table style="width:100%;font-size:12px;border-collapse:collapse;"><thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:4px 6px;">Location</th>';
+            wineNames.forEach(w => html += '<th style="text-align:right;padding:4px 6px;">' + w + '</th>');
+            html += '<th style="text-align:right;padding:4px 6px;font-weight:700;">Total</th></tr></thead><tbody>';
+            for (const [loc, vals] of Object.entries(wh.contemporary)) {
+                const bold = loc === 'Warehouse Total' ? 'font-weight:700;border-top:1px solid #e5e7eb;' : '';
+                html += '<tr style="' + bold + '"><td style="padding:3px 6px;">' + loc + '</td>';
+                wines.forEach(w => { const v = vals[w] || 0; html += '<td style="text-align:right;padding:3px 6px;">' + v.toLocaleString() + '</td>'; });
+                html += '<td style="text-align:right;padding:3px 6px;font-weight:600;">' + (vals.total||0).toLocaleString() + '</td></tr>';
+            }
+            html += '</tbody></table></div></div>';
+            html += '<div style="margin-top:12px;padding:8px 12px;background:#f9fafb;border-radius:6px;display:flex;gap:24px;font-size:13px;">';
+            html += '<span><strong>Grand Total:</strong> ' + (gt.total||0).toLocaleString() + ' cases</span>';
+            html += '<span>Classic: ' + (ct.total||0).toLocaleString() + '</span>';
+            html += '<span>Contemporary: ' + (nt.total||0).toLocaleString() + '</span>';
+            if (wh.batch4Est && wh.batch4Est.total) html += '<span style="color:#6B7280;">Batch 4 Est: +' + wh.batch4Est.total.toLocaleString() + '</span>';
+            html += '</div>';
+            panel.innerHTML = html;
         }
 
         // Accounts Tab
