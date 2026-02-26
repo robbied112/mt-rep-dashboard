@@ -1306,59 +1306,50 @@ const stateNames = {
 
 // ==================== DEPLETION SCORECARD ====================
 const distScorecard = [
-  {name:'TJ Sheehan Distributing  Inc., NY',st:'NY',ce:200.8,prior:0.0,momentum:'New Market',w4:15.9,w4trend:'New Market',oh:0,doh:0,net:-148,con:0.69,conLabel:'Building',
-   weekly:[102.5,66.6,6.3,5.3,0.0,1.1,3.2,0.0,0.0,2.1,5.3,8.5,0.0]},
-  {name:'Breakthru FL - Miramar, FL',st:'FL',ce:37.8,prior:43.5,momentum:'Opportunity: +6 CE',w4:15.4,w4trend:'+4.2%',oh:33.8,doh:76,net:9,con:0.77,conLabel:'Building',
-   weekly:[0.0,1.1,0.9,-0.2,1.1,1.4,0.1,4.3,13.7,3.2,3.3,8.9,0.0]},
-  {name:'Breakthru FL - Riverview, FL',st:'FL',ce:35.0,prior:86.0,momentum:'Opportunity: +51 CE',w4:11.5,w4trend:'Opportunity: +49 CE',oh:70.8,doh:166,net:-27,con:0.92,conLabel:'Established',
-   weekly:[1.5,3.2,4.4,1.1,3.6,1.8,4.3,2.3,1.3,2.1,7.4,2.0,0.0]},
-  {name:'Fedway Associates - Kearny, NJ',st:'NJ',ce:33.9,prior:0.0,momentum:'New Market',w4:10.6,w4trend:'New Market',oh:332.7,doh:883,net:-12,con:0.85,conLabel:'Established',
-   weekly:[0.1,1.1,2.1,1.1,11.6,1.1,1.1,3.2,2.1,0.0,1.1,9.5,0.0]},
-  {name:'Shangy Inc., PA',st:'PA',ce:31.7,prior:0.0,momentum:'New Market',w4:11.6,w4trend:'New Market',oh:37.0,doh:105,net:-4,con:0.77,conLabel:'Building',
-   weekly:[2.1,6.3,0.0,3.2,2.1,1.1,0.0,4.2,1.1,4.2,2.1,5.3,0.0]},
-  {name:'Tryon Distributing - Durham, NC',st:'NC',ce:15.2,prior:0.0,momentum:'New Market',w4:1.9,w4trend:'New Market',oh:37.7,doh:215,net:-10,con:0.85,conLabel:'Established',
-   weekly:[1.5,1.3,4.3,1.8,0.9,0.4,0.2,0.5,2.4,0.2,0.0,1.8,0.0]},
-  {name:'Breakthru CT / CDI, CT',st:'CT',ce:14.4,prior:0.0,momentum:'New Market',w4:2.1,w4trend:'New Market',oh:67.6,doh:393,net:-13,con:0.77,conLabel:'Building',
-   weekly:[1.4,0.3,1.1,2.5,0.1,2.5,3.2,0.0,1.4,1.1,0.0,1.1,0.0]},
-  {name:'Republic National Dist - Dallas/ FTW, TX',st:'TX',ce:11.3,prior:0.0,momentum:'New Market',w4:1.1,w4trend:'New Market',oh:104.8,doh:653,net:-18,con:0.46,conLabel:'Emerging',
-   weekly:[0.0,1.1,0.0,0.0,5.5,0.0,2.6,0.5,0.4,1.1,0.0,0.0,0.0]},
-  {name:'QUAIL DISTRIBUTING - AZ, AZ',st:'AZ',ce:9.6,prior:0.0,momentum:'New Market',w4:1.3,w4trend:'New Market',oh:38.9,doh:365,net:-18,con:0.77,conLabel:'Building',
-   weekly:[0.2,1.4,0.0,3.2,0.2,1.1,2.0,0.2,0.1,1.1,0.3,0.0,0.0]},
-  {name:'Tryon Distributing Co, NC',st:'NC',ce:9.1,prior:0.0,momentum:'New Market',w4:3.4,w4trend:'New Market',oh:13.9,doh:132,net:-1,con:0.85,conLabel:'Established',
-   weekly:[0.1,1.1,0.2,0.3,0.7,1.4,0.5,0.0,1.4,1.9,1.1,0.4,0.0]},
-  {name:'Republic National Dist - Houston, TX',st:'TX',ce:8.5,prior:0.0,momentum:'New Market',w4:2.4,w4trend:'New Market',oh:139.0,doh:1464,net:-14,con:0.62,conLabel:'Building',
-   weekly:[0.0,0.8,0.2,0.9,0.5,1.4,2.4,0.0,0.0,1.1,0.0,1.3,0.0]},
-  {name:'Breakthru SC / Ben Arnold (Sunbelt), SC',st:'SC',ce:7.0,prior:0.0,momentum:'New Market',w4:5.5,w4trend:'New Market',oh:32.8,doh:424,net:5,con:0.46,conLabel:'Emerging',
-   weekly:[0.0,0.0,0.0,0.0,0.2,1.1,0.0,0.1,0.2,4.8,0.7,0.0,0.0]},
-  {name:'Republic National Dist - San Antonio, TX',st:'TX',ce:2.1,prior:0.0,momentum:'New Market',w4:1.1,w4trend:'New Market',oh:129.6,doh:2208,net:-2,con:0.23,conLabel:'Emerging',
-   weekly:[0.0,0.0,0.0,-3.2,1.1,0.0,0.0,0.0,3.2,0.0,0.0,1.1,0.0]},
-  {name:'Republic National Dist - Atlanta, GA',st:'GA',ce:1.1,prior:0.0,momentum:'New Market',w4:0.9,w4trend:'New Market',oh:329.7,doh:25920,net:8,con:0.31,conLabel:'Emerging',
-   weekly:[1.8,0.0,-1.7,0.2,0.0,0.0,0.0,0.0,0.0,0.4,0.0,0.4,0.0]},
-  {name:'Breakthru NV - Reno (Sparks), NV',st:'NV',ce:1.1,prior:0.0,momentum:'New Market',w4:0,w4trend:'New Market',oh:14.8,doh:1260,net:-1,con:0.08,conLabel:'Emerging',
-   weekly:[0.0,0.0,0.0,0.0,0.0,0.0,1.1,0.0,0.0,0.0,0.0,0.0,0.0]},
+  {name:'TJ Sheehan Distributing  Inc., NY',st:'NY',ce:200.8,prior:0.0,momentum:'New Market',w4:15.9,prior_w4:0.0,w4trend:'New Market',oh:0,doh:0,net:-148,con:0.69,conLabel:'Building',
+   weekly:[102.5,66.6,6.3,5.3,0.0,1.1,3.2,0.0,0.0,2.1,5.3,8.5,0.0],isGroup:false},
+  {name:'Breakthru FL (Combined)',st:'FL',ce:72.8,prior:129.5,momentum:'Opportunity: +57 CE',w4:26.9,prior_w4:75.7,w4trend:'Opportunity: +49 CE',oh:104.6,doh:120,net:-18,con:0.92,conLabel:'Established',
+   weekly:[1.5,4.3,5.3,0.9,4.7,3.2,4.4,6.6,15.0,5.3,10.7,10.9,0.0],isGroup:true,children:[{name:'Breakthru FL - Miramar, FL',st:'FL',ce:37.8,prior:43.5,momentum:'Opportunity: +6 CE',w4:15.4,prior_w4:14.8,w4trend:'+4.2%',oh:33.8,doh:76,net:9,con:0.77,conLabel:'Building',weekly:[0.0,1.1,0.9,-0.2,1.1,1.4,0.1,4.3,13.7,3.2,3.3,8.9,0.0]},{name:'Breakthru FL - Riverview, FL',st:'FL',ce:35.0,prior:86.0,momentum:'Opportunity: +51 CE',w4:11.5,prior_w4:60.9,w4trend:'Opportunity: +49 CE',oh:70.8,doh:166,net:-27,con:0.92,conLabel:'Established',weekly:[1.5,3.2,4.4,1.1,3.6,1.8,4.3,2.3,1.3,2.1,7.4,2.0,0.0]}]},
+  {name:'Fedway Associates - Kearny, NJ',st:'NJ',ce:33.9,prior:0.0,momentum:'New Market',w4:10.6,prior_w4:0.0,w4trend:'New Market',oh:332.7,doh:883,net:-12,con:0.85,conLabel:'Established',
+   weekly:[0.1,1.1,2.1,1.1,11.6,1.1,1.1,3.2,2.1,0.0,1.1,9.5,0.0],isGroup:false},
+  {name:'Shangy Inc., PA',st:'PA',ce:31.7,prior:0.0,momentum:'New Market',w4:11.6,prior_w4:0.0,w4trend:'New Market',oh:37.0,doh:105,net:-4,con:0.77,conLabel:'Building',
+   weekly:[2.1,6.3,0.0,3.2,2.1,1.1,0.0,4.2,1.1,4.2,2.1,5.3,0.0],isGroup:false},
+  {name:'RNDC TX (Combined)',st:'TX',ce:21.9,prior:0.0,momentum:'New Market',w4:4.6,prior_w4:0.0,w4trend:'New Market',oh:373.4,doh:1189,net:-34,con:0.62,conLabel:'Building',
+   weekly:[0.0,1.9,0.2,-2.3,7.1,1.4,5.0,0.5,3.6,2.2,0.0,2.4,0.0],isGroup:true,children:[{name:'Republic National Dist - Dallas/ FTW, TX',st:'TX',ce:11.3,prior:0.0,momentum:'New Market',w4:1.1,prior_w4:0.0,w4trend:'New Market',oh:104.8,doh:653,net:-18,con:0.46,conLabel:'Emerging',weekly:[0.0,1.1,0.0,0.0,5.5,0.0,2.6,0.5,0.4,1.1,0.0,0.0,0.0]},{name:'Republic National Dist - Houston, TX',st:'TX',ce:8.5,prior:0.0,momentum:'New Market',w4:2.4,prior_w4:0.0,w4trend:'New Market',oh:139.0,doh:1464,net:-14,con:0.62,conLabel:'Building',weekly:[0.0,0.8,0.2,0.9,0.5,1.4,2.4,0.0,0.0,1.1,0.0,1.3,0.0]},{name:'Republic National Dist - San Antonio, TX',st:'TX',ce:2.1,prior:0.0,momentum:'New Market',w4:1.1,prior_w4:0.0,w4trend:'New Market',oh:129.6,doh:2208,net:-2,con:0.23,conLabel:'Emerging',weekly:[0.0,0.0,0.0,-3.2,1.1,0.0,0.0,0.0,3.2,0.0,0.0,1.1,0.0]}]},
+  {name:'Tryon Distributing - Durham, NC',st:'NC',ce:15.2,prior:0.0,momentum:'New Market',w4:1.9,prior_w4:0.0,w4trend:'New Market',oh:37.7,doh:215,net:-10,con:0.85,conLabel:'Established',
+   weekly:[1.5,1.3,4.3,1.8,0.9,0.4,0.2,0.5,2.4,0.2,0.0,1.8,0.0],isGroup:false},
+  {name:'Breakthru CT / CDI, CT',st:'CT',ce:14.4,prior:0.0,momentum:'New Market',w4:2.1,prior_w4:0.0,w4trend:'New Market',oh:67.6,doh:393,net:-13,con:0.77,conLabel:'Building',
+   weekly:[1.4,0.3,1.1,2.5,0.1,2.5,3.2,0.0,1.4,1.1,0.0,1.1,0.0],isGroup:false},
+  {name:'QUAIL DISTRIBUTING - AZ, AZ',st:'AZ',ce:9.6,prior:0.0,momentum:'New Market',w4:1.3,prior_w4:0.0,w4trend:'New Market',oh:38.9,doh:365,net:-18,con:0.77,conLabel:'Building',
+   weekly:[0.2,1.4,0.0,3.2,0.2,1.1,2.0,0.2,0.1,1.1,0.3,0.0,0.0],isGroup:false},
+  {name:'Tryon Distributing Co, NC',st:'NC',ce:9.1,prior:0.0,momentum:'New Market',w4:3.4,prior_w4:0.0,w4trend:'New Market',oh:13.9,doh:132,net:-1,con:0.85,conLabel:'Established',
+   weekly:[0.1,1.1,0.2,0.3,0.7,1.4,0.5,0.0,1.4,1.9,1.1,0.4,0.0],isGroup:false},
+  {name:'Breakthru SC / Ben Arnold (Sunbelt), SC',st:'SC',ce:7.0,prior:0.0,momentum:'New Market',w4:5.5,prior_w4:0.0,w4trend:'New Market',oh:32.8,doh:424,net:5,con:0.46,conLabel:'Emerging',
+   weekly:[0.0,0.0,0.0,0.0,0.2,1.1,0.0,0.1,0.2,4.8,0.7,0.0,0.0],isGroup:false},
+  {name:'Republic National Dist - Atlanta, GA',st:'GA',ce:1.1,prior:0.0,momentum:'New Market',w4:0.9,prior_w4:0.0,w4trend:'New Market',oh:329.7,doh:25920,net:8,con:0.31,conLabel:'Emerging',
+   weekly:[1.8,0.0,-1.7,0.2,0.0,0.0,0.0,0.0,0.0,0.4,0.0,0.4,0.0],isGroup:false},
+  {name:'Breakthru NV - Reno (Sparks), NV',st:'NV',ce:1.1,prior:0.0,momentum:'New Market',w4:0,prior_w4:0,w4trend:'New Market',oh:14.8,doh:1260,net:-1,con:0.08,conLabel:'Emerging',
+   weekly:[0.0,0.0,0.0,0.0,0.0,0.0,1.1,0.0,0.0,0.0,0.0,0.0,0.0],isGroup:false},
 ];
 
 const inventoryData = [
-  {name:'Fedway Associates - Kearny, NJ',st:'NJ',oh:332.7,rate:0.38,doh:883,dep90:33.9,status:'Review Needed',proj:-332.7,skus:[{w:'Still Red',oh:34.9,rate:0.23,doh:152,status:'Healthy'},{w:'Still White',oh:83.2,rate:0.05,doh:1519,status:'Review Needed'},{w:'Still Rose',oh:92.1,rate:0.04,doh:2354,status:'Review Needed'},{w:'Sparkling White',oh:61.7,rate:0.01,doh:4206,status:'Review Needed'},{w:'Sparkling Rose',oh:60.8,rate:0.04,doh:1592,status:'Review Needed'}]},
-  {name:'Republic National Dist - Atlanta, GA',st:'GA',oh:329.7,rate:0.01,doh:25920,dep90:1.1,status:'Review Needed',proj:-329.7,skus:[{w:'Still Red',oh:64.8,rate:0.0,doh:33120,status:'Review Needed'},{w:'Still White',oh:66.5,rate:0.0,doh:33975,status:'Review Needed'},{w:'Still Rose',oh:67.4,rate:0.0,doh:22950,status:'Review Needed'},{w:'Sparkling White',oh:63.8,rate:0.0,doh:16313,status:'Review Needed'},{w:'Sparkling Rose',oh:67.2,rate:0.0,doh:34335,status:'Review Needed'}]},
-  {name:'Republic National Dist - Houston, TX',st:'TX',oh:139.0,rate:0.09,doh:1464,dep90:8.5,status:'Review Needed',proj:-139.0,skus:[{w:'Still Red',oh:32.1,rate:0.02,doh:1428,status:'Review Needed'},{w:'Still White',oh:38.1,rate:0.01,doh:4330,status:'Review Needed'},{w:'Still Rose',oh:32.2,rate:0.02,doh:1497,status:'Review Needed'},{w:'Sparkling White',oh:16.8,rate:0.0,doh:4298,status:'Review Needed'},{w:'Sparkling Rose',oh:19.6,rate:0.04,doh:515,status:'Review Needed'}]},
-  {name:'Republic National Dist - San Antonio, TX',st:'TX',oh:129.6,rate:0.06,doh:2208,dep90:5.3,status:'Review Needed',proj:-129.6,skus:[{w:'Still Red',oh:34.8,rate:0.0,doh:3130,status:'Review Needed'},{w:'Still White',oh:32.7,rate:0.0,doh:2940,status:'Review Needed'},{w:'Still Rose',oh:30.6,rate:0.04,doh:868,status:'Review Needed'},{w:'Sparkling White',oh:21.0,rate:0.0,doh:1894,status:'Review Needed'},{w:'Sparkling Rose',oh:10.6,rate:0.02,doh:450,status:'Review Needed'}]},
-  {name:'Republic National Dist - Dallas/ FTW, TX',st:'TX',oh:104.8,rate:0.16,doh:653,dep90:14.4,status:'Review Needed',proj:-104.8,skus:[{w:'Still Red',oh:25.0,rate:0.04,doh:623,status:'Review Needed'},{w:'Still White',oh:29.6,rate:0.02,doh:1890,status:'Review Needed'},{w:'Still Rose',oh:29.2,rate:0.02,doh:1867,status:'Review Needed'},{w:'Sparkling White',oh:12.1,rate:0.0,doh:4110,status:'Review Needed'},{w:'Sparkling Rose',oh:8.9,rate:0.09,doh:103,status:'Healthy'}]},
-  {name:'Breakthru FL - Riverview, FL',st:'FL',oh:70.8,rate:0.43,doh:166,dep90:38.5,status:'Healthy',proj:-45.8,skus:[{w:'Still White',oh:20.1,rate:0.08,doh:256,status:'Overstocked'},{w:'Still Rose',oh:11.6,rate:0.05,doh:216,status:'Overstocked'},{w:'Sparkling White',oh:19.0,rate:0.04,doh:442,status:'Review Needed'},{w:'Sparkling Rose',oh:20.1,rate:0.12,doh:174,status:'Healthy'}]},
-  {name:'Breakthru CT / CDI, CT',st:'CT',oh:67.6,rate:0.17,doh:393,dep90:15.5,status:'Review Needed',proj:-50.5,skus:[{w:'Still Red',oh:6.3,rate:0.08,doh:79,status:'Reorder Opportunity'},{w:'Still White',oh:15.8,rate:0.04,doh:405,status:'Review Needed'},{w:'Still Rose',oh:25.4,rate:0.0,doh:8640,status:'Review Needed'},{w:'Sparkling Rose',oh:20.1,rate:0.05,doh:402,status:'Review Needed'}]},
-  {name:'Pine State Trading Co, ME',st:'ME',oh:62.7,rate:0.0,doh:5643,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:12.9,rate:0.0,doh:1165,status:'Review Needed'},{w:'Still White',oh:13.8,rate:0.0,doh:1244,status:'Review Needed'},{w:'Sparkling White',oh:9.3,rate:0.0,doh:840,status:'Review Needed'},{w:'Sparkling Rose',oh:26.6,rate:0.0,doh:2393,status:'Review Needed'}]},
-  {name:'QUAIL DISTRIBUTING - AZ, AZ',st:'AZ',oh:38.9,rate:0.11,doh:365,dep90:9.6,status:'Overstocked',proj:-22.0,skus:[{w:'Still Red',oh:7.9,rate:0.05,doh:159,status:'Healthy'},{w:'Still White',oh:8.2,rate:0.01,doh:930,status:'Review Needed'},{w:'Still Rose',oh:5.3,rate:0.0,doh:1800,status:'Review Needed'},{w:'Sparkling White',oh:7.4,rate:0.02,doh:378,status:'Review Needed'},{w:'Sparkling Rose',oh:10.1,rate:0.03,doh:398,status:'Review Needed'}]},
-  {name:'Tryon Distributing - Durham, NC',st:'NC',oh:37.7,rate:0.18,doh:215,dep90:15.8,status:'Overstocked',proj:-35.4,skus:[{w:'Still Red',oh:10.9,rate:0.09,doh:117,status:'Healthy'},{w:'Still White',oh:6.1,rate:0.03,doh:188,status:'Overstocked'},{w:'Sparkling White',oh:8.2,rate:0.03,doh:310,status:'Overstocked'},{w:'Sparkling Rose',oh:12.5,rate:0.02,doh:532,status:'Review Needed'}]},
-  {name:'Shangy Inc., PA',st:'PA',oh:37.0,rate:0.35,doh:105,dep90:31.7,status:'Healthy',proj:-37.0,skus:[{w:'Still Red',oh:0.0,rate:0.22,doh:0,status:'Review Needed'},{w:'Still White',oh:5.3,rate:0.06,doh:90,status:'Reorder Opportunity'},{w:'Still Rose',oh:9.5,rate:0.0,doh:856,status:'Review Needed'},{w:'Sparkling White',oh:4.2,rate:0.06,doh:72,status:'Reorder Opportunity'},{w:'Sparkling Rose',oh:18.0,rate:0.01,doh:1530,status:'Review Needed'}]},
-  {name:'Breakthru FL - Miramar, FL',st:'FL',oh:33.8,rate:0.45,doh:76,dep90:40.2,status:'Reorder Opportunity',proj:2.7,skus:[{w:'Still Red',oh:0.0,rate:0.17,doh:0,status:'Review Needed'},{w:'Still White',oh:6.3,rate:0.14,doh:45,status:'Reorder Opportunity'},{w:'Still Rose',oh:12.7,rate:0.03,doh:463,status:'Review Needed'},{w:'Sparkling White',oh:9.5,rate:0.03,doh:295,status:'Overstocked'},{w:'Sparkling Rose',oh:5.3,rate:0.08,doh:69,status:'Reorder Opportunity'}]},
-  {name:'Breakthru SC / Ben Arnold (Sunbelt), SC',st:'SC',oh:32.8,rate:0.08,doh:424,dep90:7.0,status:'Review Needed',proj:-15.1,skus:[{w:'Still Red',oh:9.5,rate:0.01,doh:648,status:'Review Needed'},{w:'Still White',oh:7.4,rate:0.03,doh:270,status:'Overstocked'},{w:'Still Rose',oh:6.3,rate:0.03,doh:202,status:'Overstocked'},{w:'Sparkling Rose',oh:9.5,rate:0.0,doh:2430,status:'Review Needed'}]},
-  {name:'Breakthru NV - Las Vegas (Wine&Spirits), NV',st:'NV',oh:30.6,rate:0.01,doh:2610,dep90:1.1,status:'Review Needed',proj:-30.6,skus:[{w:'Still Red',oh:7.4,rate:0.0,doh:666,status:'Review Needed'},{w:'Still White',oh:8.5,rate:0.0,doh:761,status:'Review Needed'},{w:'Sparkling White',oh:6.3,rate:0.0,doh:571,status:'Review Needed'},{w:'Sparkling Rose',oh:8.5,rate:0.01,doh:720,status:'Review Needed'}]},
-  {name:'Breakthru NV - Reno (Sparks), NV',st:'NV',oh:14.8,rate:0.01,doh:1260,dep90:1.1,status:'Review Needed',proj:-14.8,skus:[{w:'Still Red',oh:8.5,rate:0.0,doh:761,status:'Review Needed'},{w:'Still White',oh:2.1,rate:0.01,doh:180,status:'Healthy'},{w:'Sparkling White',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}]},
-  {name:'Tryon Distributing Co, NC',st:'NC',oh:13.9,rate:0.11,doh:132,dep90:9.5,status:'Healthy',proj:-12.2,skus:[{w:'Still Red',oh:3.9,rate:0.02,doh:172,status:'Healthy'},{w:'Still White',oh:4.8,rate:0.05,doh:101,status:'Healthy'},{w:'Sparkling Rose',oh:5.3,rate:0.04,doh:146,status:'Healthy'}]},
-  {name:'Republic National Dist - Corpus Christi, TX',st:'TX',oh:12.7,rate:0.0,doh:1141,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still White',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still Rose',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Sparkling White',oh:1.1,rate:0.0,doh:95,status:'Healthy'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}]},
-  {name:'Republic National Dist - Lubbock, TX',st:'TX',oh:12.7,rate:0.0,doh:1141,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still White',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still Rose',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Sparkling White',oh:1.1,rate:0.0,doh:95,status:'Healthy'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}]},
-  {name:'Republic National Dist - El Paso, TX',st:'TX',oh:9.5,rate:0.0,doh:856,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Still White',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}]},
-  {name:'TJ Sheehan Distributing  Inc., NY',st:'NY',oh:0,rate:2.23,doh:0,dep90:200.8,status:'Review Needed',proj:0.0,skus:[]},
+  {name:'RNDC TX (Combined)',st:'TX',oh:373.4,rate:0.31,doh:1205,dep90:28.2,status:'Review Needed',proj:-373.4,skus:[{w:'Still Red',oh:91.9,rate:0.06,doh:1532,status:'Review Needed'},{w:'Still White',oh:100.4,rate:0.03,doh:3347,status:'Review Needed'},{w:'Still Rose',oh:92.0,rate:0.08,doh:1150,status:'Review Needed'},{w:'Sparkling White',oh:49.9,rate:0.0,doh:0,status:'Review Needed'},{w:'Sparkling Rose',oh:39.1,rate:0.15,doh:261,status:'Overstocked'}],isGroup:true,children:[{name:'Republic National Dist - Houston, TX',st:'TX',oh:139.0,rate:0.09,doh:1464,dep90:8.5,status:'Review Needed',proj:-139.0,skus:[{w:'Still Red',oh:32.1,rate:0.02,doh:1428,status:'Review Needed'},{w:'Still White',oh:38.1,rate:0.01,doh:4330,status:'Review Needed'},{w:'Still Rose',oh:32.2,rate:0.02,doh:1497,status:'Review Needed'},{w:'Sparkling White',oh:16.8,rate:0.0,doh:4298,status:'Review Needed'},{w:'Sparkling Rose',oh:19.6,rate:0.04,doh:515,status:'Review Needed'}]},{name:'Republic National Dist - San Antonio, TX',st:'TX',oh:129.6,rate:0.06,doh:2208,dep90:5.3,status:'Review Needed',proj:-129.6,skus:[{w:'Still Red',oh:34.8,rate:0.0,doh:3130,status:'Review Needed'},{w:'Still White',oh:32.7,rate:0.0,doh:2940,status:'Review Needed'},{w:'Still Rose',oh:30.6,rate:0.04,doh:868,status:'Review Needed'},{w:'Sparkling White',oh:21.0,rate:0.0,doh:1894,status:'Review Needed'},{w:'Sparkling Rose',oh:10.6,rate:0.02,doh:450,status:'Review Needed'}]},{name:'Republic National Dist - Dallas/ FTW, TX',st:'TX',oh:104.8,rate:0.16,doh:653,dep90:14.4,status:'Review Needed',proj:-104.8,skus:[{w:'Still Red',oh:25.0,rate:0.04,doh:623,status:'Review Needed'},{w:'Still White',oh:29.6,rate:0.02,doh:1890,status:'Review Needed'},{w:'Still Rose',oh:29.2,rate:0.02,doh:1867,status:'Review Needed'},{w:'Sparkling White',oh:12.1,rate:0.0,doh:4110,status:'Review Needed'},{w:'Sparkling Rose',oh:8.9,rate:0.09,doh:103,status:'Healthy'}]}]},
+  {name:'Fedway Associates - Kearny, NJ',st:'NJ',oh:332.7,rate:0.38,doh:883,dep90:33.9,status:'Review Needed',proj:-332.7,skus:[{w:'Still Red',oh:34.9,rate:0.23,doh:152,status:'Healthy'},{w:'Still White',oh:83.2,rate:0.05,doh:1519,status:'Review Needed'},{w:'Still Rose',oh:92.1,rate:0.04,doh:2354,status:'Review Needed'},{w:'Sparkling White',oh:61.7,rate:0.01,doh:4206,status:'Review Needed'},{w:'Sparkling Rose',oh:60.8,rate:0.04,doh:1592,status:'Review Needed'}],isGroup:false},
+  {name:'Republic National Dist - Atlanta, GA',st:'GA',oh:329.7,rate:0.01,doh:25920,dep90:1.1,status:'Review Needed',proj:-329.7,skus:[{w:'Still Red',oh:64.8,rate:0.0,doh:33120,status:'Review Needed'},{w:'Still White',oh:66.5,rate:0.0,doh:33975,status:'Review Needed'},{w:'Still Rose',oh:67.4,rate:0.0,doh:22950,status:'Review Needed'},{w:'Sparkling White',oh:63.8,rate:0.0,doh:16313,status:'Review Needed'},{w:'Sparkling Rose',oh:67.2,rate:0.0,doh:34335,status:'Review Needed'}],isGroup:false},
+  {name:'Breakthru FL (Combined)',st:'FL',oh:104.6,rate:0.88,doh:119,dep90:78.7,status:'Healthy',proj:-43.1,skus:[{w:'Still Red',oh:0.0,rate:0.17,doh:0,status:'Review Needed'},{w:'Still White',oh:26.4,rate:0.22,doh:120,status:'Healthy'},{w:'Still Rose',oh:24.3,rate:0.08,doh:304,status:'Overstocked'},{w:'Sparkling White',oh:28.5,rate:0.07,doh:407,status:'Review Needed'},{w:'Sparkling Rose',oh:25.4,rate:0.2,doh:127,status:'Healthy'}],isGroup:true,children:[{name:'Breakthru FL - Riverview, FL',st:'FL',oh:70.8,rate:0.43,doh:166,dep90:38.5,status:'Healthy',proj:-45.8,skus:[{w:'Still White',oh:20.1,rate:0.08,doh:256,status:'Overstocked'},{w:'Still Rose',oh:11.6,rate:0.05,doh:216,status:'Overstocked'},{w:'Sparkling White',oh:19.0,rate:0.04,doh:442,status:'Review Needed'},{w:'Sparkling Rose',oh:20.1,rate:0.12,doh:174,status:'Healthy'}]},{name:'Breakthru FL - Miramar, FL',st:'FL',oh:33.8,rate:0.45,doh:76,dep90:40.2,status:'Reorder Opportunity',proj:2.7,skus:[{w:'Still Red',oh:0.0,rate:0.17,doh:0,status:'Review Needed'},{w:'Still White',oh:6.3,rate:0.14,doh:45,status:'Reorder Opportunity'},{w:'Still Rose',oh:12.7,rate:0.03,doh:463,status:'Review Needed'},{w:'Sparkling White',oh:9.5,rate:0.03,doh:295,status:'Overstocked'},{w:'Sparkling Rose',oh:5.3,rate:0.08,doh:69,status:'Reorder Opportunity'}]}]},
+  {name:'Breakthru CT / CDI, CT',st:'CT',oh:67.6,rate:0.17,doh:393,dep90:15.5,status:'Review Needed',proj:-50.5,skus:[{w:'Still Red',oh:6.3,rate:0.08,doh:79,status:'Reorder Opportunity'},{w:'Still White',oh:15.8,rate:0.04,doh:405,status:'Review Needed'},{w:'Still Rose',oh:25.4,rate:0.0,doh:8640,status:'Review Needed'},{w:'Sparkling Rose',oh:20.1,rate:0.05,doh:402,status:'Review Needed'}],isGroup:false},
+  {name:'Pine State Trading Co, ME',st:'ME',oh:62.7,rate:0.0,doh:5643,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:12.9,rate:0.0,doh:1165,status:'Review Needed'},{w:'Still White',oh:13.8,rate:0.0,doh:1244,status:'Review Needed'},{w:'Sparkling White',oh:9.3,rate:0.0,doh:840,status:'Review Needed'},{w:'Sparkling Rose',oh:26.6,rate:0.0,doh:2393,status:'Review Needed'}],isGroup:false},
+  {name:'QUAIL DISTRIBUTING - AZ, AZ',st:'AZ',oh:38.9,rate:0.11,doh:365,dep90:9.6,status:'Overstocked',proj:-22.0,skus:[{w:'Still Red',oh:7.9,rate:0.05,doh:159,status:'Healthy'},{w:'Still White',oh:8.2,rate:0.01,doh:930,status:'Review Needed'},{w:'Still Rose',oh:5.3,rate:0.0,doh:1800,status:'Review Needed'},{w:'Sparkling White',oh:7.4,rate:0.02,doh:378,status:'Review Needed'},{w:'Sparkling Rose',oh:10.1,rate:0.03,doh:398,status:'Review Needed'}],isGroup:false},
+  {name:'Tryon Distributing - Durham, NC',st:'NC',oh:37.7,rate:0.18,doh:215,dep90:15.8,status:'Overstocked',proj:-35.4,skus:[{w:'Still Red',oh:10.9,rate:0.09,doh:117,status:'Healthy'},{w:'Still White',oh:6.1,rate:0.03,doh:188,status:'Overstocked'},{w:'Sparkling White',oh:8.2,rate:0.03,doh:310,status:'Overstocked'},{w:'Sparkling Rose',oh:12.5,rate:0.02,doh:532,status:'Review Needed'}],isGroup:false},
+  {name:'Shangy Inc., PA',st:'PA',oh:37.0,rate:0.35,doh:105,dep90:31.7,status:'Healthy',proj:-37.0,skus:[{w:'Still Red',oh:0.0,rate:0.22,doh:0,status:'Review Needed'},{w:'Still White',oh:5.3,rate:0.06,doh:90,status:'Reorder Opportunity'},{w:'Still Rose',oh:9.5,rate:0.0,doh:856,status:'Review Needed'},{w:'Sparkling White',oh:4.2,rate:0.06,doh:72,status:'Reorder Opportunity'},{w:'Sparkling Rose',oh:18.0,rate:0.01,doh:1530,status:'Review Needed'}],isGroup:false},
+  {name:'Breakthru SC / Ben Arnold (Sunbelt), SC',st:'SC',oh:32.8,rate:0.08,doh:424,dep90:7.0,status:'Review Needed',proj:-15.1,skus:[{w:'Still Red',oh:9.5,rate:0.01,doh:648,status:'Review Needed'},{w:'Still White',oh:7.4,rate:0.03,doh:270,status:'Overstocked'},{w:'Still Rose',oh:6.3,rate:0.03,doh:202,status:'Overstocked'},{w:'Sparkling Rose',oh:9.5,rate:0.0,doh:2430,status:'Review Needed'}],isGroup:false},
+  {name:'Breakthru NV - Las Vegas (Wine&Spirits), NV',st:'NV',oh:30.6,rate:0.01,doh:2610,dep90:1.1,status:'Review Needed',proj:-30.6,skus:[{w:'Still Red',oh:7.4,rate:0.0,doh:666,status:'Review Needed'},{w:'Still White',oh:8.5,rate:0.0,doh:761,status:'Review Needed'},{w:'Sparkling White',oh:6.3,rate:0.0,doh:571,status:'Review Needed'},{w:'Sparkling Rose',oh:8.5,rate:0.01,doh:720,status:'Review Needed'}],isGroup:false},
+  {name:'Breakthru NV - Reno (Sparks), NV',st:'NV',oh:14.8,rate:0.01,doh:1260,dep90:1.1,status:'Review Needed',proj:-14.8,skus:[{w:'Still Red',oh:8.5,rate:0.0,doh:761,status:'Review Needed'},{w:'Still White',oh:2.1,rate:0.01,doh:180,status:'Healthy'},{w:'Sparkling White',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}],isGroup:false},
+  {name:'Tryon Distributing Co, NC',st:'NC',oh:13.9,rate:0.11,doh:132,dep90:9.5,status:'Healthy',proj:-12.2,skus:[{w:'Still Red',oh:3.9,rate:0.02,doh:172,status:'Healthy'},{w:'Still White',oh:4.8,rate:0.05,doh:101,status:'Healthy'},{w:'Sparkling Rose',oh:5.3,rate:0.04,doh:146,status:'Healthy'}],isGroup:false},
+  {name:'Republic National Dist - Corpus Christi, TX',st:'TX',oh:12.7,rate:0.0,doh:1141,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still White',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still Rose',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Sparkling White',oh:1.1,rate:0.0,doh:95,status:'Healthy'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}],isGroup:false},
+  {name:'Republic National Dist - Lubbock, TX',st:'TX',oh:12.7,rate:0.0,doh:1141,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still White',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still Rose',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Sparkling White',oh:1.1,rate:0.0,doh:95,status:'Healthy'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}],isGroup:false},
+  {name:'Republic National Dist - El Paso, TX',st:'TX',oh:9.5,rate:0.0,doh:856,dep90:0.0,status:'Review Needed',proj:0.0,skus:[{w:'Still Red',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Still White',oh:3.2,rate:0.0,doh:285,status:'Overstocked'},{w:'Still Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'},{w:'Sparkling Rose',oh:2.1,rate:0.0,doh:190,status:'Overstocked'}],isGroup:false},
+  {name:'TJ Sheehan Distributing  Inc., NY',st:'NY',oh:0,rate:2.23,doh:0,dep90:200.8,status:'Review Needed',proj:0.0,skus:[],isGroup:false},
 ];
 
 // ==================== RE-ENGAGEMENT OPPORTUNITIES ====================
@@ -1569,22 +1560,19 @@ const newWins = [
 ];
 
 const placementSummary = [
-  {name:'TJ Sheehan Distribut',st:'NY',newA:0,reEngageA:148,net:-148},
-  {name:'Breakthru FL - River',st:'FL',newA:13,reEngageA:40,net:-27},
-  {name:'Republic National Di',st:'TX',newA:5,reEngageA:23,net:-18},
-  {name:'QUAIL DISTRIBUTING -',st:'AZ',newA:2,reEngageA:20,net:-18},
-  {name:'Republic National Di',st:'TX',newA:4,reEngageA:18,net:-14},
-  {name:'Breakthru CT / CDI, ',st:'CT',newA:5,reEngageA:18,net:-13},
-  {name:'Fedway NJ',st:'NJ',newA:2,reEngageA:14,net:-12},
-  {name:'Tryon Distributing -',st:'NC',newA:7,reEngageA:17,net:-10},
-  {name:'Shangy PA',st:'PA',newA:6,reEngageA:10,net:-4},
-  {name:'Republic National Di',st:'TX',newA:2,reEngageA:4,net:-2},
-  {name:'Tryon Co NC',st:'NC',newA:3,reEngageA:4,net:-1},
-  {name:'Breakthru NV - Las V',st:'NV',newA:0,reEngageA:1,net:-1},
-  {name:'Breakthru NV - Reno ',st:'NV',newA:0,reEngageA:1,net:-1},
-  {name:'Breakthru SC / Ben A',st:'SC',newA:9,reEngageA:4,net:5},
-  {name:'Republic National Di',st:'GA',newA:10,reEngageA:2,net:8},
-  {name:'Breakthru FL - Miram',st:'FL',newA:25,reEngageA:16,net:9},
+  {name:'TJ Sheehan Distribut',st:'NY',newA:0,reEngageA:148,net:-148,isGroup:false},
+  {name:'RNDC TX (Combined)',st:'TX',newA:11,reEngageA:45,net:-34,isGroup:true,children:[{name:'Republic National Di',st:'TX',newA:5,reEngageA:23,net:-18},{name:'Republic National Di',st:'TX',newA:4,reEngageA:18,net:-14},{name:'Republic National Di',st:'TX',newA:2,reEngageA:4,net:-2}]},
+  {name:'Breakthru FL (Combined)',st:'FL',newA:38,reEngageA:56,net:-18,isGroup:true,children:[{name:'Breakthru FL - River',st:'FL',newA:13,reEngageA:40,net:-27},{name:'Breakthru FL - Miram',st:'FL',newA:25,reEngageA:16,net:9}]},
+  {name:'QUAIL DISTRIBUTING -',st:'AZ',newA:2,reEngageA:20,net:-18,isGroup:false},
+  {name:'Breakthru CT / CDI, ',st:'CT',newA:5,reEngageA:18,net:-13,isGroup:false},
+  {name:'Fedway NJ',st:'NJ',newA:2,reEngageA:14,net:-12,isGroup:false},
+  {name:'Tryon Distributing -',st:'NC',newA:7,reEngageA:17,net:-10,isGroup:false},
+  {name:'Shangy PA',st:'PA',newA:6,reEngageA:10,net:-4,isGroup:false},
+  {name:'Breakthru NV - Reno ',st:'NV',newA:0,reEngageA:1,net:-1,isGroup:false},
+  {name:'Tryon Co NC',st:'NC',newA:3,reEngageA:4,net:-1,isGroup:false},
+  {name:'Breakthru NV - Las V',st:'NV',newA:0,reEngageA:1,net:-1,isGroup:false},
+  {name:'Breakthru SC / Ben A',st:'SC',newA:9,reEngageA:4,net:5,isGroup:false},
+  {name:'Republic National Di',st:'GA',newA:10,reEngageA:2,net:8,isGroup:false},
 ];
 
 // ==================== TOP ACCOUNTS ====================
@@ -2588,19 +2576,40 @@ const dataThrough = '11/23/2025';
 
             // Distributor Scorecard Table
             let tableHtml = '';
-            data.forEach(d => {
-                tableHtml += `<tr>
-                    <td>${d.name}</td>
+            data.forEach((d, idx) => {
+                const isGroup = d.isGroup || false;
+                const grpToggle = isGroup ? `<span class="grp-toggle" onclick="toggleGroupRow('groupChildren_${idx}')" style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show warehouses">&#9654;</span>` : '';
+                tableHtml += `<tr id="scorecard_${idx}" style="background-color:${isGroup ? '#f0f4f8' : 'transparent'};">
+                    <td>${grpToggle}${d.name}</td>
                     <td>${d.st}</td>
-                    <td>${d.ce.toFixed(1)}</td>
+                    <td><strong>${d.ce.toFixed(1)}</strong></td>
                     <td>${renderMomentum(d.momentum)}</td>
-                    <td>${d.w4.toFixed(1)}</td>
+                    <td><strong>${d.w4.toFixed(1)}</strong></td>
                     <td>${renderMomentum(d.w4trend)}</td>
                     <td>${d.oh.toFixed(1)}</td>
                     <td>${Math.round(d.doh)}</td>
                     <td>${d.net}</td>
                     <td>${renderStage(d.conLabel)}</td>
                 </tr>`;
+                // Add children rows if this is a group
+                if (isGroup && d.children) {
+                    d.children.forEach((child, childIdx) => {
+                        tableHtml += `<tr id="groupChildren_${idx}_${childIdx}" style="display:none;background-color:#f9f9f9;border-left:3px solid #3498db;">
+                            <td style="padding-left:30px;">${child.name}</td>
+                            <td>${child.st}</td>
+                            <td>${child.ce.toFixed(1)}</td>
+                            <td>${renderMomentum(child.momentum)}</td>
+                            <td>${child.w4.toFixed(1)}</td>
+                            <td>${renderMomentum(child.w4trend)}</td>
+                            <td>${child.oh.toFixed(1)}</td>
+                            <td>${Math.round(child.doh)}</td>
+                            <td>${child.net}</td>
+                            <td>${renderStage(child.conLabel)}</td>
+                        </tr>`;
+                    });
+                    // Wrap all children with a common parent ID
+                    const childrenHtml = Array.from({length: (d.children || []).length}, (_, i) => `groupChildren_${idx}_${i}`).map(id => `<tbody id="${id}"></tbody>`).join('');
+                }
             });
             document.getElementById('distScorecardBody').innerHTML = tableHtml;
             initTableSorting('distScorecardTable');
@@ -2840,8 +2849,10 @@ const dataThrough = '11/23/2025';
                     // Show only the selected SKU's data for this distributor
                     const sku = (d.skus || []).find(s => s.w === skuFilter);
                     if (!sku) return; // skip if this dist doesn't have this SKU
-                    tableHtml += `<tr>
-                        <td>${d.name}</td>
+                    const isGroup = d.isGroup || false;
+                    const grpToggle = isGroup ? `<span class="grp-toggle" onclick="toggleGroupRow('invGroupChildren_${idx}')" style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show warehouses">&#9654;</span>` : '';
+                    tableHtml += `<tr style="background-color:${isGroup ? '#f0f4f8' : 'transparent'};">
+                        <td>${grpToggle}${d.name}</td>
                         <td>${d.st}</td>
                         <td>${sku.oh.toFixed(1)}</td>
                         <td>${sku.rate.toFixed(2)}</td>
@@ -2850,15 +2861,35 @@ const dataThrough = '11/23/2025';
                         <td>${renderInventoryStatus(sku.status)}</td>
                         <td>-</td>
                     </tr>`;
+                    // Add children if this is a group
+                    if (isGroup && d.children) {
+                        d.children.forEach((child, childIdx) => {
+                            const childSku = (child.skus || []).find(s => s.w === skuFilter);
+                            if (childSku) {
+                                tableHtml += `<tr id="invGroupChildren_${idx}_${childIdx}" style="display:none;background-color:#f9f9f9;border-left:3px solid #3498db;">
+                                    <td style="padding-left:30px;">${child.name}</td>
+                                    <td>${child.st}</td>
+                                    <td>${childSku.oh.toFixed(1)}</td>
+                                    <td>${childSku.rate.toFixed(2)}</td>
+                                    <td>${Math.round(childSku.doh)}</td>
+                                    <td>-</td>
+                                    <td>${renderInventoryStatus(childSku.status)}</td>
+                                    <td>-</td>
+                                </tr>`;
+                            }
+                        });
+                    }
                 } else {
                     // Show distributor total with expandable SKU rows
+                    const isGroup = d.isGroup || false;
                     const hasSkus = d.skus && d.skus.length > 0;
                     const expId = 'inv-sku-' + idx;
+                    const grpToggle = isGroup ? `<span class="grp-toggle" onclick="toggleGroupRow('invGroupChildren_${idx}')" style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show warehouses">&#9654;</span>` : '';
                     const expIcon = hasSkus ? `<span class="sku-toggle" onclick="toggleSkuRow('${expId}')" style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show wine breakdown">&#9654;</span>` : '';
-                    tableHtml += `<tr>
-                        <td>${expIcon}${d.name}${getQbOrderBadge(d.name)}</td>
+                    tableHtml += `<tr style="background-color:${isGroup ? '#f0f4f8' : 'transparent'};">
+                        <td>${grpToggle}${expIcon}${d.name}${getQbOrderBadge(d.name)}</td>
                         <td>${d.st}</td>
-                        <td>${d.oh.toFixed(1)}</td>
+                        <td><strong>${d.oh.toFixed(1)}</strong></td>
                         <td>${d.rate.toFixed(2)}</td>
                         <td>${Math.round(d.doh)}</td>
                         <td>${d.dep90.toFixed(1)}</td>
@@ -2889,6 +2920,49 @@ const dataThrough = '11/23/2025';
                                     <td style="padding:4px 10px;border:none;"></td>
                                 </tr>`).join('')}
                             </tbody></table></td></tr>`;
+                    }
+                    // Add children if this is a group
+                    if (isGroup && d.children) {
+                        d.children.forEach((child, childIdx) => {
+                            const childHasSkus = child.skus && child.skus.length > 0;
+                            const childExpId = 'inv-sku-' + idx + '-' + childIdx;
+                            const childExpIcon = childHasSkus ? `<span class="sku-toggle" onclick="toggleSkuRow('${childExpId}')" style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show wine breakdown">&#9654;</span>` : '';
+                            tableHtml += `<tr id="invGroupChildren_${idx}_${childIdx}" style="display:none;background-color:#f9f9f9;border-left:3px solid #3498db;">
+                                <td style="padding-left:30px;">${childExpIcon}${child.name}</td>
+                                <td>${child.st}</td>
+                                <td>${child.oh.toFixed(1)}</td>
+                                <td>${child.rate.toFixed(2)}</td>
+                                <td>${Math.round(child.doh)}</td>
+                                <td>${child.dep90.toFixed(1)}</td>
+                                <td>${renderInventoryStatus(child.status)}</td>
+                                <td>${child.proj.toFixed(1)}</td>
+                            </tr>`;
+                            if (childHasSkus) {
+                                tableHtml += `<tr id="${childExpId}" style="display:none;"><td colspan="8" style="padding:0;">
+                                    <table style="width:100%;background:#f8f9fa;border:none;margin:0;">
+                                        <thead style="font-size:11px;color:#7f8c8d;"><tr>
+                                            <th style="padding:6px 10px;border:none;">Wine</th>
+                                            <th style="padding:6px 10px;border:none;"></th>
+                                            <th style="padding:6px 10px;border:none;">On Hand</th>
+                                            <th style="padding:6px 10px;border:none;">Daily Rate</th>
+                                            <th style="padding:6px 10px;border:none;">DOH</th>
+                                            <th style="padding:6px 10px;border:none;"></th>
+                                            <th style="padding:6px 10px;border:none;">Status</th>
+                                            <th style="padding:6px 10px;border:none;"></th>
+                                        </tr></thead><tbody>
+                                        ${child.skus.map(s => `<tr style="font-size:12px;">
+                                            <td style="padding:4px 10px;border:none;font-weight:500;">${s.w}</td>
+                                            <td style="padding:4px 10px;border:none;"></td>
+                                            <td style="padding:4px 10px;border:none;">${s.oh.toFixed(1)}</td>
+                                            <td style="padding:4px 10px;border:none;">${s.rate.toFixed(2)}</td>
+                                            <td style="padding:4px 10px;border:none;">${Math.round(s.doh)}</td>
+                                            <td style="padding:4px 10px;border:none;"></td>
+                                            <td style="padding:4px 10px;border:none;">${renderInventoryStatus(s.status)}</td>
+                                            <td style="padding:4px 10px;border:none;"></td>
+                                        </tr>`).join('')}
+                                    </tbody></table></td></tr>`;
+                            }
+                        });
                     }
                 }
             });
@@ -3251,6 +3325,18 @@ const dataThrough = '11/23/2025';
             const prevRow = row.previousElementSibling;
             if (prevRow) {
                 const toggle = prevRow.querySelector('.sku-toggle');
+                if (toggle) toggle.innerHTML = isHidden ? '&#9660;' : '&#9654;';
+            }
+        }
+
+        function toggleGroupRow(id) {
+            const row = document.getElementById(id);
+            if (!row) return;
+            const isHidden = row.style.display === 'none';
+            row.style.display = isHidden ? 'table-row' : 'none';
+            const prevRow = row.previousElementSibling;
+            if (prevRow) {
+                const toggle = prevRow.querySelector('.grp-toggle');
                 if (toggle) toggle.innerHTML = isHidden ? '&#9660;' : '&#9654;';
             }
         }
