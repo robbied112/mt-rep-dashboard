@@ -419,44 +419,6 @@
             color: var(--text);
         }
 
-        /* Momentum Summary */
-        .momentum-summary {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-
-        .momentum-summary h3 {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text);
-        }
-
-        .momentum-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 13px;
-        }
-
-        .momentum-item:last-child {
-            border-bottom: none;
-        }
-
-        .momentum-name {
-            font-weight: 500;
-        }
-
-        .momentum-value {
-            color: var(--green);
-            font-weight: 600;
-        }
-
         /* Filter Badge */
         .filter-badge {
             display: inline-flex;
@@ -725,10 +687,6 @@
                 </div>
             </div>
 
-            <div class="momentum-summary">
-                <h3>Momentum Leaders</h3>
-                <div id="momentumList"></div>
-            </div>
         </div>
 
         <!-- Tab: Depletions -->
@@ -1569,8 +1527,8 @@ const placementSummary = [
   {name:'Tryon Distributing -',st:'NC',newA:7,reEngageA:17,net:-10,isGroup:false},
   {name:'Shangy PA',st:'PA',newA:6,reEngageA:10,net:-4,isGroup:false},
   {name:'Tryon Co NC',st:'NC',newA:3,reEngageA:4,net:-1,isGroup:false},
-  {name:'Breakthru NV - Las V',st:'NV',newA:0,reEngageA:1,net:-1,isGroup:false},
   {name:'Breakthru NV - Reno ',st:'NV',newA:0,reEngageA:1,net:-1,isGroup:false},
+  {name:'Breakthru NV - Las V',st:'NV',newA:0,reEngageA:1,net:-1,isGroup:false},
   {name:'Breakthru SC / Ben A',st:'SC',newA:9,reEngageA:4,net:5,isGroup:false},
   {name:'Republic National Di',st:'GA',newA:10,reEngageA:2,net:8,isGroup:false},
 ];
@@ -2481,19 +2439,6 @@ const dataThrough = '11/23/2025';
                 }
             });
 
-            // Momentum Leaders
-            const momentumLeaders = data.filter(d => d.momentum.startsWith('+')).sort((a, b) => {
-                return parseFloat(b.momentum) - parseFloat(a.momentum);
-            }).slice(0, 5);
-
-            let momentumHtml = '';
-            momentumLeaders.forEach(d => {
-                momentumHtml += `<div class="momentum-item">
-                    <span class="momentum-name">${d.name} (${d.st})</span>
-                    <span class="momentum-value">${d.momentum}</span>
-                </div>`;
-            });
-            document.getElementById('momentumList').innerHTML = momentumHtml || '<p style="color: var(--text-dim);">No positive momentum distributors.</p>';
         }
 
         // Depletions Tab
