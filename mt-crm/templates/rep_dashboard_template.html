@@ -1,0 +1,3228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missing Thorn - Distributor Performance Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #F9F7F5;
+            --card: #FFFFFF;
+            --border: #E8E0DA;
+            --text: #2D2420;
+            --text-dim: #7A6E66;
+            --accent: #B13B34;
+            --accent2: #DF584A;
+            --accent-light: #F2A49D;
+            --cream: #FFF4EC;
+            --peach: #FEDAB2;
+            --orange: #F8992D;
+            --burgundy: #6C312E;
+            --green: #0D9F6E;
+            --red: #DC2626;
+            --yellow: #D97706;
+            --blue: #2563EB;
+        }
+
+        body {
+            font-family: 'Catamaran', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        header img {
+            height: 50px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #FFFFFF;
+        }
+
+        .header-text p {
+            font-size: 14px;
+            opacity: 0.95;
+            color: #e2e8f0;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Catamaran', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--cream);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .pill:hover {
+            background: var(--peach);
+            border-color: var(--orange);
+        }
+
+        .pill.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 18px;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-family: 'Catamaran', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--accent);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* KPI Cards */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .kpi-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .kpi-subtext {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 5px;
+        }
+
+        /* Charts Container */
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .chart-container {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Tables */
+        .table-container {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Catamaran', sans-serif;
+            font-size: 13px;
+            width: 200px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Catamaran', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #991c16;
+        }
+
+        .btn-secondary {
+            background: var(--cream);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--peach);
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: var(--cream);
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th.sortable:hover {
+            background: var(--peach);
+        }
+
+        th .sort-indicator {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+
+        th.sorted-asc .sort-indicator::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        th.sorted-desc .sort-indicator::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background: var(--cream);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-green {
+            background: #D1F5E8;
+            color: var(--green);
+        }
+
+        .badge-blue {
+            background: #D1E9FF;
+            color: var(--blue);
+        }
+
+        .badge-yellow {
+            background: #FEF3C7;
+            color: var(--yellow);
+        }
+
+        .badge-orange {
+            background: #FED7AA;
+            color: var(--orange);
+        }
+
+        /* Snapshot Summary */
+        .snapshot-box {
+            background: linear-gradient(135deg, #FFF4EC 0%, #FEDAB2 100%);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+
+        .snapshot-box p {
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        /* Filter Badge */
+        .filter-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--cream);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .filter-badge-close {
+            cursor: pointer;
+            font-weight: 700;
+            opacity: 0.6;
+        }
+
+        .filter-badge-close:hover {
+            opacity: 1;
+        }
+
+        /* Section Headers */
+        .section-header {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-dim);
+            font-size: 12px;
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Key/Legend */
+        .key-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .key-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .key-box h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .key-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .key-label {
+            font-weight: 600;
+            min-width: 100px;
+            color: var(--text-dim);
+        }
+
+        .key-desc {
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-text h1 {
+                font-size: 22px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            select, .search-input {
+                width: 100%;
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .tabs {
+                gap: 0;
+                overflow-x: auto;
+            }
+
+            .tab {
+                padding: 10px 14px;
+                font-size: 12px;
+            }
+        }
+
+        /* Pulse animation for Overdue */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Toggle Switch */
+        .toggle-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .toggle-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: var(--cream);
+            color: var(--text);
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Dropdown Filter */
+        .dropdown-select {
+            min-width: 250px;
+        }
+
+        /* ==================== ACCOUNT CRM PANEL STYLES ==================== */
+        .account-panel-overlay {
+            position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:9998;opacity:0;pointer-events:none;transition:opacity 0.3s;
+        }
+        .account-panel-overlay.active {opacity:1;pointer-events:auto;}
+        .account-panel {
+            position:fixed;top:0;right:-520px;width:520px;height:100%;background:#fff;z-index:9999;
+            box-shadow:-4px 0 24px rgba(0,0,0,0.15);transition:right 0.3s ease;overflow-y:auto;
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+        }
+        .account-panel.active {right:0;}
+        .ap-header {
+            position:sticky;top:0;background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);
+            color:#fff;padding:20px 24px;z-index:1;
+        }
+        .ap-header h2 {font-size:18px;font-weight:700;margin:0 0 4px;}
+        .ap-header .ap-sub {font-size:13px;opacity:0.85;}
+        .ap-close {position:absolute;top:16px;right:16px;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px 8px;border-radius:4px;}
+        .ap-close:hover {background:rgba(255,255,255,0.15);}
+        .ap-section {padding:16px 24px;border-bottom:1px solid #e5e7eb;}
+        .ap-section h3 {font-size:14px;font-weight:700;color:#1a1a2e;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.5px;}
+        .ap-kpi-grid {display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+        .ap-kpi {background:#f8fafc;border-radius:8px;padding:10px 12px;text-align:center;}
+        .ap-kpi .val {font-size:20px;font-weight:700;color:#1a1a2e;}
+        .ap-kpi .label {font-size:11px;color:#6B7280;margin-top:2px;}
+        .ap-sku-table {width:100%;border-collapse:collapse;font-size:12px;}
+        .ap-sku-table th {background:#f1f5f9;padding:6px 8px;text-align:left;font-weight:600;color:#475569;}
+        .ap-sku-table td {padding:6px 8px;border-bottom:1px solid #f1f5f9;}
+        .ap-sparkline {display:flex;align-items:flex-end;gap:3px;height:32px;}
+        .ap-sparkline .bar {width:16px;background:#3b82f6;border-radius:2px 2px 0 0;min-height:2px;}
+        .ap-tags {display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+        .ap-tag {padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #e5e7eb;background:#fff;transition:all 0.15s;}
+        .ap-tag:hover {border-color:#3b82f6;color:#3b82f6;}
+        .ap-tag.selected {background:#3b82f6;color:#fff;border-color:#3b82f6;}
+        .ap-notes-list {max-height:300px;overflow-y:auto;}
+        .ap-note {background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:13px;}
+        .ap-note .meta {font-size:11px;color:#9ca3af;margin-bottom:4px;}
+        .ap-note-input {display:flex;gap:8px;margin-top:12px;}
+        .ap-note-input textarea {flex:1;border:1px solid #d1d5db;border-radius:8px;padding:8px 12px;font-size:13px;resize:none;height:60px;font-family:inherit;}
+        .ap-note-input button {background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:600;cursor:pointer;font-size:13px;white-space:nowrap;}
+        .ap-note-input button:hover {background:#2563eb;}
+        .ap-action-row {display:flex;gap:8px;align-items:center;}
+        .ap-action-row input[type="date"] {border:1px solid #d1d5db;border-radius:6px;padding:6px 10px;font-size:13px;}
+        .ap-action-row select {border:1px solid #d1d5db;border-radius:6px;padding:6px 10px;font-size:13px;}
+        .ap-status-badge {display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;}
+        .acct-clickable {cursor:pointer;color:#2563eb;text-decoration:none;}
+        .acct-clickable:hover {text-decoration:underline;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="https://missingthorn.com/cdn/shop/files/MT_Logo_Horiz_Red.png?v=1755630325&width=600" alt="Missing Thorn">
+            <div class="header-text">
+                <h1>Distributor Performance Report</h1>
+                <p>Real-time sales rep opportunity tracking • Data through <span id="dataThrough">2/14</span></p>
+            </div>
+        </header>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>Region</label>
+                <select id="regionFilter" style="padding:8px 12px;border-radius:8px;border:1px solid #e2e8f0;font-size:13px;margin-right:8px;">
+                    <option value="">All Regions</option>
+                    <option value="East">East</option>
+                    <option value="West">West</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Market</label>
+                <select id="stateFilter">
+                    <option value="">All Markets</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>States</label>
+                <div class="filter-pills" id="statePills"></div>
+            </div>
+            <div class="filter-group">
+                <label>Channel</label>
+                <div class="filter-pills" id="channelPills">
+                    <div class="pill active" data-channel="ALL">All</div>
+                    <div class="pill" data-channel="ON">On-Premise</div>
+                    <div class="pill" data-channel="OFF">Off-Premise</div>
+                </div>
+            </div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+                <span style="font-size:12px;color:#6B7280;">Rep:</span>
+                <span id="repNameDisplay" style="font-size:12px;font-weight:600;color:#1a1a2e;cursor:pointer;" onclick="changeRepName()" title="Click to change"></span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="performance">Performance Overview</button>
+            <button class="tab" data-tab="depletions">Depletions</button>
+            <button class="tab" data-tab="distributor-detail">Distributor Health</button>
+            <button class="tab" data-tab="inventory">Inventory</button>
+            <button class="tab" data-tab="accounts">Account Insights</button>
+            <button class="tab" data-tab="opportunities">Opportunities</button>
+            <button class="tab" data-tab="reorder">Reorder Forecast</button>
+            <button class="tab" data-tab="action-items" style="background:#7C3AED;color:#fff;border-radius:6px;">My Action Items</button>
+            <button class="tab" data-tab="key">Key / Legend</button>
+        </div>
+
+        <!-- Tab: Performance Overview -->
+        <div id="performance" class="tab-content active">
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total 13W CE</div>
+                    <div class="kpi-value" id="kpi-perf-ce">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">4W Velocity</div>
+                    <div class="kpi-value" id="kpi-perf-vel">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Active Markets</div>
+                    <div class="kpi-value" id="kpi-perf-markets">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">New Wins</div>
+                    <div class="kpi-value" id="kpi-perf-wins">0</div>
+                </div>
+            </div>
+
+            <div class="snapshot-box" id="performanceSnapshot"></div>
+
+            <div class="charts-row">
+                <div class="chart-container">
+                    <div class="chart-title">Weekly Depletion Trend (13W)</div>
+                    <div class="chart-wrapper">
+                        <canvas id="weeklyTrendChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Top Distributors by 13W CE</div>
+                    <div class="chart-wrapper">
+                        <canvas id="topDistributorsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Tab: Depletions -->
+        <div id="depletions" class="tab-content">
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total 13W CE</div>
+                    <div class="kpi-value" id="kpi-dep-ce">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">4W CE</div>
+                    <div class="kpi-value" id="kpi-dep-4w">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Markets w/ Momentum</div>
+                    <div class="kpi-value" id="kpi-dep-momentum">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Consistency Score</div>
+                    <div class="kpi-value" id="kpi-dep-consistency">0%</div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-container">
+                    <div class="chart-title">Weekly CE by Top Distributors</div>
+                    <div class="chart-wrapper">
+                        <canvas id="weeklyCEChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">SKU Mix</div>
+                    <div class="chart-wrapper">
+                        <canvas id="skuMixChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Distributor Scorecard</div>
+                    <div class="table-controls">
+                        <button class="btn btn-secondary btn-small" onclick="exportTableToExcel('distScorecardTable', 'Distributor_Scorecard')">Export to Excel</button>
+                    </div>
+                </div>
+                <table class="sortable" id="distScorecardTable">
+                    <thead>
+                        <tr>
+                            <th>Distributor</th>
+                            <th>State</th>
+                            <th>13W CE</th>
+                            <th>Momentum</th>
+                            <th>4W CE</th>
+                            <th>4W Trend</th>
+                            <th>On Hand</th>
+                            <th>DOH</th>
+                            <th>Net Placements</th>
+                            <th>Trend</th>
+                            <th>Sell-Thru</th>
+                            <th>Stage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="distScorecardBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Distributor Health -->
+        <div id="distributor-detail" class="tab-content">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Select Distributor</label>
+                    <select id="distHealthDropdown" class="dropdown-select">
+                        <option value="">-- Choose a distributor --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Health Summary Cards (hidden until selection) -->
+            <div id="healthSummary" style="display:none;">
+                <div class="kpi-row">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Sell-In (4M)</div>
+                        <div class="kpi-value" id="kpi-health-sellin">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Sell-Through (13W)</div>
+                        <div class="kpi-value" id="kpi-health-sellthru">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pull-Through Rate</div>
+                        <div class="kpi-value" id="kpi-health-ratio">0%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Active Accounts</div>
+                        <div class="kpi-value" id="kpi-health-accounts">0</div>
+                    </div>
+                </div>
+
+                <!-- Sell-In vs Sell-Through by SKU -->
+                <div class="table-container" style="margin-top:16px;">
+                    <div class="table-header">
+                        <div class="table-title">Sell-In vs Sell-Through by Wine</div>
+                    </div>
+                    <div style="height:280px;padding:12px;">
+                        <canvas id="healthSkuChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Two-column layout: Monthly Pattern + Account Penetration -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+                    <!-- Monthly Purchasing Pattern -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-title">Monthly Purchasing Pattern (CE)</div>
+                        </div>
+                        <div style="height:240px;padding:12px;">
+                            <canvas id="healthMonthlyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Account Penetration -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-title">Account Penetration</div>
+                        </div>
+                        <div style="padding:16px;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                                <div style="text-align:center;padding:12px;background:#f8f9fa;border-radius:8px;">
+                                    <div style="font-size:24px;font-weight:700;color:#2c3e50;" id="health-total-accts">0</div>
+                                    <div style="font-size:11px;color:#7f8c8d;">Total Accounts</div>
+                                </div>
+                                <div style="text-align:center;padding:12px;background:#f8f9fa;border-radius:8px;">
+                                    <div style="font-size:24px;font-weight:700;color:#2c3e50;" id="health-avg-sku">0</div>
+                                    <div style="font-size:11px;color:#7f8c8d;">Avg SKU Breadth</div>
+                                </div>
+                            </div>
+                            <div style="height:140px;padding:0 12px;">
+                                <canvas id="healthPenetrationChart"></canvas>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;margin-top:12px;padding:8px 12px;background:#f8f9fa;border-radius:8px;font-size:12px;">
+                                <span style="color:#27ae60;">+<span id="health-new-accts">0</span> New Wins</span>
+                                <span style="color:#e67e22;"><span id="health-lost-accts">0</span> Re-Engage Opps</span>
+                                <span style="font-weight:600;color:#2c3e50;">Net: <span id="health-net-accts">0</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Coverage Table -->
+                <div class="table-container" style="margin-top:16px;">
+                    <div class="table-header">
+                        <div class="table-title">Inventory Coverage by Wine</div>
+                    </div>
+                    <table class="sortable" id="healthInvTable">
+                        <thead>
+                            <tr>
+                                <th>Wine</th>
+                                <th>Sell-In (4M CE)</th>
+                                <th>Sell-Through (13W CE)</th>
+                                <th>Pull-Through %</th>
+                                <th>On Hand (CE)</th>
+                                <th>Weeks Supply</th>
+                                <th>Inventory Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="healthInvBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Inventory -->
+        <div id="inventory" class="tab-content">
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total On Hand</div>
+                    <div class="kpi-value" id="kpi-inv-oh">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Avg DOH</div>
+                    <div class="kpi-value" id="kpi-inv-doh">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Reorder Opportunities</div>
+                    <div class="kpi-value" id="kpi-inv-reorder">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Distributors Reviewed</div>
+                    <div class="kpi-value" id="kpi-inv-reviewed">0</div>
+                </div>
+            </div>
+
+            <div id="warehousePanel" class="table-container" style="margin-bottom:20px;"></div>
+
+            <div class="charts-row">
+                <div class="chart-container">
+                    <div class="chart-title">Inventory Status Distribution</div>
+                    <div class="chart-wrapper">
+                        <canvas id="inventoryStatusChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">On Hand vs Days on Hand</div>
+                    <div class="chart-wrapper">
+                        <canvas id="scatterInventoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Inventory Details by Distributor</div>
+                    <div class="table-controls">
+                        <select id="invSkuFilter" class="dropdown-select" style="margin-right:8px;min-width:140px;" onchange="renderInventory()">
+                            <option value="all">All Wines</option>
+                            <option value="Still Red">Still Red</option>
+                            <option value="Still White">Still White</option>
+                            <option value="Still Rose">Still Rose</option>
+                            <option value="Sparkling White">Sparkling White</option>
+                            <option value="Sparkling Rose">Sparkling Rose</option>
+                        </select>
+                        <button class="btn btn-secondary btn-small" onclick="exportTableToExcel('inventoryDetailTable', 'Inventory_Details')">Export to Excel</button>
+                    </div>
+                </div>
+                <table class="sortable" id="inventoryDetailTable">
+                    <thead>
+                        <tr>
+                            <th>Distributor</th>
+                            <th>State</th>
+                            <th>On Hand</th>
+                            <th>Daily Rate</th>
+                            <th>DOH</th>
+                            <th>90D Depletion</th>
+                            <th>Status</th>
+                            <th>Proj Order</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryDetailBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Account Insights -->
+        <div id="accounts" class="tab-content">
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Accounts</div>
+                    <div class="kpi-value" id="kpi-acc-total">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Momentum Accounts</div>
+                    <div class="kpi-value" id="kpi-acc-momentum">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Growth Opportunity</div>
+                    <div class="kpi-value" id="kpi-acc-growth">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Consistent Accounts</div>
+                    <div class="kpi-value" id="kpi-acc-consistent">0</div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-container">
+                    <div class="chart-title">Account Trend Distribution</div>
+                    <div class="chart-wrapper">
+                        <canvas id="accountTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="accountConcentrationInsight"></div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Accounts</div>
+                    <div class="table-controls">
+                        <input type="text" class="search-input" id="accountsSearch" placeholder="Search accounts...">
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" onclick="toggleAccountsView('top')">Top 20</button>
+                            <button class="toggle-btn" onclick="toggleAccountsView('all')">Show All</button>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="exportTableToExcel('accountsTable', 'Accounts')">Export to Excel</button>
+                    </div>
+                </div>
+                <table class="sortable" id="accountsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Account</th>
+                            <th>Distributor</th>
+                            <th>State</th>
+                            <th>Channel</th>
+                            <th>Nov</th>
+                            <th>Dec</th>
+                            <th>Jan</th>
+                            <th>Feb</th>
+                            <th>4M CE</th>
+                            <th>Trend</th>
+                            <th>Growth Potential</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accountsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Opportunities -->
+        <div id="opportunities" class="tab-content">
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">Re-Engagement Targets</div>
+                    <div class="kpi-value" id="kpi-opp-reeng">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">New Wins (30D)</div>
+                    <div class="kpi-value" id="kpi-opp-wins">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Net Doors</div>
+                    <div class="kpi-value" id="kpi-opp-doors">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Opportunity CE</div>
+                    <div class="kpi-value" id="kpi-opp-ce">0</div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h3>Re-Engagement Opportunities</h3>
+                <p>These accounts previously carried Missing Thorn and represent warm leads for reconnection. Focus outreach here for highest conversion probability.</p>
+            </div>
+
+            <div class="table-container">
+                <table class="sortable" id="reEngagementTable">
+                    <thead>
+                        <tr>
+                            <th>Distributor</th>
+                            <th>State</th>
+                            <th>Accounts to Re-engage</th>
+                            <th>Prior Volume (CE)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reEngagementBody"></tbody>
+                </table>
+            </div>
+
+            <div class="section-header">
+                <h3>New Wins</h3>
+                <p>Recent new accounts -- momentum builders for the brand. Ensure proper stocking and distributor support.</p>
+            </div>
+
+            <div class="table-container">
+                <table class="sortable" id="newWinsTable">
+                    <thead>
+                        <tr>
+                            <th>Account</th>
+                            <th>Distributor</th>
+                            <th>State</th>
+                            <th>30D CE</th>
+                            <th>SKUs</th>
+                        </tr>
+                    </thead>
+                    <tbody id="newWinsBody"></tbody>
+                </table>
+            </div>
+
+            <div class="chart-container" style="margin-top: 25px;">
+                <div class="chart-title">Net Placement Activity by Distributor</div>
+                <div class="chart-wrapper">
+                    <canvas id="netPlacementChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Reorder Forecast -->
+        <div id="reorder" class="tab-content">
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">Overdue Accounts</div>
+                    <div class="kpi-value" id="kpi-reord-overdue">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Due Soon</div>
+                    <div class="kpi-value" id="kpi-reord-soon">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">On Track</div>
+                    <div class="kpi-value" id="kpi-reord-track">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Avg Cycle (Days)</div>
+                    <div class="kpi-value" id="kpi-reord-cycle">0</div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-container">
+                    <div class="chart-title">Reorder Status Distribution</div>
+                    <div class="chart-wrapper">
+                        <canvas id="reorderStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Priority Reorder Forecast</div>
+                    <div class="table-controls">
+                        <select id="reorderSkuFilter" class="dropdown-select" style="margin-right:8px;min-width:140px;" onchange="renderReorderTable(null)">
+                            <option value="all">All Wines</option>
+                            <option value="Still Red">Still Red</option>
+                            <option value="Still White">Still White</option>
+                            <option value="Still Rose">Still Rose</option>
+                            <option value="Sparkling White">Sparkling White</option>
+                            <option value="Sparkling Rose">Sparkling Rose</option>
+                        </select>
+                        <input type="text" class="search-input" id="reorderSearch" placeholder="Search accounts...">
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" onclick="toggleReorderView('top')">Top 20</button>
+                            <button class="toggle-btn" onclick="toggleReorderView('all')">Show All</button>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="exportTableToExcel('reorderTable', 'Reorder_Forecast')">Export to Excel</button>
+                    </div>
+                </div>
+                <table class="sortable" id="reorderTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Account</th>
+                            <th>Distributor</th>
+                            <th>State</th>
+                            <th>Channel</th>
+                            <th>4M CE</th>
+                            <th>Purchases</th>
+                            <th>Avg Cycle</th>
+                            <th>Last Order</th>
+                            <th>Days Since</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reorderBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: My Action Items -->
+        <div id="action-items" class="tab-content">
+            <div class="kpi-row" id="actionKpis"></div>
+
+            <!-- Overdue / Urgent Alerts -->
+            <div id="actionAlerts" style="margin-bottom:16px;"></div>
+
+            <!-- Filter -->
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <label style="font-size:12px;font-weight:600;color:#6B7280;">Show:</label>
+                    <select id="actionFilter" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                        <option value="all">All Tagged / Action Items</option>
+                        <option value="Needs Visit">Needs Visit</option>
+                        <option value="Follow Up">Follow Up</option>
+                        <option value="At Risk">At Risk</option>
+                        <option value="Hot Lead">Hot Lead</option>
+                        <option value="VIP">VIP</option>
+                        <option value="action">Has Next Action</option>
+                        <option value="overdue">Overdue Follow-Ups</option>
+                    </select>
+                </div>
+                <button id="actionRefreshBtn" style="padding:6px 14px;background:#7C3AED;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Refresh</button>
+                <span id="actionLoadStatus" style="font-size:11px;color:#9ca3af;"></span>
+            </div>
+
+            <!-- Action Items List -->
+            <div id="actionItemsList"></div>
+            <div id="actionSummary" style="margin-top:12px;font-size:12px;color:#6B7280;"></div>
+        </div>
+
+        <!-- Tab: Key / Legend -->
+        <div id="key" class="tab-content">
+            <div class="key-section">
+                <div class="key-box">
+                    <h4>Metrics Definitions</h4>
+                    <div class="key-item">
+                        <div class="key-label">13W CE</div>
+                        <div class="key-desc">13-week case equivalents (total volume)</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">4W CE</div>
+                        <div class="key-desc">4-week case equivalents (current velocity)</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Momentum</div>
+                        <div class="key-desc">Positive growth trend (green) or growth opportunity (blue)</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">DOH</div>
+                        <div class="key-desc">Days on hand (inventory coverage)</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Consistency</div>
+                        <div class="key-desc">Order regularity score (0-1.0 scale)</div>
+                    </div>
+                </div>
+
+                <div class="key-box">
+                    <h4>Performance Stages</h4>
+                    <div class="key-item">
+                        <div class="key-label">Established</div>
+                        <div class="key-desc">Consistent, high-performing distributor</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Building</div>
+                        <div class="key-desc">Growing distributor with positive trajectory</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Emerging</div>
+                        <div class="key-desc">New or recently growing relationship</div>
+                    </div>
+                </div>
+
+                <div class="key-box">
+                    <h4>Inventory Status</h4>
+                    <div class="key-item">
+                        <div class="key-label">Healthy</div>
+                        <div class="key-desc">Optimal inventory level for velocity</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Reorder Opportunity</div>
+                        <div class="key-desc">Time to reorder based on depletion rate</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Review Needed</div>
+                        <div class="key-desc">Unusual pattern or non-moving inventory</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Overstocked</div>
+                        <div class="key-desc">Inventory exceeds typical market demand</div>
+                    </div>
+                </div>
+
+                <div class="key-box">
+                    <h4>Products</h4>
+                    <div class="key-item">
+                        <div class="key-label">Still Red</div>
+                        <div class="key-desc">Core red wine offering</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Still White</div>
+                        <div class="key-desc">Signature white wine</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Still Rosé</div>
+                        <div class="key-desc">Premium rosé selection</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Sparkling</div>
+                        <div class="key-desc">Celebration-ready sparkling</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Variety Pack</div>
+                        <div class="key-desc">Mixed SKU bundle</div>
+                    </div>
+                </div>
+
+                <div class="key-box">
+                    <h4>Account Trends</h4>
+                    <div class="key-item">
+                        <div class="key-label">Momentum</div>
+                        <div class="key-desc">Accelerating depletion (growth)</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Growth Opportunity</div>
+                        <div class="key-desc">Accounts with room to grow back to previous volume levels</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Consistent</div>
+                        <div class="key-desc">Stable, predictable performance</div>
+                    </div>
+                </div>
+
+                <div class="key-box">
+                    <h4>Reorder Status</h4>
+                    <div class="key-item">
+                        <div class="key-label">On Track</div>
+                        <div class="key-desc">Normal ordering cadence expected</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Due Soon</div>
+                        <div class="key-desc">Proactive outreach recommended</div>
+                    </div>
+                    <div class="key-item">
+                        <div class="key-label">Overdue</div>
+                        <div class="key-desc">Immediate action needed - follow up</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Missing Thorn - Distributor Performance Report - Generated <span id="generatedDate">February 24, 2026</span> - Data source: VIP Depletion Report
+    </footer>
+
+    <script>
+        // __DATA_START__
+        // DATA INJECTED BY BUILD SCRIPT
+// __DATA_END__
+
+        // Global State
+        let currentRegionFilter = '';
+        let currentStateFilter = '';
+        let currentChannelFilter = 'ALL';
+        let accountsViewMode = 'top';
+        let reorderViewMode = 'top';
+        let charts = {};
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFilters();
+            populateDistributorDetail();
+            renderPerformanceOverview();
+            renderDepletions();
+            renderInventory();
+            renderAccounts();
+            renderOpportunities();
+            renderReorder();
+            attachEventListeners();
+            document.getElementById('dataThrough').textContent = dataThrough;
+            document.getElementById('generatedDate').textContent = buildDate;
+        });
+
+        // Filter Management
+        function initializeFilters() {
+            const states = new Set();
+            distScorecard.forEach(d => states.add(d.st));
+
+            const stateDropdown = document.getElementById('stateFilter');
+            const statePills = document.getElementById('statePills');
+
+            Array.from(states).sort().forEach(st => {
+                const option = document.createElement('option');
+                option.value = st;
+                option.textContent = stateNames[st] || st;
+                stateDropdown.appendChild(option);
+
+                const pill = document.createElement('div');
+                pill.className = 'pill';
+                pill.textContent = st;
+                pill.dataset.state = st;
+                pill.addEventListener('click', function() {
+                    const wasActive = this.classList.contains('active');
+                    // Deactivate all pills first (single-select behavior)
+                    document.querySelectorAll('#statePills .pill').forEach(p => p.classList.remove('active'));
+                    if (wasActive) {
+                        // Clicking active pill deselects it
+                        currentStateFilter = '';
+                    } else {
+                        this.classList.add('active');
+                        currentStateFilter = this.dataset.state;
+                    }
+                    // Sync dropdown
+                    const dd = document.getElementById('stateFilter');
+                    if (dd) dd.value = currentStateFilter;
+                    applyFilters();
+                });
+                statePills.appendChild(pill);
+            });
+
+            stateDropdown.addEventListener('change', function() {
+                currentStateFilter = this.value;
+                document.querySelectorAll('#statePills .pill').forEach(p => p.classList.remove('active'));
+                if (currentStateFilter) {
+                    document.querySelector(`#statePills [data-state="${currentStateFilter}"]`).classList.add('active');
+                }
+                applyFilters();
+            });
+
+            const regionDropdown = document.getElementById('regionFilter');
+            if(regionDropdown) {
+                regionDropdown.addEventListener('change', function() {
+                    currentRegionFilter = this.value;
+                    currentStateFilter = '';
+                    // Reset state dropdown and rebuild with filtered states
+                    const stateDropdown = document.getElementById('stateFilter');
+                    if(stateDropdown) {
+                        stateDropdown.value = '';
+                        // Show only states in selected region
+                        Array.from(stateDropdown.options).forEach(opt => {
+                            if(!opt.value) { opt.style.display = ''; return; }
+                            if(!currentRegionFilter) { opt.style.display = ''; return; }
+                            opt.style.display = regionMap[opt.value] === currentRegionFilter ? '' : 'none';
+                        });
+                    }
+                    // Show/hide state pills by region
+                    document.querySelectorAll('#statePills .pill').forEach(p => {
+                        p.classList.remove('active');
+                        const st = p.dataset.state;
+                        if(!currentRegionFilter) { p.style.display = ''; }
+                        else { p.style.display = regionMap[st] === currentRegionFilter ? '' : 'none'; }
+                    });
+                    applyFilters();
+                });
+            }
+        }
+
+        function applyFilters() {
+            renderPerformanceOverview();
+            renderDepletions();
+            renderDistributorHealth();
+            renderInventory();
+            renderWarehousePanel();
+            renderAccounts();
+            renderOpportunities();
+            renderReorder();
+        }
+
+        function getFilteredData(data, stateField = 'st') {
+            let filtered = data;
+
+            if (currentRegionFilter) {
+                filtered = filtered.filter(d => regionMap[d[stateField]] === currentRegionFilter);
+            }
+
+            if (currentStateFilter) {
+                filtered = filtered.filter(d => d[stateField] === currentStateFilter);
+            }
+
+            if (currentChannelFilter && currentChannelFilter !== 'ALL') {
+                filtered = filtered.filter(d => {
+                    if (!d.ch) return true; // keep data without channel field
+                    return currentChannelFilter === 'ON' ? d.ch === 'On-Premise' : d.ch === 'Off-Premise';
+                });
+            }
+
+            return filtered;
+        }
+
+        // Utility Functions
+        function renderStage(label) {
+            if (label === 'Established') return '<span class="badge badge-green">Established</span>';
+            if (label === 'Building') return '<span class="badge badge-blue">Building</span>';
+            return '<span class="badge badge-yellow">Emerging</span>';
+        }
+
+        function renderMomentum(val) {
+            if (val.startsWith('+')) return `<span class="badge badge-green">${val}</span>`;
+            if (val.startsWith('Opportunity')) return `<span class="badge badge-yellow">${val}</span>`;
+            if (val === 'New Market') return `<span class="badge badge-blue">${val}</span>`;
+            return `<span class="badge badge-blue">${val}</span>`;
+        }
+
+        function renderTrend(trend) {
+            if (trend === 'Momentum') return '<span class="badge badge-green">Momentum</span>';
+            if (trend === 'Growth Opportunity') return '<span class="badge badge-yellow">Growth Opportunity</span>';
+            return '<span class="badge" style="background: #E5E7EB; color: #6B7280;">Consistent</span>';
+        }
+
+        function getReorderStatus(days, cycle) {
+            if (days > cycle * 1.5) return 'Overdue';
+            if (days > cycle * 0.8) return 'Due Soon';
+            return 'On Track';
+        }
+
+        function renderReorderStatus(status) {
+            if (status === 'Overdue') {
+                return '<span class="badge badge-orange pulse">Overdue</span>';
+            }
+            if (status === 'Due Soon') {
+                return '<span class="badge badge-yellow">Due Soon</span>';
+            }
+            return '<span class="badge badge-green">On Track</span>';
+        }
+
+        function renderInventoryStatus(status) {
+            if (status === 'Healthy') return '<span class="badge badge-green">Healthy</span>';
+            if (status === 'Reorder Opportunity') return '<span class="badge badge-orange">Reorder Opportunity</span>';
+            if (status === 'Overstocked') return '<span class="badge badge-blue">Overstocked</span>';
+            return '<span class="badge badge-blue">Review Needed</span>';
+        }
+
+        function getQbOrderBadge(distName) {
+            if (typeof qbDistOrders === 'undefined') return '';
+            const order = qbDistOrders[distName];
+            if (!order) return '';
+            let labelBadge = '';
+            if (order.label === 'Classic') labelBadge = '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;margin-left:4px;">Classic</span>';
+            else if (order.label === 'Contemporary') labelBadge = '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;margin-left:4px;">Contemporary</span>';
+            else if (order.label === 'Both') labelBadge = '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;margin-left:4px;">Classic</span><span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;margin-left:2px;">Contemporary</span>';
+            return `<div style="font-size:11px;color:#6B7280;margin-top:2px;" title="QB Invoice #${order.num} - ${order.items}">Last QB Order: ${order.date} | $${order.total.toLocaleString()}${order.items ? ' | ' + order.items : ''}${labelBadge}</div>`;
+        }
+        function getLabelBadgeOnly(distName) {
+            if (typeof qbDistOrders === 'undefined') return '';
+            const order = qbDistOrders[distName];
+            if (!order) return '';
+            if (order.label === 'Classic') return '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;">Classic</span>';
+            if (order.label === 'Contemporary') return '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;">Contemporary</span>';
+            if (order.label === 'Both') return '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;">Classic</span> <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;">Contemporary</span>';
+            return '';
+        }
+
+        function velTrendBadge(t){if(t==='up')return'<span style="color:#10b981;font-weight:700">&#9650;</span>';if(t==='down')return'<span style="color:#ef4444;font-weight:700">&#9660;</span>';if(t==='new')return'<span style="color:#6B7280;font-size:10px">NEW</span>';return'<span style="color:#6B7280">&#9644;</span>';}
+        function sellThruBadge(p){const c=p>=60?'#10b981':p>=40?'#f59e0b':'#ef4444';return`<span style="color:${c};font-weight:600">${p}%</span>`;}
+
+        function exportTableToExcel(tableId, fileName) {
+            const table = document.getElementById(tableId);
+            const ws = XLSX.utils.table_to_sheet(table);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Data');
+            XLSX.writeFile(wb, `${fileName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        // Tab Management
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.getElementById(tabId).classList.add('active');
+
+                setTimeout(() => {
+                    Object.values(charts).forEach(chart => chart && chart.resize && chart.resize());
+                }, 100);
+            });
+        });
+
+        // Performance Overview Tab
+        function renderPerformanceOverview() {
+            const data = getFilteredData(distScorecard);
+
+            const totalCE = data.reduce((sum, d) => sum + d.ce, 0);
+            const velocity = data.reduce((sum, d) => sum + d.w4, 0);
+            const markets = new Set(data.map(d => d.st)).size;
+            const wins = data.reduce((sum, d) => sum + d.net, 0);
+
+            document.getElementById('kpi-perf-ce').textContent = totalCE.toFixed(0);
+            document.getElementById('kpi-perf-vel').textContent = velocity.toFixed(0);
+            document.getElementById('kpi-perf-markets').textContent = markets;
+            document.getElementById('kpi-perf-wins').textContent = wins;
+
+            const avgMomentum = (data.filter(d => d.momentum.startsWith('+')).length / data.length * 100).toFixed(0);
+            const snapshot = `<strong>Summary:</strong> You have <strong>${data.length} active distributors</strong> across <strong>${markets} markets</strong> with <strong>${totalCE.toFixed(0)} CE</strong> in 13-week volume. <strong>${avgMomentum}%</strong> of distributors show positive momentum. 4-week velocity is <strong>${velocity.toFixed(0)} CE</strong>, indicating ${velocity > totalCE / 3 ? 'acceleration' : 'stable demand'}.`;
+            document.getElementById('performanceSnapshot').innerHTML = snapshot;
+
+            // Weekly Trend Chart
+            const weeks = Array.from({length: 13}, (_, i) => `W${i+1}`);
+            const weeklyTotal = Array.from({length: 13}, (_, week) => {
+                return data.reduce((sum, d) => sum + (d.weekly[week] || 0), 0);
+            });
+
+            if (charts.weeklyTrendChart) charts.weeklyTrendChart.destroy();
+            const ctx1 = document.getElementById('weeklyTrendChart').getContext('2d');
+            charts.weeklyTrendChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: weeks,
+                    datasets: [{
+                        label: 'Weekly CE',
+                        data: weeklyTotal,
+                        borderColor: '#B13B34',
+                        backgroundColor: 'rgba(177, 59, 52, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#B13B34'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Top Distributors Chart
+            const topDists = data.sort((a, b) => b.ce - a.ce).slice(0, 10);
+            if (charts.topDistributorsChart) charts.topDistributorsChart.destroy();
+            const ctx2 = document.getElementById('topDistributorsChart').getContext('2d');
+            charts.topDistributorsChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: topDists.map(d => d.name.substring(0, 20)),
+                    datasets: [{
+                        label: '13W CE',
+                        data: topDists.map(d => d.ce),
+                        backgroundColor: '#B13B34'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+        }
+
+        // Depletions Tab
+        function renderDepletions() {
+            const data = getFilteredData(distScorecard);
+
+            const totalCE = data.reduce((sum, d) => sum + d.ce, 0);
+            const total4W = data.reduce((sum, d) => sum + d.w4, 0);
+            const momentumCount = data.filter(d => d.momentum.startsWith('+')).length;
+            const avgConsistency = (data.reduce((sum, d) => sum + d.con, 0) / data.length * 100).toFixed(0);
+
+            document.getElementById('kpi-dep-ce').textContent = totalCE.toFixed(0);
+            document.getElementById('kpi-dep-4w').textContent = total4W.toFixed(0);
+            document.getElementById('kpi-dep-momentum').textContent = momentumCount;
+            document.getElementById('kpi-dep-consistency').textContent = avgConsistency + '%';
+
+            // Weekly CE Chart
+            const topDists = data.sort((a, b) => b.ce - a.ce).slice(0, 6);
+            const weeks = Array.from({length: 13}, (_, i) => `W${i+1}`);
+
+            const datasets = topDists.map((d, idx) => ({
+                label: d.name.substring(0, 15),
+                data: d.weekly,
+                backgroundColor: ['#B13B34', '#DF584A', '#F8992D', '#0D9F6E', '#2563EB', '#D97706'][idx],
+                stack: 'stack'
+            }));
+
+            if (charts.weeklyCEChart) charts.weeklyCEChart.destroy();
+            const ctx1 = document.getElementById('weeklyCEChart').getContext('2d');
+            charts.weeklyCEChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: weeks,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    }
+                }
+            });
+
+            // SKU Mix Chart
+            const skus = ['Still Red', 'Still White', 'Still Rosé', 'Sparkling'];
+            const skuDistribution = [35, 25, 20, 20];
+
+            if (charts.skuMixChart) charts.skuMixChart.destroy();
+            const ctx2 = document.getElementById('skuMixChart').getContext('2d');
+            charts.skuMixChart = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: skus,
+                    datasets: [{
+                        data: skuDistribution,
+                        backgroundColor: ['#B13B34', '#F8992D', '#0D9F6E', '#2563EB']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Distributor Scorecard Table
+            let tableHtml = '';
+            data.forEach((d, idx) => {
+                const isGroup = d.isGroup || false;
+                if (isGroup && d.children) {
+                    const gid = 'depGrp_' + idx;
+                    const grpToggle = `<span style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show warehouses" onclick="toggleRow(this,'${gid}')">&#9654;</span>`;
+                    tableHtml += `<tr style="background-color:#f0f4f8;font-weight:600;">
+                        <td>${grpToggle}${d.name} <span style="font-size:10px;color:#6B7280;font-weight:400">(${d.children.length} locations)</span></td>
+                        <td>${d.st}</td>
+                        <td><strong>${d.ce.toFixed(1)}</strong></td>
+                        <td>${renderMomentum(d.momentum)}</td>
+                        <td><strong>${d.w4.toFixed(1)}</strong></td>
+                        <td>${renderMomentum(d.w4trend)}</td>
+                        <td>${d.oh.toFixed(1)}</td>
+                        <td>${Math.round(d.doh)}</td>
+                        <td>${d.net}</td>
+                        <td style="text-align:center">${velTrendBadge(d.velTrend||'flat')}</td>
+                        <td>${sellThruBadge(d.sellThru||0)}</td>
+                        <td>${renderStage(d.conLabel)}</td>
+                    </tr>`;
+                    tableHtml += `<tr id="${gid}" style="display:none"><td colspan="12" style="padding:0"><table style="width:100%;border:none;margin:0"><tbody>`;
+                    d.children.forEach((child) => {
+                        tableHtml += `<tr style="background-color:#f9f9f9;font-size:12px;border-left:3px solid #3498db;">
+                            <td style="padding:4px 10px 4px 28px;border-bottom:1px solid #e5e7eb">${child.name}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.st}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.ce.toFixed(1)}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${renderMomentum(child.momentum)}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.w4.toFixed(1)}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${renderMomentum(child.w4trend)}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.oh.toFixed(1)}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${Math.round(child.doh)}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.net}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb;text-align:center">${velTrendBadge(child.velTrend||'flat')}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${sellThruBadge(child.sellThru||0)}</td>
+                            <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${renderStage(child.conLabel)}</td>
+                        </tr>`;
+                    });
+                    tableHtml += `</tbody></table></td></tr>`;
+                } else {
+                    tableHtml += `<tr>
+                        <td>${d.name}</td>
+                        <td>${d.st}</td>
+                        <td><strong>${d.ce.toFixed(1)}</strong></td>
+                        <td>${renderMomentum(d.momentum)}</td>
+                        <td><strong>${d.w4.toFixed(1)}</strong></td>
+                        <td>${renderMomentum(d.w4trend)}</td>
+                        <td>${d.oh.toFixed(1)}</td>
+                        <td>${Math.round(d.doh)}</td>
+                        <td>${d.net}</td>
+                        <td style="text-align:center">${velTrendBadge(d.velTrend||'flat')}</td>
+                        <td>${sellThruBadge(d.sellThru||0)}</td>
+                        <td>${renderStage(d.conLabel)}</td>
+                    </tr>`;
+                }
+            });
+            document.getElementById('distScorecardBody').innerHTML = tableHtml;
+            initTableSorting('distScorecardTable');
+        }
+
+        // Distributor Health Tab
+        let healthSkuChart = null;
+        let healthMonthlyChart = null;
+        let healthPenetrationChart = null;
+
+        function populateDistributorDetail() {
+            const dropdown = document.getElementById('distHealthDropdown');
+            const uniqueDists = [...new Set(distHealth.map(d => d.dist))];
+
+            // Get state info from distScorecard to filter by region
+            const distStateMap = {};
+            distScorecard.forEach(d => {
+                distStateMap[d.name] = d.st;
+            });
+
+            uniqueDists.forEach(dist => {
+                const option = document.createElement('option');
+                option.value = dist;
+                option.textContent = dist;
+                // Store state for filtering
+                const distState = distStateMap[dist];
+                if (distState) {
+                    option.dataset.state = distState;
+                    option.dataset.region = regionMap[distState] || '';
+                }
+                dropdown.appendChild(option);
+            });
+
+            dropdown.addEventListener('change', renderDistributorHealth);
+
+            // Add change listener for region filter to update distributor dropdown visibility
+            const regionDropdown = document.getElementById('regionFilter');
+            if (regionDropdown) {
+                regionDropdown.addEventListener('change', function() {
+                    // Filter distributor dropdown options by region
+                    Array.from(dropdown.options).forEach(opt => {
+                        if (!opt.value) { opt.style.display = ''; return; }
+                        if (!currentRegionFilter) { opt.style.display = ''; return; }
+                        opt.style.display = opt.dataset.region === currentRegionFilter ? '' : 'none';
+                    });
+                    dropdown.value = '';
+                    renderDistributorHealth();
+                });
+            }
+        }
+
+        function renderDistributorHealth() {
+            const dropdown = document.getElementById('distHealthDropdown');
+            // Filter distributor dropdown options by current state/region
+            Array.from(dropdown.options).forEach(opt => {
+                if (!opt.value) { opt.style.display = ''; return; }
+                const st = opt.dataset.state || '';
+                let show = true;
+                if (currentRegionFilter) show = (opt.dataset.region === currentRegionFilter);
+                if (currentStateFilter) show = (st === currentStateFilter);
+                opt.style.display = show ? '' : 'none';
+            });
+            // If selected distributor is now hidden, reset selection
+            const selectedOpt = dropdown.options[dropdown.selectedIndex];
+            if (selectedOpt && selectedOpt.style.display === 'none') {
+                dropdown.value = '';
+            }
+            const distName = dropdown.value;
+            const summary = document.getElementById('healthSummary');
+            if (!distName) {
+                summary.style.display = 'none';
+                return;
+            }
+
+            const h = distHealth.find(d => d.dist === distName);
+            if (!h) return;
+
+            summary.style.display = 'block';
+
+            // KPI cards
+            document.getElementById('kpi-health-sellin').textContent = h.totalSellIn.toFixed(1) + ' CE';
+            document.getElementById('kpi-health-sellthru').textContent = h.totalSellThru.toFixed(1) + ' CE';
+            document.getElementById('kpi-health-ratio').textContent = h.totalRatio + '%';
+            document.getElementById('kpi-health-accounts').textContent = h.activeAccounts + ' / ' + h.totalAccounts;
+
+            // Account penetration numbers
+            document.getElementById('health-total-accts').textContent = h.totalAccounts;
+            document.getElementById('health-avg-sku').textContent = h.avgSkuBreadth;
+            document.getElementById('health-new-accts').textContent = h.newAccts;
+            document.getElementById('health-lost-accts').textContent = h.lostAccts;
+            document.getElementById('health-net-accts').textContent = (h.newAccts - h.lostAccts);
+
+            // --- SKU Bar Chart (Sell-In vs Sell-Through) ---
+            if (healthSkuChart) healthSkuChart.destroy();
+            const skuLabels = h.skus.map(s => s.w);
+            const skuCtx = document.getElementById('healthSkuChart').getContext('2d');
+            healthSkuChart = new Chart(skuCtx, {
+                type: 'bar',
+                data: {
+                    labels: skuLabels,
+                    datasets: [
+                        { label: 'Sell-In (4M)', data: h.skus.map(s => s.sellIn), backgroundColor: 'rgba(52,152,219,0.7)', borderRadius: 4 },
+                        { label: 'Sell-Through (13W)', data: h.skus.map(s => s.sellThru), backgroundColor: 'rgba(46,204,113,0.7)', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Case Equivalents' } }
+                    }
+                }
+            });
+
+            // --- Monthly Purchasing Pattern ---
+            if (healthMonthlyChart) healthMonthlyChart.destroy();
+            const monthCtx = document.getElementById('healthMonthlyChart').getContext('2d');
+            healthMonthlyChart = new Chart(monthCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Nov', 'Dec', 'Jan', 'Feb'],
+                    datasets: [{
+                        label: 'Distributor Purchases (CE)',
+                        data: [h.nov, h.dec, h.jan, h.feb],
+                        backgroundColor: ['rgba(155,89,182,0.7)', 'rgba(52,152,219,0.7)', 'rgba(46,204,113,0.7)', 'rgba(241,196,15,0.7)'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'CE' } }
+                    }
+                }
+            });
+
+            // --- Account Penetration Donut ---
+            if (healthPenetrationChart) healthPenetrationChart.destroy();
+            const penCtx = document.getElementById('healthPenetrationChart').getContext('2d');
+            const hasData = h.established + h.building + h.emerging > 0;
+            healthPenetrationChart = new Chart(penCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Established', 'Building', 'Emerging'],
+                    datasets: [{
+                        data: hasData ? [h.established, h.building, h.emerging] : [1],
+                        backgroundColor: hasData ? ['#27ae60', '#3498db', '#f39c12'] : ['#ecf0f1'],
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 8 } }
+                    }
+                }
+            });
+
+            // --- Inventory Table ---
+            let tableHtml = '';
+            h.skus.forEach(s => {
+                const ratioColor = s.ratio >= 80 ? '#27ae60' : s.ratio >= 50 ? '#f39c12' : '#e74c3c';
+                const supplyLabel = s.wkSupply > 26 ? 'Overstocked' : s.wkSupply >= 8 ? 'Healthy' : s.wkSupply > 0 ? 'Reorder Soon' : '-';
+                const supplyColor = s.wkSupply > 26 ? '#e67e22' : s.wkSupply >= 8 ? '#27ae60' : s.wkSupply > 0 ? '#e74c3c' : '#95a5a6';
+                tableHtml += `<tr>
+                    <td>${s.w}</td>
+                    <td>${s.sellIn.toFixed(1)}</td>
+                    <td>${s.sellThru.toFixed(1)}</td>
+                    <td style="color:${ratioColor};font-weight:600;">${s.ratio}%</td>
+                    <td>${s.oh.toFixed(1)}</td>
+                    <td><span style="color:${supplyColor};font-weight:500;">${s.wkSupply.toFixed(1)} wks</span> <span style="font-size:10px;color:${supplyColor};">(${supplyLabel})</span></td>
+                    <td><span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${s.invAction==='Reorder Now'?'#fee2e2':s.invAction==='Monitor'?'#fef3c7':s.invAction==='Healthy'?'#d1fae5':s.invAction==='Reduce'?'#ede9fe':'#f1f5f9'};color:${s.invAction==='Reorder Now'?'#991b1b':s.invAction==='Monitor'?'#92400e':s.invAction==='Healthy'?'#065f46':s.invAction==='Reduce'?'#5b21b6':'#64748b'};">${s.invAction||'--'}</span></td>
+                </tr>`;
+            });
+            // Totals row
+            const totalOH = h.skus.reduce((sum, s) => sum + s.oh, 0);
+            tableHtml += `<tr style="font-weight:700;border-top:2px solid #2c3e50;">
+                <td>Total</td>
+                <td>${h.totalSellIn.toFixed(1)}</td>
+                <td>${h.totalSellThru.toFixed(1)}</td>
+                <td style="color:${h.totalRatio >= 80 ? '#27ae60' : '#f39c12'};font-weight:700;">${h.totalRatio}%</td>
+                <td>${totalOH.toFixed(1)}</td>
+                <td>${h.doh} days on hand</td>
+            </tr>`;
+            document.getElementById('healthInvBody').innerHTML = tableHtml;
+            initTableSorting('healthInvTable');
+        }
+
+        // Inventory Tab
+        function renderInventory() {
+            const data = getFilteredData(inventoryData);
+
+            const totalOH = data.reduce((sum, d) => sum + d.oh, 0);
+            const avgDOH = (data.reduce((sum, d) => sum + d.doh, 0) / data.length).toFixed(0);
+            const reorderCount = data.filter(d => d.status === 'Reorder Opportunity').length;
+
+            document.getElementById('kpi-inv-oh').textContent = totalOH.toFixed(1);
+            document.getElementById('kpi-inv-doh').textContent = avgDOH;
+            document.getElementById('kpi-inv-reorder').textContent = reorderCount;
+            document.getElementById('kpi-inv-reviewed').textContent = data.length;
+
+            // Inventory Status Chart
+            const statusCounts = {
+                'Healthy': data.filter(d => d.status === 'Healthy').length,
+                'Reorder Opportunity': data.filter(d => d.status === 'Reorder Opportunity').length,
+                'Overstocked': data.filter(d => d.status === 'Overstocked').length,
+                'Dead Stock': data.filter(d => d.status === 'Dead Stock').length,
+                'Review Needed': data.filter(d => d.status === 'Review Needed').length
+            };
+
+            if (charts.inventoryStatusChart) charts.inventoryStatusChart.destroy();
+            const ctx1 = document.getElementById('inventoryStatusChart').getContext('2d');
+            charts.inventoryStatusChart = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(statusCounts),
+                    datasets: [{
+                        data: Object.values(statusCounts),
+                        backgroundColor: ['#0D9F6E', '#F8992D', '#2563EB', '#6B7280', '#2563EB']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Scatter Chart
+            const scatterData = data.map(d => ({
+                x: d.oh,
+                y: d.doh,
+                label: d.name.substring(0, 15)
+            }));
+
+            if (charts.scatterInventoryChart) charts.scatterInventoryChart.destroy();
+            const ctx2 = document.getElementById('scatterInventoryChart').getContext('2d');
+            charts.scatterInventoryChart = new Chart(ctx2, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Distributors',
+                        data: scatterData.map(d => ({x: d.x, y: d.y})),
+                        backgroundColor: '#B13B34'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'On Hand'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Days on Hand'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Inventory Details Table (with SKU filter)
+            const skuFilter = document.getElementById('invSkuFilter') ? document.getElementById('invSkuFilter').value : 'all';
+            let tableHtml = '';
+            data.forEach((d, idx) => {
+                if (skuFilter !== 'all') {
+                    const sku = (d.skus || []).find(s => s.w === skuFilter);
+                    if (!sku) return;
+                    const isGroup = d.isGroup || false;
+                    if (isGroup) {
+                        const gid = 'invGrpF_' + idx;
+                        const grpToggle = `<span style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" onclick="toggleRow(this,'${gid}')">&#9654;</span>`;
+                        tableHtml += `<tr style="background-color:#f0f4f8;font-weight:600;">
+                            <td>${grpToggle}${d.name}</td><td>${d.st}</td>
+                            <td>${sku.oh.toFixed(1)}</td><td>${sku.rate.toFixed(2)}</td>
+                            <td>${Math.round(sku.doh)}</td><td>-</td>
+                            <td>${renderInventoryStatus(sku.status)}</td><td>-</td>
+                        </tr>`;
+                        tableHtml += `<tr id="${gid}" style="display:none"><td colspan="8" style="padding:0"><table style="width:100%;border:none;margin:0"><tbody>`;
+                        d.children.forEach((child) => {
+                            const childSku = (child.skus || []).find(s => s.w === skuFilter);
+                            if (childSku) {
+                                tableHtml += `<tr style="background-color:#f9f9f9;font-size:12px;border-left:3px solid #3498db;">
+                                    <td style="padding:4px 10px 4px 28px;border-bottom:1px solid #e5e7eb">${child.name}</td>
+                                    <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.st}</td>
+                                    <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${childSku.oh.toFixed(1)}</td>
+                                    <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${childSku.rate.toFixed(2)}</td>
+                                    <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${Math.round(childSku.doh)}</td>
+                                    <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">-</td>
+                                    <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${renderInventoryStatus(childSku.status)}</td>
+                                    <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">-</td>
+                                </tr>`;
+                            }
+                        });
+                        tableHtml += `</tbody></table></td></tr>`;
+                    } else {
+                        tableHtml += `<tr>
+                            <td>${d.name}</td><td>${d.st}</td>
+                            <td>${sku.oh.toFixed(1)}</td><td>${sku.rate.toFixed(2)}</td>
+                            <td>${Math.round(sku.doh)}</td><td>-</td>
+                            <td>${renderInventoryStatus(sku.status)}</td><td>-</td>
+                        </tr>`;
+                    }
+                } else {
+                    // Show distributor total with expandable rows
+                    const isGroup = d.isGroup || false;
+                    const hasSkus = d.skus && d.skus.length > 0;
+                    const expId = 'inv-sku-' + idx;
+                    if (isGroup) {
+                        // GROUP: warehouse toggle only (no combined wine toggle)
+                        const gid = 'invGrp_' + idx;
+                        const grpToggle = `<span style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show warehouses" onclick="toggleRow(this,'${gid}')">&#9654;</span>`;
+                        tableHtml += `<tr style="background-color:#f0f4f8;font-weight:600;">
+                            <td>${grpToggle}${d.name} <span style="font-size:10px;color:#6B7280;font-weight:400">(${d.children.length} locations)</span></td>
+                            <td>${d.st}</td>
+                            <td><strong>${d.oh.toFixed(1)}</strong></td>
+                            <td>${d.rate.toFixed(2)}</td>
+                            <td>${Math.round(d.doh)}</td>
+                            <td>${d.dep90.toFixed(1)}</td>
+                            <td>${renderInventoryStatus(d.status)}</td>
+                            <td>${d.proj.toFixed(1)}</td>
+                        </tr>`;
+                        // Warehouse children container (hidden)
+                        tableHtml += `<tr id="${gid}" style="display:none"><td colspan="8" style="padding:0"><table style="width:100%;border:none;margin:0"><tbody>`;
+                        d.children.forEach((child, childIdx) => {
+                            const childHasSkus = child.skus && child.skus.length > 0;
+                            const childExpId = 'inv-wh-sku-' + idx + '-' + childIdx;
+                            const childExpIcon = childHasSkus ? `<span style="cursor:pointer;color:#3498db;font-size:11px;margin-right:2px;" title="Show wine breakdown" onclick="toggleRow(this,'${childExpId}')">&#9654;</span>` : '';
+                            tableHtml += `<tr style="background-color:#f9f9f9;font-size:12px;border-left:3px solid #3498db;">
+                                <td style="padding:4px 10px 4px 28px;border-bottom:1px solid #e5e7eb;font-weight:500">${childExpIcon}${child.name}${getQbOrderBadge(child.name)}</td>
+                                <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.st}</td>
+                                <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.oh.toFixed(1)}</td>
+                                <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.rate.toFixed(2)}</td>
+                                <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${Math.round(child.doh)}</td>
+                                <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.dep90.toFixed(1)}</td>
+                                <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${renderInventoryStatus(child.status)}</td>
+                                <td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${child.proj.toFixed(1)}</td>
+                            </tr>`;
+                            if (childHasSkus) {
+                                tableHtml += `<tr id="${childExpId}" style="display:none"><td colspan="8" style="padding:0">
+                                    <table style="width:100%;background:#f0f1f3;border:none;margin:0"><tbody>
+                                    ${child.skus.map(s => `<tr style="font-size:11px">
+                                        <td style="padding:3px 10px 3px 48px;border-bottom:1px solid #e5e7eb;font-weight:500">${s.w}</td>
+                                        <td></td>
+                                        <td style="padding:3px 6px;border-bottom:1px solid #e5e7eb">${s.oh.toFixed(1)}</td>
+                                        <td style="padding:3px 6px;border-bottom:1px solid #e5e7eb">${s.rate.toFixed(2)}</td>
+                                        <td style="padding:3px 6px;border-bottom:1px solid #e5e7eb">${Math.round(s.doh)}</td>
+                                        <td style="padding:3px 6px;border-bottom:1px solid #e5e7eb"></td>
+                                        <td style="padding:3px 6px;border-bottom:1px solid #e5e7eb">${renderInventoryStatus(s.status)}</td>
+                                        <td></td>
+                                    </tr>`).join('')}
+                                    </tbody></table></td></tr>`;
+                            }
+                        });
+                        tableHtml += `</tbody></table></td></tr>`;
+                    } else {
+                        // SINGLE distributor: wine toggle
+                        const expIcon = hasSkus ? `<span style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show wine breakdown" onclick="toggleRow(this,'${expId}')">&#9654;</span>` : '';
+                        tableHtml += `<tr>
+                            <td>${expIcon}${d.name}${getQbOrderBadge(d.name)}</td>
+                            <td>${d.st}</td>
+                            <td><strong>${d.oh.toFixed(1)}</strong></td>
+                            <td>${d.rate.toFixed(2)}</td>
+                            <td>${Math.round(d.doh)}</td>
+                            <td>${d.dep90.toFixed(1)}</td>
+                            <td>${renderInventoryStatus(d.status)}</td>
+                            <td>${d.proj.toFixed(1)}</td>
+                        </tr>`;
+                        if (hasSkus) {
+                            tableHtml += `<tr id="${expId}" style="display:none;"><td colspan="8" style="padding:0;">
+                                <table style="width:100%;background:#f8f9fa;border:none;margin:0;">
+                                    <thead style="font-size:11px;color:#7f8c8d;"><tr>
+                                        <th style="padding:6px 10px;border:none;">Wine</th>
+                                        <th style="padding:6px 10px;border:none;"></th>
+                                        <th style="padding:6px 10px;border:none;">On Hand</th>
+                                        <th style="padding:6px 10px;border:none;">Daily Rate</th>
+                                        <th style="padding:6px 10px;border:none;">DOH</th>
+                                        <th style="padding:6px 10px;border:none;"></th>
+                                        <th style="padding:6px 10px;border:none;">Status</th>
+                                        <th style="padding:6px 10px;border:none;"></th>
+                                    </tr></thead><tbody>
+                                    ${d.skus.map(s => `<tr style="font-size:12px;">
+                                        <td style="padding:4px 10px;border:none;font-weight:500;">${s.w}</td>
+                                        <td style="padding:4px 10px;border:none;"></td>
+                                        <td style="padding:4px 10px;border:none;">${s.oh.toFixed(1)}</td>
+                                        <td style="padding:4px 10px;border:none;">${s.rate.toFixed(2)}</td>
+                                        <td style="padding:4px 10px;border:none;">${Math.round(s.doh)}</td>
+                                        <td style="padding:4px 10px;border:none;"></td>
+                                        <td style="padding:4px 10px;border:none;">${renderInventoryStatus(s.status)}</td>
+                                        <td style="padding:4px 10px;border:none;"></td>
+                                    </tr>`).join('')}
+                                </tbody></table></td></tr>`;
+                        }
+                    }
+                }
+            });
+            document.getElementById('inventoryDetailBody').innerHTML = tableHtml;
+            initTableSorting('inventoryDetailTable');
+            renderWarehousePanel();
+        }
+
+        function renderWarehousePanel() {
+            const panel = document.getElementById('warehousePanel');
+            if (!panel) return;
+            if (typeof warehouseInventory === 'undefined' || !warehouseInventory) { panel.style.display='none'; return; }
+            const wh = warehouseInventory;
+            const ct = wh.classic['Warehouse Total'] || {};
+            const nt = wh.contemporary['Warehouse Total'] || {};
+            const gt = wh.grandTotal || {};
+            const wines = ['sw','sr','rd','spw','spr'];
+            const wineNames = ['Still White','Still Rose','Red','Spark White','Spark Rose'];
+            let html = '<div class="table-header"><div class="table-title">Company Warehouse Inventory (by Label Type)</div></div>';
+            const classicSpr = ct.spr || 0;
+            if (classicSpr > 0) {
+                html += '<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#991B1B;">Note: Classic Sparkling Rose (' + classicSpr + ' cases) includes Batch 1 sequestered inventory with known quality issues (hard-to-open bottles). Not suitable for normal distribution.</div>';
+            }
+            html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
+            html += '<div><div style="font-weight:600;margin-bottom:6px;"><span style="display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;background:#F3E8FF;color:#7C3AED;margin-right:6px;">Classic</span> Batch 1+2</div>';
+            html += '<table style="width:100%;font-size:12px;border-collapse:collapse;"><thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:4px 6px;">Location</th>';
+            wineNames.forEach(w => html += '<th style="text-align:right;padding:4px 6px;">' + w + '</th>');
+            html += '<th style="text-align:right;padding:4px 6px;font-weight:700;">Total</th></tr></thead><tbody>';
+            for (const [loc, vals] of Object.entries(wh.classic)) {
+                const bold = (loc === 'Warehouse Total' || loc === 'Zephyr Total') ? 'font-weight:700;border-top:1px solid #e5e7eb;' : '';
+                html += '<tr style="' + bold + '"><td style="padding:3px 6px;">' + loc + '</td>';
+                wines.forEach(w => { const v = vals[w] || 0; html += '<td style="text-align:right;padding:3px 6px;' + (w==='spr' && v > 0 ? 'color:#DC2626;' : '') + '">' + v.toLocaleString() + '</td>'; });
+                html += '<td style="text-align:right;padding:3px 6px;font-weight:600;">' + (vals.total||0).toLocaleString() + '</td></tr>';
+            }
+            html += '</tbody></table></div>';
+            html += '<div><div style="font-weight:600;margin-bottom:6px;"><span style="display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;background:#DBEAFE;color:#2563EB;margin-right:6px;">Contemporary</span> Batch 3+</div>';
+            html += '<table style="width:100%;font-size:12px;border-collapse:collapse;"><thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:4px 6px;">Location</th>';
+            wineNames.forEach(w => html += '<th style="text-align:right;padding:4px 6px;">' + w + '</th>');
+            html += '<th style="text-align:right;padding:4px 6px;font-weight:700;">Total</th></tr></thead><tbody>';
+            for (const [loc, vals] of Object.entries(wh.contemporary)) {
+                const bold = loc === 'Warehouse Total' ? 'font-weight:700;border-top:1px solid #e5e7eb;' : '';
+                html += '<tr style="' + bold + '"><td style="padding:3px 6px;">' + loc + '</td>';
+                wines.forEach(w => { const v = vals[w] || 0; html += '<td style="text-align:right;padding:3px 6px;">' + v.toLocaleString() + '</td>'; });
+                html += '<td style="text-align:right;padding:3px 6px;font-weight:600;">' + (vals.total||0).toLocaleString() + '</td></tr>';
+            }
+            html += '</tbody></table></div></div>';
+            html += '<div style="margin-top:12px;padding:8px 12px;background:#f9fafb;border-radius:6px;display:flex;gap:24px;font-size:13px;">';
+            html += '<span><strong>Grand Total:</strong> ' + (gt.total||0).toLocaleString() + ' cases</span>';
+            html += '<span>Classic: ' + (ct.total||0).toLocaleString() + '</span>';
+            html += '<span>Contemporary: ' + (nt.total||0).toLocaleString() + '</span>';
+            if (wh.batch4Est && wh.batch4Est.total) html += '<span style="color:#6B7280;">Batch 4 Est: +' + wh.batch4Est.total.toLocaleString() + '</span>';
+            html += '</div>';
+            panel.innerHTML = html;
+        }
+
+        // Accounts Tab
+        function renderAccounts() {
+            const data = getFilteredData(accountsTop);
+
+            const totalAccounts = data.length;
+            const momentumAccounts = data.filter(a => a.trend === 'Momentum').length;
+            const growthAccounts = data.filter(a => a.trend === 'Growth Opportunity').length;
+            const consistentAccounts = data.filter(a => a.trend === 'Consistent').length;
+
+            document.getElementById('kpi-acc-total').textContent = totalAccounts;
+            document.getElementById('kpi-acc-momentum').textContent = momentumAccounts;
+            document.getElementById('kpi-acc-growth').textContent = growthAccounts;
+            document.getElementById('kpi-acc-consistent').textContent = consistentAccounts;
+
+            // Account Concentration Insight
+            if(typeof acctConcentration!=='undefined'&&acctConcentration.total>0){
+                const concentrationDiv = document.getElementById('accountConcentrationInsight');
+                if(concentrationDiv){
+                    let html = `<div style="padding:12px;background:#f0f4f8;border-radius:8px;margin-bottom:16px;border-left:4px solid #3498db;">
+                        <h4 style="margin:0 0 8px 0;color:#2c3e50;">Account Concentration</h4>
+                        <div style="font-size:14px;color:#555;">
+                            Top 10 accounts = <strong>${acctConcentration.top10}%</strong> of volume | Median = <strong>${acctConcentration.median} CE</strong> | ${acctConcentration.under1} accounts under 1 CE
+                        </div>
+                    </div>`;
+                    concentrationDiv.innerHTML = html;
+                }
+            }
+
+            // Trend Distribution Chart
+            if (charts.accountTrendChart) charts.accountTrendChart.destroy();
+            const ctx = document.getElementById('accountTrendChart').getContext('2d');
+            charts.accountTrendChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Momentum', 'Growth Opportunity', 'Consistent'],
+                    datasets: [{
+                        data: [momentumAccounts, growthAccounts, consistentAccounts],
+                        backgroundColor: ['#0D9F6E', '#F8992D', '#E5E7EB']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Render accounts table
+            renderAccountsTable(data);
+        }
+
+        function renderAccountsTable(data) {
+            const displayData = accountsViewMode === 'top' ? data.slice(0, 20) : data;
+
+            let tableHtml = '';
+            displayData.forEach(a => {
+                tableHtml += `<tr>
+                    <td>${a.rank}</td>
+                    <td><span class="acct-clickable" onclick="openAccountPanel('${a.acct.replace(/'/g,"\\'")}')">${a.acct}</span></td>
+                    <td>${a.dist}</td>
+                    <td>${a.st}</td>
+                    <td>${a.ch}</td>
+                    <td>${a.nov ? a.nov.toFixed(1) : '-'}</td>
+                    <td>${a.dec ? a.dec.toFixed(1) : '-'}</td>
+                    <td>${a.jan ? a.jan.toFixed(1) : '-'}</td>
+                    <td>${a.feb ? a.feb.toFixed(1) : '-'}</td>
+                    <td>${a.total.toFixed(1)}</td>
+                    <td>${renderTrend(a.trend)}</td>
+                    <td>${a.growthPotential > 0 ? '+' + a.growthPotential.toFixed(1) + ' CE' : '—'}</td>
+                </tr>`;
+            });
+            document.getElementById('accountsBody').innerHTML = tableHtml;
+            initTableSorting('accountsTable');
+        }
+
+        function toggleAccountsView(mode) {
+            accountsViewMode = mode;
+            document.querySelectorAll('#accounts .toggle-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderAccountsTable(getFilteredData(accountsTop));
+        }
+
+        // Opportunities Tab
+        function renderOpportunities() {
+            const reEngData = getFilteredData(reEngagementData);
+            const newWinsData = getFilteredData(newWins);
+            const placementData = getFilteredData(placementSummary);
+
+            const reEngAccounts = reEngData.reduce((sum, d) => sum + d.priorAccts, 0);
+            const newWinsCount = newWinsData.length;
+            const netDoors = placementData.reduce((sum, d) => sum + d.net, 0);
+            const totalOppCE = (reEngData.reduce((sum, d) => sum + d.priorCE, 0) +
+                                newWinsData.reduce((sum, d) => sum + d.ce, 0)).toFixed(1);
+
+            document.getElementById('kpi-opp-reeng').textContent = reEngAccounts;
+            document.getElementById('kpi-opp-wins').textContent = newWinsCount;
+            document.getElementById('kpi-opp-doors').textContent = Math.round(netDoors);
+            document.getElementById('kpi-opp-ce').textContent = totalOppCE;
+
+            // Re-engagement table
+            let reEngHtml = '';
+            reEngData.forEach(d => {
+                reEngHtml += `<tr>
+                    <td><span class="acct-clickable" onclick="openAccountPanel('${d.name.replace(/'/g,"\\'")}')">${d.name}</span></td>
+                    <td>${d.st}</td>
+                    <td>${d.priorAccts}</td>
+                    <td>${d.priorCE.toFixed(1)}</td>
+                </tr>`;
+            });
+            document.getElementById('reEngagementBody').innerHTML = reEngHtml;
+
+            // New wins table
+            let newWinsHtml = '';
+            newWinsData.forEach(w => {
+                newWinsHtml += `<tr>
+                    <td><span class="acct-clickable" onclick="openAccountPanel('${w.acct.replace(/'/g,"\\'")}')">${w.acct}</span></td>
+                    <td>${w.dist}</td>
+                    <td>${w.st}</td>
+                    <td>${w.ce.toFixed(1)}</td>
+                    <td>${w.skus}</td>
+                </tr>`;
+            });
+            document.getElementById('newWinsBody').innerHTML = newWinsHtml;
+
+            // Net Placement Chart
+            const topPlacement = placementData.sort((a, b) => b.net - a.net).slice(0, 10);
+            if (charts.netPlacementChart) charts.netPlacementChart.destroy();
+            const ctx = document.getElementById('netPlacementChart').getContext('2d');
+            charts.netPlacementChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: topPlacement.map(d => d.name.substring(0, 20)),
+                    datasets: [
+                        {
+                            label: 'New Placements',
+                            data: topPlacement.map(d => d.newA),
+                            backgroundColor: '#0D9F6E'
+                        },
+                        {
+                            label: 'Re-engagement',
+                            data: topPlacement.map(d => d.reEngageA),
+                            backgroundColor: '#2563EB'
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            stacked: false
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+
+            initTableSorting('reEngagementTable');
+            initTableSorting('newWinsTable');
+        }
+
+        // Reorder Tab
+        function renderReorder() {
+            const data = getFilteredData(reorderData);
+
+            const reorderWithStatus = data.map(r => ({
+                ...r,
+                status: getReorderStatus(r.days, r.cycle)
+            }));
+
+            const overdueCount = reorderWithStatus.filter(r => r.status === 'Overdue').length;
+            const soonCount = reorderWithStatus.filter(r => r.status === 'Due Soon').length;
+            const trackCount = reorderWithStatus.filter(r => r.status === 'On Track').length;
+            const avgCycle = (reorderWithStatus.reduce((sum, r) => sum + r.cycle, 0) / reorderWithStatus.length).toFixed(0);
+
+            document.getElementById('kpi-reord-overdue').textContent = overdueCount;
+            document.getElementById('kpi-reord-soon').textContent = soonCount;
+            document.getElementById('kpi-reord-track').textContent = trackCount;
+            document.getElementById('kpi-reord-cycle').textContent = avgCycle;
+
+            // Status Distribution Chart
+            if (charts.reorderStatusChart) charts.reorderStatusChart.destroy();
+            const ctx = document.getElementById('reorderStatusChart').getContext('2d');
+            charts.reorderStatusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Overdue', 'Due Soon', 'On Track'],
+                    datasets: [{
+                        data: [overdueCount, soonCount, trackCount],
+                        backgroundColor: ['#F8992D', '#D97706', '#0D9F6E']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Reorder table
+            renderReorderTable(reorderWithStatus);
+        }
+
+        let _lastReorderData = [];
+        function renderReorderTable(data) {
+            if (data) _lastReorderData = data;
+            else data = _lastReorderData;
+            const skuFilter = document.getElementById('reorderSkuFilter') ? document.getElementById('reorderSkuFilter').value : 'all';
+            let filteredData = data;
+            if (skuFilter !== 'all') {
+                filteredData = data.filter(r => r.skus && r.skus.some(s => s.w === skuFilter));
+            }
+            const displayData = reorderViewMode === 'top' ? filteredData.slice(0, 20) : filteredData;
+
+            let tableHtml = '';
+            displayData.forEach((r, idx) => {
+                if (skuFilter !== 'all') {
+                    const sku = r.skus.find(s => s.w === skuFilter);
+                    if (!sku) return;
+                    const skuStatus = sku.days > sku.cycle && sku.cycle > 0 ? 'Overdue' : sku.days >= sku.cycle - 7 && sku.cycle > 0 ? 'Due Soon' : 'On Track';
+                    tableHtml += `<tr>
+                        <td>${idx+1}</td>
+                        <td><span class="acct-clickable" onclick="openAccountPanel('${r.acct.replace(/'/g,"\\'")}')">${r.acct}</span></td>
+                        <td>${r.dist}${getQbOrderBadge(r.dist)}</td>
+                        <td>${r.st}</td>
+                        <td>${r.ch}</td>
+                        <td>${sku.ce.toFixed(1)}</td>
+                        <td>${sku.purch}</td>
+                        <td>${sku.cycle}</td>
+                        <td>${sku.last}</td>
+                        <td>${sku.days}</td>
+                        <td><div style="display:flex;align-items:center;gap:4px;"><div style="width:40px;height:6px;background:#eee;border-radius:3px;overflow:hidden;"><div style="width:${Math.min(r.priority||0,100)}%;height:100%;background:${r.priority>=70?'#ef4444':r.priority>=40?'#f59e0b':'#10b981'};"></div></div><span style="font-size:10px;color:#64748b;">${r.priority||0}</span></div></td>
+                        <td>${renderReorderStatus(skuStatus)}</td>
+                    </tr>`;
+                    return;
+                }
+                const hasSkus = r.skus && r.skus.length > 0;
+                const expandId = 'sku-expand-' + idx;
+                const expandIcon = hasSkus ? `<span class="sku-toggle" onclick="toggleRow(this,'${expandId}')" style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show SKU breakdown">&#9654;</span>` : '';
+                tableHtml += `<tr>
+                    <td>${r.rank}</td>
+                    <td>${expandIcon}<span class="acct-clickable" onclick="openAccountPanel('${r.acct.replace(/'/g,"\\'")}')">${r.acct}</span></td>
+                    <td>${r.dist}${getQbOrderBadge(r.dist)}</td>
+                    <td>${r.st}</td>
+                    <td>${r.ch}</td>
+                    <td>${r.ce.toFixed(1)}</td>
+                    <td>${r.purch.toFixed(1)}</td>
+                    <td>${Math.round(r.cycle)}</td>
+                    <td>${r.last}</td>
+                    <td>${Math.round(r.days)}</td>
+                    <td><div style="display:flex;align-items:center;gap:4px;"><div style="width:40px;height:6px;background:#eee;border-radius:3px;overflow:hidden;"><div style="width:${Math.min(r.priority||0,100)}%;height:100%;background:${r.priority>=70?'#ef4444':r.priority>=40?'#f59e0b':'#10b981'};"></div></div><span style="font-size:10px;color:#64748b;">${r.priority||0}</span></div></td>
+                    <td>${renderReorderStatus(r.status)}</td>
+                </tr>`;
+                // SKU sub-rows (hidden by default)
+                if (hasSkus) {
+                    tableHtml += `<tr id="${expandId}" style="display:none;">
+                        <td colspan="12" style="padding:0;">
+                            <table style="width:100%;background:#f8f9fa;border:none;margin:0;">
+                                <thead style="font-size:11px;color:#7f8c8d;">
+                                    <tr>
+                                        <th style="padding:6px 10px;border:none;"></th>
+                                        <th style="padding:6px 10px;border:none;">Wine</th>
+                                        <th style="padding:6px 10px;border:none;"></th>
+                                        <th style="padding:6px 10px;border:none;"></th>
+                                        <th style="padding:6px 10px;border:none;"></th>
+                                        <th style="padding:6px 10px;border:none;">CE</th>
+                                        <th style="padding:6px 10px;border:none;">Orders</th>
+                                        <th style="padding:6px 10px;border:none;">Cycle</th>
+                                        <th style="padding:6px 10px;border:none;">Last Order</th>
+                                        <th style="padding:6px 10px;border:none;">Days</th>
+                                        <th style="padding:6px 10px;border:none;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                ${r.skus.map(s => {
+                                    const skuStatus = s.days > s.cycle && s.cycle > 0 ? '<span class="badge badge-red">Overdue</span>' : s.days >= s.cycle - 7 && s.cycle > 0 ? '<span class="badge badge-yellow">Due</span>' : '<span class="badge badge-green">On Track</span>';
+                                    return `<tr style="font-size:12px;">
+                                        <td style="padding:4px 10px;border:none;"></td>
+                                        <td style="padding:4px 10px;border:none;font-weight:500;">${s.w}</td>
+                                        <td style="padding:4px 10px;border:none;"></td>
+                                        <td style="padding:4px 10px;border:none;"></td>
+                                        <td style="padding:4px 10px;border:none;"></td>
+                                        <td style="padding:4px 10px;border:none;">${s.ce.toFixed(1)}</td>
+                                        <td style="padding:4px 10px;border:none;">${s.purch}</td>
+                                        <td style="padding:4px 10px;border:none;">${s.cycle}</td>
+                                        <td style="padding:4px 10px;border:none;">${s.last}</td>
+                                        <td style="padding:4px 10px;border:none;">${s.days}</td>
+                                        <td style="padding:4px 10px;border:none;">${skuStatus}</td>
+                                    </tr>`;
+                                }).join('')}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>`;
+                }
+            });
+            document.getElementById('reorderBody').innerHTML = tableHtml;
+            initTableSorting('reorderTable');
+        }
+
+        function toggleRow(btn, id) {
+            const row = document.getElementById(id);
+            if (!row) return;
+            const isHidden = row.style.display === 'none';
+            row.style.display = isHidden ? 'table-row' : 'none';
+            if (btn) btn.innerHTML = isHidden ? '&#9660;' : '&#9654;';
+        }
+
+        function toggleReorderView(mode) {
+            reorderViewMode = mode;
+            document.querySelectorAll('#reorder .toggle-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderReorder();
+        }
+
+        // Table Sorting
+        function initTableSorting(tableId) {
+            const table = document.getElementById(tableId);
+            const headers = table.querySelectorAll('th');
+
+            headers.forEach((header, index) => {
+                header.classList.add('sortable');
+                header.addEventListener('click', function() {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    const isAsc = header.classList.contains('sorted-asc');
+
+                    headers.forEach(h => {
+                        h.classList.remove('sorted-asc', 'sorted-desc');
+                    });
+
+                    rows.sort((a, b) => {
+                        const aVal = a.children[index].textContent.trim();
+                        const bVal = b.children[index].textContent.trim();
+
+                        const aNum = parseFloat(aVal);
+                        const bNum = parseFloat(bVal);
+
+                        if (!isNaN(aNum) && !isNaN(bNum)) {
+                            return isAsc ? bNum - aNum : aNum - bNum;
+                        }
+
+                        return isAsc ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
+                    });
+
+                    tbody.innerHTML = '';
+                    rows.forEach(row => tbody.appendChild(row));
+
+                    if (isAsc) {
+                        header.classList.add('sorted-desc');
+                    } else {
+                        header.classList.add('sorted-asc');
+                    }
+                });
+            });
+        }
+
+        // Event Listeners
+        function attachEventListeners() {
+            document.getElementById('accountsSearch').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const filtered = accountsTop.filter(a =>
+                    a.acct.toLowerCase().includes(query)
+                );
+                renderAccountsTable(filtered);
+            });
+
+            document.getElementById('reorderSearch').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const filtered = reorderData.filter(r =>
+                    r.acct.toLowerCase().includes(query)
+                );
+                renderReorderTable(filtered.map(r => ({
+                    ...r,
+                    status: getReorderStatus(r.days, r.cycle)
+                })));
+            });
+
+            document.querySelectorAll('#channelPills .pill').forEach(pill => {
+                pill.addEventListener('click', function() {
+                    document.querySelectorAll('#channelPills .pill').forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    currentChannelFilter = this.dataset.channel;
+                    applyFilters();
+                });
+            });
+        }
+    </script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+    // Firebase Configuration - REPLACE with your project's config
+    const FIREBASE_CONFIG = {
+        apiKey: "AIzaSyC958VfAkRbtxFHXlmtTONtyvTJWUlq83g",
+        authDomain: "mt-dashboard-dab8e.firebaseapp.com",
+        projectId: "mt-dashboard-dab8e",
+        storageBucket: "mt-dashboard-dab8e.firebasestorage.app",
+        messagingSenderId: "252962457560",
+        appId: "1:252962457560:web:06475f8801ff2ed50a54ad"
+    };
+
+    let db = null;
+    let firebaseReady = false;
+    try {
+        firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+        firebaseReady = true;
+        console.log('Firebase connected');
+    } catch(e) {
+        console.warn('Firebase not configured - using local storage fallback. Set up Firebase for cloud sync.');
+        firebaseReady = false;
+    }
+
+    // Storage abstraction - uses Firebase if available, localStorage fallback
+    const AccountStore = {
+        _localKey(acctId) { return 'mt_acct_' + acctId; },
+        _sanitizeId(name) { return name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 100); },
+
+        async getNotes(acctId) {
+            const id = this._sanitizeId(acctId);
+            if(firebaseReady) {
+                const snap = await db.collection('accounts').doc(id).collection('notes').orderBy('ts','desc').get();
+                return snap.docs.map(d => ({id:d.id, ...d.data()}));
+            }
+            const data = JSON.parse(localStorage.getItem(this._localKey(id)) || '{}');
+            return (data.notes || []).sort((a,b) => b.ts - a.ts);
+        },
+
+        async addNote(acctId, text, author) {
+            const id = this._sanitizeId(acctId);
+            const note = {text, author, ts: Date.now(), date: new Date().toLocaleDateString()};
+            if(firebaseReady) {
+                await db.collection('accounts').doc(id).collection('notes').add(note);
+                return;
+            }
+            const data = JSON.parse(localStorage.getItem(this._localKey(id)) || '{}');
+            if(!data.notes) data.notes = [];
+            data.notes.push(note);
+            localStorage.setItem(this._localKey(id), JSON.stringify(data));
+        },
+
+        async getMeta(acctId) {
+            const id = this._sanitizeId(acctId);
+            if(firebaseReady) {
+                const doc = await db.collection('accounts').doc(id).get();
+                return doc.exists ? doc.data() : {};
+            }
+            const data = JSON.parse(localStorage.getItem(this._localKey(id)) || '{}');
+            return {tags: data.tags || [], status: data.status || '', followUp: data.followUp || '', nextAction: data.nextAction || ''};
+        },
+
+        async setMeta(acctId, meta) {
+            const id = this._sanitizeId(acctId);
+            if(firebaseReady) {
+                await db.collection('accounts').doc(id).set(meta, {merge: true});
+                return;
+            }
+            const data = JSON.parse(localStorage.getItem(this._localKey(id)) || '{}');
+            Object.assign(data, meta);
+            localStorage.setItem(this._localKey(id), JSON.stringify(data));
+        }
+    };
+    </script>
+
+    <script>
+    // ==================== ACCOUNT CRM PANEL ====================
+    let currentRepName = localStorage.getItem('mt_rep_name') || '';
+
+    function getAccountKey(name) {
+        return name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 100);
+    }
+
+    function openAccountPanel(acctName) {
+        // Prompt for rep name if not set
+        if(!currentRepName) {
+            currentRepName = prompt('Enter your name (for notes attribution):') || 'Unknown';
+            localStorage.setItem('mt_rep_name', currentRepName);
+        }
+
+        // Gather all data for this account
+        const topData = accountsTop.find(a => a.acct === acctName);
+        const reorderInfo = reorderData.find(r => r.acct === acctName);
+        const reEngInfo = reEngagementData.find(r => r.name === acctName);
+        const newWinInfo = newWins.find(w => w.acct === acctName);
+
+        const dist = topData?.dist || reorderInfo?.dist || newWinInfo?.dist || '--';
+        const st = topData?.st || reorderInfo?.st || newWinInfo?.st || '--';
+        const ch = topData?.ch || reorderInfo?.ch || '--';
+
+        document.getElementById('apName').textContent = acctName;
+        document.getElementById('apSub').innerHTML = `${dist} &bull; ${st} &bull; ${ch === 'ON' ? 'On-Premise' : ch === 'OFF' ? 'Off-Premise' : ch}`;
+
+        // Build content
+        let html = '';
+
+        // -- KPI Section --
+        const totalCE = topData?.total || reorderInfo?.ce || 0;
+        const purchases = reorderInfo?.purch || 0;
+        const cycle = reorderInfo?.cycle || 0;
+        const lastOrder = reorderInfo?.last || '--';
+        const daysSince = reorderInfo?.days || '--';
+        const trend = topData?.trend || '--';
+        const growth = topData?.growthPotential || 0;
+        const priority = reorderInfo?.priority || 0;
+
+        html += `<div class="ap-section"><h3>Performance</h3><div class="ap-kpi-grid">
+            <div class="ap-kpi"><div class="val">${totalCE.toFixed?totalCE.toFixed(1):totalCE}</div><div class="label">4M Total CE</div></div>
+            <div class="ap-kpi"><div class="val">${purchases}</div><div class="label">Purchases</div></div>
+            <div class="ap-kpi"><div class="val">${cycle}w</div><div class="label">Avg Cycle</div></div>
+            <div class="ap-kpi"><div class="val">${lastOrder}</div><div class="label">Last Order</div></div>
+            <div class="ap-kpi"><div class="val">${daysSince}</div><div class="label">Days Since</div></div>
+            <div class="ap-kpi"><div class="val">${priority}</div><div class="label">Priority Score</div></div>
+        </div></div>`;
+
+        // -- Monthly Trend Sparkline --
+        if(topData) {
+            const months = [topData.nov||0, topData.dec||0, topData.jan||0, topData.feb||0];
+            const maxM = Math.max(...months, 0.1);
+            html += `<div class="ap-section"><h3>Monthly Depletions</h3><div style="display:flex;align-items:center;gap:16px;">
+                <div class="ap-sparkline">
+                    ${months.map((m,i) => `<div class="bar" style="height:${Math.max(2, m/maxM*32)}px;" title="${['Nov','Dec','Jan','Feb'][i]}: ${m.toFixed(1)} CE"></div>`).join('')}
+                </div>
+                <div style="font-size:12px;color:#6B7280;">${['Nov','Dec','Jan','Feb'].map((l,i) => `${l}: ${months[i].toFixed(1)}`).join(' / ')}</div>
+            </div>
+            <div style="margin-top:8px;font-size:13px;">
+                <span class="ap-status-badge" style="background:${trend==='Momentum'?'#d1fae5':trend==='Growth Opportunity'?'#fef3c7':'#f3f4f6'};color:${trend==='Momentum'?'#065f46':trend==='Growth Opportunity'?'#92400e':'#374151'}">${trend}</span>
+                ${growth > 0 ? `<span style="color:#10b981;font-weight:600;margin-left:8px;">+${growth.toFixed(1)} CE potential</span>` : ''}
+            </div></div>`;
+        }
+
+        // -- SKU Breakdown (from reorder data) --
+        if(reorderInfo && reorderInfo.skus && reorderInfo.skus.length > 0) {
+            html += `<div class="ap-section"><h3>SKU Breakdown</h3><table class="ap-sku-table">
+                <tr><th>Wine</th><th>CE</th><th>Purchases</th><th>Last Order</th><th>Days</th></tr>`;
+            reorderInfo.skus.forEach(s => {
+                html += `<tr><td>${s.w}</td><td>${s.ce.toFixed(1)}</td><td>${s.purch}</td><td>${s.last}</td><td>${s.days}</td></tr>`;
+            });
+            html += `</table></div>`;
+        }
+
+        // -- Re-engagement flag --
+        if(reEngInfo) {
+            html += `<div class="ap-section" style="background:#fef3c7;">
+                <h3 style="color:#92400e;">Re-Engagement Opportunity</h3>
+                <div style="font-size:13px;color:#78350f;">Previously ordered ${reEngInfo.priorCE.toFixed(1)} CE across ${reEngInfo.priorAccts} purchases. Priority: ${reEngInfo.priority}/100</div>
+            </div>`;
+        }
+
+        // -- New Win flag --
+        if(newWinInfo) {
+            html += `<div class="ap-section" style="background:#d1fae5;">
+                <h3 style="color:#065f46;">New Win</h3>
+                <div style="font-size:13px;color:#064e3b;">${newWinInfo.ce.toFixed(1)} CE | ${newWinInfo.skus} SKUs | ${newWinInfo.dateRange}</div>
+            </div>`;
+        }
+
+        // -- Tags Section --
+        html += `<div class="ap-section"><h3>Tags</h3>
+            <div class="ap-tags" id="apTags">
+                ${['VIP','At Risk','Hot Lead','Needs Visit','Seasonal','Chain','Independent','Follow Up'].map(t =>
+                    `<span class="ap-tag" data-tag="${t}">${t}</span>`
+                ).join('')}
+            </div></div>`;
+
+        // -- Notes Section --
+        html += `<div class="ap-section"><h3>Notes & Activity</h3>
+            <div class="ap-notes-list" id="apNotes"><div style="color:#9ca3af;font-size:13px;">Loading notes...</div></div>
+            <div class="ap-note-input">
+                <textarea id="apNoteText" placeholder="Add a note about this account..."></textarea>
+                <button id="apAddNoteBtn" style="flex-shrink:0;">Add</button>
+            </div>
+        </div>`;
+
+        // -- Next Action Section --
+        html += `<div class="ap-section"><h3>Next Action</h3>
+            <div class="ap-action-row">
+                <select id="apActionType" style="flex:1;">
+                    <option value="">Select action...</option>
+                    <option value="Call">Call</option>
+                    <option value="Email">Email</option>
+                    <option value="Visit">Visit</option>
+                    <option value="Send Samples">Send Samples</option>
+                    <option value="Follow Up">Follow Up</option>
+                    <option value="Reorder Check">Reorder Check</option>
+                </select>
+                <input type="date" id="apFollowDate" style="flex:1;">
+            </div>
+            <div id="apActionStatus" style="margin-top:8px;font-size:12px;color:#6B7280;"></div>
+        </div>`;
+
+        document.getElementById('apContent').innerHTML = html;
+
+        // Wire up event listeners (instead of inline onclick)
+        // Tag clicks
+        document.querySelectorAll('#apTags .ap-tag').forEach(tagEl => {
+            tagEl.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                const selectedTags = [...document.querySelectorAll('#apTags .ap-tag.selected')].map(t => t.dataset.tag);
+                AccountStore.setMeta(acctName, {tags: selectedTags}).catch(e => console.warn('Could not save tags:', e));
+            });
+        });
+
+        // Add Note button
+        const addNoteBtn = document.getElementById('apAddNoteBtn');
+        if (addNoteBtn) {
+            addNoteBtn.addEventListener('click', function() {
+                addAccountNote(acctName);
+            });
+        }
+
+        // Action selectors
+        const actionType = document.getElementById('apActionType');
+        const followDate = document.getElementById('apFollowDate');
+        if (actionType) actionType.addEventListener('change', function() { saveAccountAction(acctName); });
+        if (followDate) followDate.addEventListener('change', function() { saveAccountAction(acctName); });
+
+        // Show panel
+        document.getElementById('apOverlay').classList.add('active');
+        document.getElementById('accountPanel').classList.add('active');
+
+        // Load stored data
+        loadAccountMeta(acctName);
+        loadAccountNotes(acctName);
+    }
+
+    function closeAccountPanel() {
+        document.getElementById('apOverlay').classList.remove('active');
+        document.getElementById('accountPanel').classList.remove('active');
+    }
+
+    async function loadAccountMeta(acctName) {
+        try {
+            const meta = await AccountStore.getMeta(acctName);
+            // Restore tags
+            if(meta.tags && meta.tags.length) {
+                meta.tags.forEach(t => {
+                    const el = document.querySelector(`.ap-tag[data-tag="${t}"]`);
+                    if(el) el.classList.add('selected');
+                });
+            }
+            // Restore action
+            if(meta.nextAction) document.getElementById('apActionType').value = meta.nextAction;
+            if(meta.followUp) document.getElementById('apFollowDate').value = meta.followUp;
+            if(meta.nextAction || meta.followUp) {
+                document.getElementById('apActionStatus').innerHTML = `<span style="color:#10b981;">Saved: ${meta.nextAction || ''} ${meta.followUp ? 'by ' + meta.followUp : ''}</span>`;
+            }
+        } catch(e) { console.warn('Could not load account meta:', e); }
+    }
+
+    async function loadAccountNotes(acctName) {
+        try {
+            const notes = await AccountStore.getNotes(acctName);
+            const container = document.getElementById('apNotes');
+            if(!notes.length) {
+                container.innerHTML = '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:12px;">No notes yet. Be the first to add one.</div>';
+                return;
+            }
+            container.innerHTML = notes.map(n => `<div class="ap-note">
+                <div class="meta">${n.author || 'Unknown'} - ${n.date || new Date(n.ts).toLocaleDateString()}</div>
+                <div>${n.text}</div>
+            </div>`).join('');
+        } catch(e) {
+            document.getElementById('apNotes').innerHTML = '<div style="color:#ef4444;font-size:12px;">Could not load notes. Check Firebase config.</div>';
+        }
+    }
+
+    async function addAccountNote(acctName) {
+        const textarea = document.getElementById('apNoteText');
+        const text = textarea.value.trim();
+        if(!text) return;
+        try {
+            await AccountStore.addNote(acctName, text, currentRepName);
+            textarea.value = '';
+            loadAccountNotes(acctName);
+        } catch(e) { alert('Failed to save note: ' + e.message); }
+    }
+
+    async function toggleAccountTag(acctName, tag, el) {
+        el.classList.toggle('selected');
+        const selectedTags = [...document.querySelectorAll('.ap-tag.selected')].map(t => t.dataset.tag);
+        try {
+            await AccountStore.setMeta(acctName, {tags: selectedTags});
+        } catch(e) { console.warn('Could not save tags:', e); }
+    }
+
+    async function saveAccountAction(acctName) {
+        const action = document.getElementById('apActionType').value;
+        const date = document.getElementById('apFollowDate').value;
+        try {
+            await AccountStore.setMeta(acctName, {nextAction: action, followUp: date});
+            document.getElementById('apActionStatus').innerHTML = `<span style="color:#10b981;">Saved</span>`;
+        } catch(e) { console.warn('Could not save action:', e); }
+    }
+
+    function changeRepName() {
+        const name = prompt('Enter your name:', currentRepName);
+        if(name) {
+            currentRepName = name;
+            localStorage.setItem('mt_rep_name', name);
+            document.getElementById('repNameDisplay').textContent = name;
+        }
+    }
+
+    // Initialize rep name display on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const el = document.getElementById('repNameDisplay');
+        if(el) el.textContent = currentRepName || 'Set Name';
+    });
+
+    // ==================== MY ACTION ITEMS TAB ====================
+    let actionItemsLoaded = false;
+    let actionItemsMeta = {};
+
+    async function loadRepActionItems() {
+        const status = document.getElementById('actionLoadStatus');
+        if (status) status.textContent = 'Loading...';
+        actionItemsMeta = {};
+
+        const allAccounts = new Set();
+        if (typeof accountsTop !== 'undefined') accountsTop.forEach(a => allAccounts.add(a.acct));
+        if (typeof reorderData !== 'undefined') reorderData.forEach(r => allAccounts.add(r.acct));
+
+        if (firebaseReady && db) {
+            try {
+                const snap = await db.collection('accounts').get();
+                const fbAccounts = {};
+                snap.forEach(doc => { fbAccounts[doc.id] = doc.data(); });
+
+                for (const acctName of allAccounts) {
+                    const id = AccountStore._sanitizeId(acctName);
+                    const meta = fbAccounts[id] || {};
+                    let noteCount = 0;
+                    let lastNoteDate = '';
+                    try {
+                        const notesSnap = await db.collection('accounts').doc(id).collection('notes').orderBy('ts','desc').limit(1).get();
+                        noteCount = notesSnap.size;
+                        if (!notesSnap.empty) {
+                            const lastNote = notesSnap.docs[0].data();
+                            lastNoteDate = lastNote.date || new Date(lastNote.ts).toLocaleDateString();
+                        }
+                        const allNotesSnap = await db.collection('accounts').doc(id).collection('notes').get();
+                        noteCount = allNotesSnap.size;
+                    } catch(e) {}
+                    if (meta.tags && meta.tags.length > 0 || meta.nextAction || meta.followUp) {
+                        actionItemsMeta[acctName] = {
+                            tags: meta.tags || [],
+                            nextAction: meta.nextAction || '',
+                            followUp: meta.followUp || '',
+                            noteCount: noteCount,
+                            lastNoteDate: lastNoteDate,
+                        };
+                    }
+                }
+            } catch(e) {
+                console.warn('Firebase action items load failed, falling back to localStorage', e);
+                loadActionItemsFromLocalStorage(allAccounts);
+            }
+        } else {
+            loadActionItemsFromLocalStorage(allAccounts);
+        }
+
+        actionItemsLoaded = true;
+        if (status) status.textContent = Object.keys(actionItemsMeta).length + ' tagged accounts loaded';
+        renderActionItems();
+    }
+
+    function loadActionItemsFromLocalStorage(allAccounts) {
+        for (const acctName of allAccounts) {
+            const id = AccountStore._sanitizeId(acctName);
+            const key = 'mt_acct_' + id;
+            const data = JSON.parse(localStorage.getItem(key) || '{}');
+            if ((data.tags && data.tags.length > 0) || data.nextAction || data.followUp) {
+                actionItemsMeta[acctName] = {
+                    tags: data.tags || [],
+                    nextAction: data.nextAction || '',
+                    followUp: data.followUp || '',
+                    noteCount: (data.notes || []).length,
+                    lastNoteDate: data.notes && data.notes.length > 0 ? (data.notes[data.notes.length-1].date || '') : '',
+                };
+            }
+        }
+    }
+
+    function renderActionItems() {
+        if (!actionItemsLoaded) return;
+
+        const filterVal = document.getElementById('actionFilter')?.value || 'all';
+        const today = new Date().toISOString().split('T')[0];
+
+        const tagColors = {
+            'VIP': '#7C3AED', 'At Risk': '#DC2626', 'Hot Lead': '#F59E0B',
+            'Needs Visit': '#2563EB', 'Seasonal': '#059669', 'Chain': '#6B7280',
+            'Independent': '#8B5CF6', 'Follow Up': '#EC4899'
+        };
+
+        let items = [];
+        for (const [acctName, meta] of Object.entries(actionItemsMeta)) {
+            const top = (typeof accountsTop !== 'undefined') ? accountsTop.find(a => a.acct === acctName) : null;
+            const reorder = (typeof reorderData !== 'undefined') ? reorderData.find(r => r.acct === acctName) : null;
+
+            items.push({
+                acct: acctName,
+                dist: (top?.dist || reorder?.dist || '--'),
+                st: (top?.st || reorder?.st || ''),
+                ce: (top?.total || reorder?.ce || 0),
+                lastOrder: (reorder?.last || '--'),
+                daysSince: (reorder?.days || 999),
+                priority: (reorder?.priority || 0),
+                tags: meta.tags,
+                nextAction: meta.nextAction,
+                followUp: meta.followUp,
+                noteCount: meta.noteCount,
+                lastNoteDate: meta.lastNoteDate,
+                isOverdue: meta.followUp && meta.followUp < today,
+            });
+        }
+
+        if (filterVal === 'action') items = items.filter(i => i.nextAction);
+        else if (filterVal === 'overdue') items = items.filter(i => i.isOverdue);
+        else if (filterVal !== 'all') items = items.filter(i => i.tags.includes(filterVal));
+
+        items.sort((a, b) => {
+            if (a.isOverdue && !b.isOverdue) return -1;
+            if (!a.isOverdue && b.isOverdue) return 1;
+            return b.priority - a.priority;
+        });
+
+        const allItems = Object.values(actionItemsMeta);
+        const taggedCount = allItems.length;
+        const vipCount = allItems.filter(m => m.tags.includes('VIP')).length;
+        const atRiskCount = allItems.filter(m => m.tags.includes('At Risk')).length;
+        const overdueCount = allItems.filter(m => m.followUp && m.followUp < today).length;
+        const activeActions = allItems.filter(m => m.nextAction).length;
+        const needsVisitCount = allItems.filter(m => m.tags.includes('Needs Visit')).length;
+
+        document.getElementById('actionKpis').innerHTML = `
+            <div class="kpi-card"><div class="kpi-label">My Tagged Accounts</div><div class="kpi-value">${taggedCount}</div></div>
+            <div class="kpi-card" style="border-left:3px solid #7C3AED;"><div class="kpi-label">VIP</div><div class="kpi-value" style="color:#7C3AED;">${vipCount}</div></div>
+            <div class="kpi-card" style="border-left:3px solid #DC2626;"><div class="kpi-label">At Risk</div><div class="kpi-value" style="color:#DC2626;">${atRiskCount}</div></div>
+            <div class="kpi-card" style="border-left:3px solid #F59E0B;"><div class="kpi-label">Overdue</div><div class="kpi-value" style="color:#F59E0B;">${overdueCount}</div></div>
+            <div class="kpi-card"><div class="kpi-label">Active Actions</div><div class="kpi-value">${activeActions}</div></div>
+            <div class="kpi-card" style="border-left:3px solid #2563EB;"><div class="kpi-label">Needs Visit</div><div class="kpi-value" style="color:#2563EB;">${needsVisitCount}</div></div>
+        `;
+
+        let alerts = '';
+        const overdueItems = Object.entries(actionItemsMeta)
+            .filter(([n, m]) => m.followUp && m.followUp < today)
+            .map(([n, m]) => ({acct: n, followUp: m.followUp}));
+        if (overdueItems.length > 0) {
+            alerts += '<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;color:#991B1B;">';
+            alerts += '<strong>Overdue Follow-Ups:</strong> ';
+            alerts += overdueItems.slice(0, 5).map(i =>
+                '<span style="font-weight:600;cursor:pointer;text-decoration:underline;" onclick="openAccountPanel(\'' + i.acct.replace(/'/g, "\\'") + '\')">' + i.acct + '</span> (due ' + i.followUp + ')'
+            ).join(', ');
+            if (overdueItems.length > 5) alerts += ' + ' + (overdueItems.length - 5) + ' more';
+            alerts += '</div>';
+        }
+
+        const vipStale = items.filter(i => i.tags.includes('VIP') && i.daysSince > 30);
+        if (vipStale.length > 0) {
+            alerts += '<div style="background:#F5F3FF;border:1px solid #C4B5FD;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;color:#5B21B6;">';
+            alerts += '<strong>VIP Alert:</strong> ' + vipStale.length + ' VIP account(s) with no order in 30+ days: ';
+            alerts += vipStale.slice(0, 5).map(i =>
+                '<span style="font-weight:600;cursor:pointer;text-decoration:underline;" onclick="openAccountPanel(\'' + i.acct.replace(/'/g, "\\'") + '\')">' + i.acct + '</span> (' + i.daysSince + 'd)'
+            ).join(', ');
+            alerts += '</div>';
+        }
+
+        const atRiskAccts = items.filter(i => i.tags.includes('At Risk'));
+        if (atRiskAccts.length > 0) {
+            alerts += '<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;color:#9A3412;">';
+            alerts += '<strong>At Risk:</strong> ' + atRiskAccts.length + ' account(s) flagged: ';
+            alerts += atRiskAccts.slice(0, 5).map(i => i.acct).join(', ');
+            if (atRiskAccts.length > 5) alerts += ' + ' + (atRiskAccts.length - 5) + ' more';
+            alerts += '</div>';
+        }
+        document.getElementById('actionAlerts').innerHTML = alerts;
+
+        if (items.length === 0) {
+            document.getElementById('actionItemsList').innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;font-size:14px;">No tagged accounts or action items found.<br><span style="font-size:12px;">Open any account and add tags or actions to see them here.</span></div>';
+        } else {
+            let cardsHtml = '';
+            items.forEach(item => {
+                const tagBadges = item.tags.map(t =>
+                    '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;color:#fff;background:' + (tagColors[t] || '#6B7280') + ';margin-right:3px;">' + t + '</span>'
+                ).join('');
+
+                const dayColor = item.daysSince > 60 ? '#DC2626' : item.daysSince > 30 ? '#F59E0B' : '#059669';
+                const overdueStyle = item.isOverdue ? 'border-left:4px solid #DC2626;' : 'border-left:4px solid #e5e7eb;';
+
+                cardsHtml += '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin-bottom:10px;cursor:pointer;' + overdueStyle + 'transition:box-shadow 0.15s;" ' +
+                    'onmouseover="this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.08)\'" onmouseout="this.style.boxShadow=\'none\'" ' +
+                    'onclick="openAccountPanel(\'' + item.acct.replace(/'/g, "\\'") + '\')">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">' +
+                        '<div><span style="font-weight:700;font-size:14px;color:#1a1a2e;">' + item.acct + '</span>' +
+                        '<span style="margin-left:8px;font-size:11px;color:#6B7280;">' + item.dist + ' / ' + item.st + '</span></div>' +
+                        '<div style="text-align:right;">' +
+                            (item.ce > 0 ? '<span style="font-size:12px;font-weight:600;color:#1a1a2e;">' + item.ce.toFixed(1) + ' CE</span>' : '') +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="margin-bottom:6px;">' + (tagBadges || '') + '</div>' +
+                    '<div style="display:flex;gap:16px;font-size:12px;color:#6B7280;flex-wrap:wrap;">' +
+                        (item.nextAction ? '<span>Action: <strong style="color:#1a1a2e;">' + item.nextAction + '</strong></span>' : '') +
+                        (item.followUp ? '<span style="' + (item.isOverdue ? 'color:#DC2626;font-weight:700;' : '') + '">Due: ' + item.followUp + (item.isOverdue ? ' (OVERDUE)' : '') + '</span>' : '') +
+                        '<span>Last Order: <strong style="color:' + dayColor + ';">' + item.lastOrder + '</strong> (' + (item.daysSince < 999 ? item.daysSince + 'd ago' : '--') + ')</span>' +
+                        (item.noteCount > 0 ? '<span style="background:#EEF2FF;color:#4338CA;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:600;">' + item.noteCount + ' note' + (item.noteCount > 1 ? 's' : '') + '</span>' : '') +
+                    '</div>' +
+                '</div>';
+            });
+            document.getElementById('actionItemsList').innerHTML = cardsHtml;
+        }
+
+        document.getElementById('actionSummary').textContent = 'Showing ' + items.length + ' item' + (items.length !== 1 ? 's' : '') + (filterVal !== 'all' ? ' (filtered)' : '');
+    }
+
+    // Wire up Action Items tab auto-load and filter/refresh
+    (function() {
+        const filterEl = document.getElementById('actionFilter');
+        if (filterEl) filterEl.addEventListener('change', renderActionItems);
+
+        const refreshBtn = document.getElementById('actionRefreshBtn');
+        if (refreshBtn) refreshBtn.addEventListener('click', function() { loadRepActionItems(); });
+
+        const origTabListeners = document.querySelectorAll('.tab');
+        origTabListeners.forEach(tab => {
+            tab.addEventListener('click', function() {
+                if (this.dataset.tab === 'action-items' && !actionItemsLoaded) {
+                    loadRepActionItems();
+                }
+            });
+        });
+    })();
+    </script>
+
+    <div class="account-panel-overlay" id="apOverlay" onclick="closeAccountPanel()"></div>
+    <div class="account-panel" id="accountPanel">
+        <div class="ap-header">
+            <button class="ap-close" onclick="closeAccountPanel()">&times;</button>
+            <h2 id="apName">--</h2>
+            <div class="ap-sub" id="apSub">--</div>
+        </div>
+        <div id="apContent"></div>
+    </div>
+</body>
+</html>

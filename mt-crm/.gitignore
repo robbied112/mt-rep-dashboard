@@ -1,0 +1,21 @@
+# Sensitive data - Excel files stay in OneDrive/SharePoint
+.env
+*.xlsx
+*.xls
+*.csv
+data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

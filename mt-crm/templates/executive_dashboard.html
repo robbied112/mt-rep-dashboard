@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missing Thorn - Business Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #F9F7F5;
+  --card: #FFFFFF;
+  --card-hover: #FFF8F4;
+  --border: #E8E0DA;
+  --text: #2D2420;
+  --text-dim: #7A6E66;
+  --accent: #B13B34;
+  --accent2: #DF584A;
+  --accent-light: #F2A49D;
+  --cream: #FFF4EC;
+  --peach: #FEDAB2;
+  --orange: #F8992D;
+  --burgundy: #6C312E;
+  --green: #0D9F6E;
+  --green-bg: rgba(13,159,110,0.08);
+  --red: #DC2626;
+  --red-bg: rgba(220,38,38,0.06);
+  --yellow: #D97706;
+  --yellow-bg: rgba(217,119,6,0.08);
+  --blue: #2563EB;
+  --blue-bg: rgba(37,99,235,0.08);
+  --c1: #2563EB;
+  --c2: #7C3AED;
+  --c3: #0891B2;
+  --c4: #059669;
+  --c5: #D97706;
+  --c6: #DC2626;
+  --c7: #4F46E5;
+  --c8: #0D9488;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Catamaran', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+
+.header {
+  background: linear-gradient(135deg, #6C312E 0%, #4A2220 60%, #3A1A18 100%);
+  padding: 16px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-brand { display:flex; align-items:center; gap:16px; }
+.header-brand img { height:42px; }
+.header-brand .brand-text { display:flex; flex-direction:column; }
+.header-brand .brand-text h1 { font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#FFF4EC; line-height:1.2; }
+.header-brand .brand-text .dash-label { font-size:11px; font-weight:500; color:var(--peach); letter-spacing:1px; opacity:0.85; }
+.header-meta { font-size:12px; color:var(--peach); text-align:right; opacity:0.9; }
+.header-meta strong { color:#FFF4EC; }
+
+.filter-bar {
+  display:flex; align-items:center; gap:12px; padding:10px 32px;
+  background:#FFFFFF;
+  border-bottom:1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+.filter-bar label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent); }
+.filter-bar select {
+  padding:6px 14px; background:#FFFFFF; border:1px solid var(--border);
+  color:var(--text); border-radius:6px; font-size:13px; cursor:pointer; min-width:160px;
+  font-family:'Catamaran',sans-serif;
+}
+.filter-bar select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 2px rgba(177,59,52,0.15); }
+.filter-badge {
+  display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px;
+  font-weight:600; background:rgba(177,59,52,0.08); color:var(--accent); margin-left:4px;
+}
+.state-pills { display:flex; gap:6px; flex-wrap:wrap; margin-left:8px; }
+.state-pill {
+  padding:4px 12px; border:1px solid var(--border); background:#FFFFFF;
+  color:var(--text-dim); border-radius:16px; cursor:pointer; font-size:12px;
+  transition:all 0.2s; font-weight:600; font-family:'Catamaran',sans-serif;
+}
+.state-pill:hover { border-color:var(--accent); color:var(--accent); }
+.state-pill.active { background:var(--accent); color:#FFFFFF; border-color:var(--accent); font-weight:700; }
+
+.nav {
+  display:flex; gap:4px; padding:12px 32px; background:#FFFFFF;
+  border-bottom:1px solid var(--border); overflow-x:auto;
+}
+.nav button {
+  padding:8px 18px; border:1px solid var(--border); background:#FFFFFF;
+  color:var(--text-dim); border-radius:6px; cursor:pointer; font-size:13px;
+  white-space:nowrap; transition:all 0.2s; font-family:'Catamaran',sans-serif; font-weight:600;
+}
+.nav button:hover { background:var(--cream); color:var(--accent); border-color:var(--accent-light); }
+.nav button.active { background:var(--accent); color:#FFFFFF; border-color:var(--accent); font-weight:700; }
+
+.container { max-width:1440px; margin:0 auto; padding:20px 32px; }
+
+.section { display:none; }
+.section.active { display:block; }
+
+.grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px; }
+.grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:20px; }
+
+@media(max-width:1100px) {
+  .grid-4 { grid-template-columns:repeat(2,1fr); }
+  .grid-3,.grid-2 { grid-template-columns:1fr; }
+  .state-pills { display:flex; overflow-x:auto; flex-wrap:nowrap; }
+  .state-pill { flex-shrink:0; }
+}
+
+.card {
+  background:var(--card); border:1px solid var(--border); border-radius:10px;
+  padding:20px; transition:all 0.2s; box-shadow:var(--shadow);
+}
+.card:hover { border-color:var(--accent-light); box-shadow:var(--shadow-md); }
+.card h3 { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-dim); margin-bottom:8px; font-weight:700; }
+.card .value { font-size:28px; font-weight:800; color:var(--text); }
+.card .sub { font-size:13px; color:var(--text-dim); margin-top:4px; }
+
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; }
+.badge-green { background:var(--green-bg); color:var(--green); }
+.badge-red { background:var(--red-bg); color:var(--red); }
+.badge-yellow { background:var(--yellow-bg); color:var(--yellow); }
+.badge-blue { background:var(--blue-bg); color:var(--blue); }
+
+.chart-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px; box-shadow:var(--shadow); }
+.chart-card h3 { font-size:14px; font-weight:700; margin-bottom:16px; color:var(--text); }
+.chart-wrap { position:relative; height:300px; }
+
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; padding:10px 12px; border-bottom:2px solid #CBD5E1; color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; font-weight:700; }
+td { padding:10px 12px; border-bottom:1px solid var(--border); }
+tr:hover td { background:rgba(37,99,235,0.03); }
+.table-wrap { overflow-x:auto; }
+
+.section-title { font-size:18px; font-weight:800; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid #CBD5E1; color:var(--text); }
+
+.bar-bg { background:#E8E0DA; border-radius:4px; height:8px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:4px; transition:width 0.6s ease; }
+
+.trend-up { color:var(--green); }
+.trend-down { color:var(--red); }
+.trend-flat { color:var(--text-dim); }
+
+.filter-row { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+.filter-row select {
+  padding:6px 12px; background:#FFFFFF; border:1px solid var(--border);
+  color:var(--text); border-radius:6px; font-size:13px; font-family:'Catamaran',sans-serif;
+}
+
+.kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
+.kpi-mini { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 16px; min-width:140px; flex:1; box-shadow:var(--shadow); }
+.kpi-mini .label { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); font-weight:700; }
+.kpi-mini .val { font-size:20px; font-weight:800; margin-top:2px; color:var(--text); }
+
+.alert-bar { padding:12px 16px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:10px; font-size:13px; }
+.alert-bar.warn { background:rgba(196,127,21,0.06); border:1px solid rgba(196,127,21,0.2); color:#8B6914; }
+.alert-bar.danger { background:rgba(177,59,52,0.05); border:1px solid rgba(177,59,52,0.2); color:var(--accent); }
+.alert-bar.info { background:rgba(59,126,161,0.05); border:1px solid rgba(59,126,161,0.2); color:var(--blue); }
+
+.empty-state { text-align:center; padding:40px; color:var(--text-dim); font-style:italic; }
+
+.ai-card {
+  background:linear-gradient(135deg, #F0F4FF 0%, #FFFFFF 100%);
+  border:1px solid rgba(37,99,235,0.15); border-radius:10px; padding:20px; margin-bottom:20px;
+  box-shadow: var(--shadow);
+}
+.ai-card h3 { font-size:14px; font-weight:700; margin-bottom:12px; color:#2563EB; display:flex; align-items:center; gap:8px; }
+.ai-card .insight { padding:10px 14px; margin-bottom:8px; background:rgba(37,99,235,0.03); border-radius:6px; border-left:3px solid #2563EB; font-size:13px; line-height:1.6; }
+.ai-card .insight strong { color:#1E40AF; }
+.ai-card .factor { display:flex; align-items:center; gap:8px; padding:6px 0; font-size:13px; }
+.ai-card .factor .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.ai-card .factor .bar-sm { height:6px; border-radius:3px; }
+
+.footer { text-align:center; padding:30px; color:var(--text-dim); font-size:11px; font-weight:600; letter-spacing:1px; border-top:1px solid var(--border); margin-top:20px; }
+
+.tbl-actions { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+.btn-toggle, .btn-export {
+  padding:5px 14px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;
+  border:1px solid var(--border); font-family:'Catamaran',sans-serif; transition:all 0.2s;
+}
+.btn-toggle { background:var(--cream); color:var(--accent); }
+.btn-toggle:hover { background:var(--accent); color:#FFF; border-color:var(--accent); }
+.btn-toggle.active { background:var(--accent); color:#FFF; border-color:var(--accent); }
+.btn-export { background:#F0F4FF; color:var(--blue); border-color:rgba(37,99,235,0.2); }
+.btn-export:hover { background:var(--blue); color:#FFF; border-color:var(--blue); }
+.table-scroll { max-height:500px; overflow-y:auto; }
+.table-scroll.expanded { max-height:none; }
+
+.snapshot-bar {
+  background:linear-gradient(135deg, #FFFBF5 0%, #FFF4EC 100%);
+  border:1px solid var(--peach); border-radius:10px; padding:16px 20px; margin-bottom:20px;
+  font-size:14px; line-height:1.7; color:var(--text); box-shadow:var(--shadow);
+}
+.snapshot-bar strong { color:var(--accent); }
+.snapshot-bar .snap-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent); margin-bottom:6px; }
+
+.kpi-delta { font-size:12px; font-weight:700; margin-left:6px; }
+.kpi-delta.up { color:var(--green); }
+.kpi-delta.down { color:var(--red); }
+.kpi-delta.flat { color:var(--text-dim); }
+
+.search-input {
+  padding:6px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px;
+  font-family:'Catamaran',sans-serif; width:260px; background:#FFFFFF;
+}
+.search-input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 2px rgba(177,59,52,0.15); }
+
+th.sortable { cursor:pointer; user-select:none; position:relative; }
+th.sortable:hover { color:var(--accent); }
+th.sortable::after { content:''; margin-left:4px; opacity:0.3; font-size:10px; }
+th.sortable.sort-asc::after { content:' \\25B2'; opacity:0.8; color:var(--accent); }
+th.sortable.sort-desc::after { content:' \\25BC'; opacity:0.8; color:var(--accent); }
+
+.reconcile-card {
+  background:linear-gradient(135deg, #FFF9F0 0%, #FFFFFF 100%);
+  border:1px solid rgba(217,119,6,0.2); border-radius:10px; padding:16px 20px; margin-bottom:20px;
+  font-size:13px; line-height:1.6; box-shadow:var(--shadow);
+}
+.reconcile-card h4 { font-size:13px; font-weight:700; color:var(--yellow); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+
+.print-btn {
+  padding:5px 14px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;
+  border:1px solid var(--border); font-family:'Catamaran',sans-serif; transition:all 0.2s;
+  background:var(--cream); color:var(--accent);
+}
+.print-btn:hover { background:var(--accent); color:#FFF; border-color:var(--accent); }
+
+@media print {
+  /* Hide interactive elements */
+  .nav, .filter-bar, .btn-toggle, .btn-export, .print-btn, .state-pills,
+  .search-input, .tbl-actions, .chart-filter-badge, .filter-row,
+  .no-price-note, #overviewAlerts { display:none !important; }
+
+  /* Only show overview */
+  .section { display:none !important; }
+  .section#overview { display:block !important; }
+
+  /* Reset backgrounds for ink savings */
+  body { background:#FFF !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .header { padding:10px 20px; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .container { padding:10px 20px; max-width:100%; }
+
+  /* Collapse grids to single column for print */
+  .grid-4 { grid-template-columns:repeat(4,1fr) !important; gap:8px !important; margin-bottom:12px !important; }
+  .grid-3 { grid-template-columns:repeat(3,1fr) !important; gap:8px !important; }
+  .grid-2 { grid-template-columns:1fr !important; gap:12px !important; }
+
+  /* Shrink KPI cards */
+  .card { padding:10px 14px !important; box-shadow:none !important; border:1px solid #ddd !important; }
+  .card .value { font-size:18px !important; }
+  .card .sub { font-size:10px !important; }
+  .card h3 { font-size:9px !important; margin-bottom:4px !important; }
+
+  /* Snapshot bar print-friendly */
+  .snapshot-bar { font-size:12px !important; padding:10px 14px !important; box-shadow:none !important; border:1px solid #ccc !important; background:#f9f9f9 !important; margin-bottom:12px !important; }
+
+  /* Charts: fixed height, prevent overflow, each on its own block */
+  .chart-card { box-shadow:none !important; border:1px solid #ddd !important; padding:12px !important; page-break-inside:avoid; margin-bottom:12px !important; }
+  .chart-card h3 { font-size:12px !important; margin-bottom:8px !important; }
+  .chart-wrap { height:220px !important; overflow:hidden !important; position:relative !important; }
+  .chart-wrap canvas { max-height:220px !important; }
+
+  /* AI analysis cards */
+  .ai-card { page-break-inside:avoid; box-shadow:none !important; border:1px solid #ccc !important; padding:12px !important; }
+  .ai-card .insight { font-size:11px !important; padding:6px 10px !important; }
+
+  /* Hide KPI deltas that use special chars */
+  .kpi-delta { font-size:10px !important; }
+
+  /* Page setup */
+  @page { margin:0.5in; size:letter landscape; }
+}
+
+.no-price-note { font-size:11px; color:var(--text-dim); font-style:italic; padding:8px 12px; background:rgba(217,119,6,0.04); border:1px solid rgba(217,119,6,0.12); border-radius:6px; margin-bottom:12px; }
+
+
+.chart-filter-badge {
+  display:inline-flex; align-items:center; gap:6px; padding:4px 12px; margin-bottom:10px;
+  background:var(--blue-bg); border:1px solid rgba(37,99,235,0.2); border-radius:16px;
+  font-size:12px; font-weight:600; color:var(--blue); cursor:default;
+}
+.chart-filter-badge .clear-filter {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:16px; height:16px; border-radius:50%; background:rgba(37,99,235,0.15);
+  cursor:pointer; font-size:11px; line-height:1; color:var(--blue); font-weight:700;
+  transition:background 0.15s;
+}
+.chart-filter-badge .clear-filter:hover { background:rgba(37,99,235,0.3); }
+.chart-card canvas { cursor:pointer; }
+.chart-card .click-hint { font-size:10px; color:var(--text-dim); font-style:italic; margin-top:4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">
+    <img src="https://missingthorn.com/cdn/shop/files/MT_Logo_Horiz_Red.png?v=1755630325&width=600" alt="Missing Thorn" onerror="this.style.display='none'">
+    <div class="brand-text">
+      <h1>BI Dashboard</h1>
+      <div class="dash-label">13W Depletion + Revenue Combined View</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div>Data through <strong id="headerDataThrough">--</strong></div>
+    <div>Updated <span id="headerBuildDate">--</span></div>
+    <button class="print-btn" onclick="prepareAndPrint()" style="margin-top:6px;" title="Print overview summary">&#x1F5A8; Print</button>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <label>Market</label>
+  <select id="globalStateFilter" onchange="applyGlobalFilter()">
+    <option value="all">All Markets</option>
+  </select>
+  <div class="state-pills" id="regionPills" style="margin-bottom:8px;">
+    <button class="state-pill active" onclick="selectRegion('all')">ALL</button>
+    <button class="state-pill" onclick="selectRegion('East')">EAST</button>
+    <button class="state-pill" onclick="selectRegion('West')">WEST</button>
+  </div>
+  <div class="state-pills" id="statePills"></div>
+  <span style="border-left:2px solid var(--border);height:24px;margin:0 8px;"></span>
+  <label>Channel</label>
+  <div class="state-pills" id="channelPills">
+    <button class="state-pill active" onclick="selectChannel(this,'all')">ALL</button>
+    <button class="state-pill" onclick="selectChannel(this,'ON')">On-Premise</button>
+    <button class="state-pill" onclick="selectChannel(this,'OFF')">Off-Premise</button>
+  </div>
+  <span id="filterBadge" class="filter-badge" style="display:none;"></span>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="showSection('overview',this)">Executive Overview</button>
+  <button onclick="showSection('revenue',this)">Revenue & Sales</button>
+  <button onclick="showSection('depletion',this)">Depletions</button>
+  <button onclick="showSection('distributors',this)">Distributor Detail</button>
+  <button onclick="showSection('inventory',this)">Inventory Health</button>
+  <button onclick="showSection('accounts',this)">Account Analytics</button>
+  <button onclick="showSection('placements',this)">Placements</button>
+  <button onclick="showSection('reorder',this)">Reorder Forecast</button>
+  <button onclick="showSection('crm',this)" style="background:#7C3AED;color:#fff;border-radius:6px;">Account CRM</button>
+  <button onclick="showSection('key',this)" style="margin-left:auto;font-size:12px;">&#9432; Key / Legend</button>
+</div>
+
+<div class="container">
+
+<!-- OVERVIEW -->
+<div id="overview" class="section active">
+  <div id="overviewSnapshot" class="snapshot-bar"></div>
+  <div id="overviewKPIs" class="grid-4" style="margin-top:4px;"></div>
+  <div id="noPriceNote" class="no-price-note" style="display:none;"></div>
+  <div id="classicSelloutTracker" class="chart-card" style="margin-bottom:20px;"></div>
+  <div class="grid-2">
+    <div class="chart-card"><h3>Weekly Depletion Trend (13W)</h3><div class="chart-wrap"><canvas id="chartDepTrend"></canvas></div></div>
+    <div class="chart-card"><h3>Top Distributors by 13W CE</h3><div class="chart-wrap"><canvas id="chartDistBar"></canvas></div></div>
+  </div>
+  <div id="overviewAlerts" style="margin-top:12px;"></div>
+</div>
+
+<!-- REVENUE -->
+<div id="revenue" class="section">
+  <div class="section-title">2026 Revenue - YTD by Channel vs Budget</div>
+  <div class="alert-bar info" style="margin-bottom:16px;">All revenue figures sourced from QuickBooks. Annual budget: $2.85M. Monthly targets spread evenly.</div>
+  <div id="revKPIs" class="kpi-row"></div>
+  <div class="chart-card" style="margin-bottom:20px;">
+    <h3>2026 YTD Revenue by Channel - Monthly Breakdown</h3>
+    <div id="ytdChannelTable"></div>
+  </div>
+  <div class="grid-2">
+    <div class="chart-card"><h3>YTD Actual vs Budget by Channel</h3><div class="chart-wrap" style="height:340px;"><canvas id="chartYtdVsBudget"></canvas></div></div>
+    <div class="chart-card"><h3>Revenue Mix by Channel (2026 YTD)</h3><div class="chart-wrap" style="height:340px;"><canvas id="chartCustChannel"></canvas></div></div>
+  </div>
+  <div class="grid-2">
+    <div class="chart-card"><h3>2026 Monthly Revenue by SKU</h3><div class="chart-wrap" style="height:320px;"><canvas id="chartSkuTrend"></canvas></div></div>
+    <div class="chart-card"><h3>2026 Revenue by SKU (5 Wines)</h3><div class="chart-wrap" style="height:320px;"><canvas id="chartProductMix"></canvas></div></div>
+  </div>
+  <div class="chart-card" style="margin-bottom:20px;">
+    <h3>2026 SKU Detail</h3>
+    <div class="tbl-actions"><button class="btn-export" onclick="exportTable('skuDetail')">&#x1F4E5; Export to Excel</button></div>
+    <div class="table-wrap"><table id="tblSkuDetail"><thead><tr><th>SKU</th><th>2026 Revenue</th><th>Bottles Sold</th><th>Cases (CE)</th><th>Avg Rev/Case</th><th>% of Total</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div id="revenueAnalysis"></div>
+</div>
+
+<!-- DEPLETIONS -->
+<div id="depletion" class="section">
+  <div class="section-title">Depletion Analysis - 13 Weeks ending 2/14/2026</div>
+  <div id="depKPIs" class="kpi-row"></div>
+  <div class="grid-2">
+    <div class="chart-card"><h3>Weekly CE by Top Distributors</h3><div class="chart-wrap" style="height:350px;"><canvas id="chartDepStack"></canvas></div></div>
+    <div class="chart-card"><h3>SKU Mix - 13W Total CE by Wine Type</h3><div class="chart-wrap"><canvas id="chartSkuMix"></canvas></div></div>
+  </div>
+  <div class="chart-card" style="margin-bottom:20px;">
+    <h3>Distributor Scorecard</h3><div id="depFilterBadge"></div>
+    <div class="tbl-actions"><button class="btn-export" onclick="exportTable('scorecard')">&#x1F4E5; Export to Excel</button></div>
+    <div class="table-wrap"><table id="tblScorecard"><thead><tr><th class="sortable" data-col="name">Distributor</th><th class="sortable" data-col="st">State</th><th class="sortable" data-col="ce">13W CE</th><th class="sortable" data-col="rev">13W Rev</th><th class="sortable" data-col="yoy">YoY %</th><th class="sortable" data-col="w4">4W CE</th><th class="sortable" data-col="mom">4W Mom.</th><th class="sortable" data-col="oh">On Hand</th><th class="sortable" data-col="doh">DOH</th><th class="sortable" data-col="net">Net Pl.</th><th class="sortable" data-col="con">Consist.</th><th class="sortable" data-col="health">Health</th><th class="sortable" data-col="stage">Stage</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div id="depletionAnalysis"></div>
+</div>
+
+<!-- DISTRIBUTORS -->
+<div id="distributors" class="section">
+  <div class="section-title">Distributor SKU Detail - 13W Performance</div>
+  <div class="filter-row">
+    <select id="distFilter" onchange="renderDistDetail()"><option value="all">All Distributors</option></select>
+  </div>
+  <div class="chart-card">
+    <div class="tbl-actions"><button class="btn-export" onclick="exportTable('distDetail')">&#x1F4E5; Export to Excel</button></div>
+    <div class="table-wrap"><table id="tblDistDetail"><thead><tr><th>Distributor</th><th>State</th><th>Wine</th><th>13W CE</th><th>13W Rev</th><th>Prior 13W</th><th>YoY %</th><th>4W CE</th><th>Wkly Avg</th><th>Rev/Case</th><th>Consist.</th></tr></thead><tbody></tbody></table></div></div>
+</div>
+
+<!-- INVENTORY -->
+<div id="inventory" class="section">
+  <div class="section-title">Inventory Health - Days on Hand & Status</div>
+  <div id="invKPIs" class="kpi-row"></div>
+  <div id="warehousePanel" class="chart-card" style="margin-bottom:20px;"></div>
+  <div class="grid-2">
+    <div class="chart-card"><h3>Inventory Distribution by Status</h3><div class="chart-wrap"><canvas id="chartInvStatus"></canvas></div></div>
+    <div class="chart-card"><h3>On Hand CE vs Days on Hand</h3><div class="chart-wrap"><canvas id="chartInvScatter"></canvas></div></div>
+  </div>
+  <div class="chart-card" style="margin-bottom:20px;"><h3>Inventory by Distributor</h3><div id="invFilterBadge"></div>
+    <div class="tbl-actions"><select id="invSkuFilter" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;margin-right:8px;" onchange="renderInventoryTable()"><option value="all">All Wines</option><option value="Still Red">Still Red</option><option value="Still White">Still White</option><option value="Still Rose">Still Rose</option><option value="Sparkling White">Sparkling White</option><option value="Sparkling Rose">Sparkling Rose</option></select><button class="btn-export" onclick="exportTable('inventory')">&#x1F4E5; Export to Excel</button></div>
+    <div class="table-wrap"><table id="tblInventory"><thead><tr><th class="sortable" data-col="name">Distributor</th><th class="sortable" data-col="st">State</th><th class="sortable" data-col="oh">On Hand (CE)</th><th class="sortable" data-col="rate">Daily Rate</th><th class="sortable" data-col="doh">Days on Hand</th><th class="sortable" data-col="dep90">90D Dep.</th><th class="sortable" data-col="status">Status</th><th class="sortable" data-col="proj">Proj. Order</th></tr></thead><tbody></tbody></table></div></div>
+  <div id="inventoryAnalysis"></div>
+</div>
+
+<!-- ACCOUNTS -->
+<div id="accounts" class="section">
+  <div class="section-title">Account Analytics - 4-Month Rolling Period</div>
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="chart-card"><h3>Account Trend Distribution</h3><div class="chart-wrap" style="height:250px;"><canvas id="chartAcctTrend"></canvas></div></div>
+    <div class="chart-card"><h3>Account Risk Overview</h3><div id="acctRiskKPIs" class="kpi-row" style="margin-bottom:0;"></div></div>
+  </div>
+  <div class="chart-card" style="margin-bottom:20px;">
+    <h3 id="acctHeader">Accounts - 4-Month Rolling Period</h3>
+    <div class="tbl-actions">
+      <button class="btn-toggle" id="btnAcctToggle" onclick="toggleAcctView()">Show All</button>
+      <button class="btn-export" onclick="exportTable('accounts')">&#x1F4E5; Export to Excel</button>
+      <input type="text" class="search-input" id="acctSearch" placeholder="Search accounts..." oninput="renderAccounts()">
+      <span id="acctCount" style="font-size:12px;color:var(--text-dim);margin-left:8px;"></span>
+    </div>
+    <div class="table-wrap table-scroll" id="acctTableWrap"><table id="tblAccounts"><thead><tr><th class="sortable" data-col="rank">#</th><th class="sortable" data-col="acct">Account</th><th class="sortable" data-col="dist">Distributor</th><th class="sortable" data-col="st">State</th><th class="sortable" data-col="ch">Channel</th><th class="sortable" data-col="nov">Nov</th><th class="sortable" data-col="dec">Dec</th><th class="sortable" data-col="jan">Jan</th><th class="sortable" data-col="feb">Feb</th><th class="sortable" data-col="total">4M CE</th><th class="sortable" data-col="rev">4M Rev</th><th class="sortable" data-col="trend">Trend</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div id="accountsAnalysis"></div>
+</div>
+
+<!-- PLACEMENTS -->
+<div id="placements" class="section">
+  <div class="section-title">Placement Tracker - New vs Lost Retail Accounts</div>
+  <div id="placeKPIs" class="kpi-row"></div>
+  <div class="grid-2">
+    <div class="chart-card"><h3>Net Placements by Distributor</h3><div class="chart-wrap" style="height:400px;"><canvas id="chartPlacements"></canvas></div></div>
+    <div class="chart-card"><h3>New Retail Accounts (Last 30D)</h3><div id="placeFilterBadge"></div>
+      <div class="tbl-actions">
+        <button class="btn-toggle" id="btnNewAcctToggle" onclick="toggleNewAcctView()">Show All</button>
+        <button class="btn-export" onclick="exportTable('newAccounts')">&#x1F4E5; Export to Excel</button>
+        <span id="newAcctCount" style="font-size:12px;color:var(--text-dim);margin-left:8px;"></span>
+      </div>
+      <div class="table-wrap table-scroll" id="newAcctTableWrap"><table id="tblNewAccts"><thead><tr><th>Account</th><th>Distributor</th><th>State</th><th>30D CE</th><th>SKUs</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+  <div id="placementAI"></div>
+</div>
+
+<!-- REORDER -->
+<div id="reorder" class="section">
+  <div class="section-title">Reorder Forecast - Account Purchase Cycle Analysis</div>
+  <div id="reorderKPIs" class="kpi-row"></div>
+  <div class="chart-card" style="margin-bottom:20px;"><h3>Reorder Status Distribution</h3><div style="height:250px;"><canvas id="chartReorderPie"></canvas></div></div>
+  <div class="chart-card">
+    <h3 id="reorderHeader">Priority Reorder List</h3>
+    <div class="tbl-actions">
+      <select id="reorderSkuFilter" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;margin-right:8px;" onchange="renderReorder()"><option value="all">All Wines</option><option value="Still Red">Still Red</option><option value="Still White">Still White</option><option value="Still Rose">Still Rose</option><option value="Sparkling White">Sparkling White</option><option value="Sparkling Rose">Sparkling Rose</option></select>
+      <button class="btn-toggle" id="btnReorderToggle" onclick="toggleReorderView()">Show All</button>
+      <button class="btn-export" onclick="exportTable('reorder')">&#x1F4E5; Export to Excel</button>
+      <span id="reorderCount" style="font-size:12px;color:var(--text-dim);margin-left:8px;"></span>
+    </div>
+    <div class="table-wrap table-scroll" id="reorderTableWrap"><table id="tblReorder"><thead><tr><th class="sortable" data-col="rank">#</th><th class="sortable" data-col="acct">Account</th><th class="sortable" data-col="dist">Distributor</th><th class="sortable" data-col="st">State</th><th class="sortable" data-col="ch">Channel</th><th class="sortable" data-col="ce">4M CE</th><th class="sortable" data-col="purch">Purchases</th><th class="sortable" data-col="cycle">Avg Cycle</th><th class="sortable" data-col="last">Last Order</th><th class="sortable" data-col="days">Days Since</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div id="reorderAnalysis"></div>
+</div>
+
+<!-- ACCOUNT CRM -->
+<div id="crm" class="section">
+  <div class="section-title">Account CRM - Manager View</div>
+  <div class="kpi-row" id="crmKpis" style="margin-bottom:12px;"></div>
+  <div id="crmAlerts" style="margin-bottom:12px;"></div>
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:6px;">
+          <label style="font-size:12px;font-weight:600;color:#6B7280;">Tag:</label>
+          <select id="crmTagFilter" onchange="renderCRMReport()" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+              <option value="">All Accounts</option>
+              <option value="__tagged__">Tagged Only</option>
+              <option value="__untagged__">Untagged</option>
+              <option value="__action__">Has Action Item</option>
+              <option value="VIP">VIP</option>
+              <option value="At Risk">At Risk</option>
+              <option value="Hot Lead">Hot Lead</option>
+              <option value="Needs Visit">Needs Visit</option>
+              <option value="Seasonal">Seasonal</option>
+              <option value="Follow Up">Follow Up</option>
+          </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+          <label style="font-size:12px;font-weight:600;color:#6B7280;">State:</label>
+          <select id="crmStateFilter" onchange="renderCRMReport()" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+              <option value="">All States</option>
+          </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+          <label style="font-size:12px;font-weight:600;color:#6B7280;">Sort:</label>
+          <select id="crmSortBy" onchange="renderCRMReport()" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+              <option value="priority">Priority Score</option>
+              <option value="daysSince">Days Since Order</option>
+              <option value="ce">Case Equivalents</option>
+              <option value="tags">Tag Count</option>
+          </select>
+      </div>
+      <button onclick="refreshCRMData()" style="padding:6px 14px;background:#7C3AED;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Refresh</button>
+      <span id="crmLoadStatus" style="font-size:11px;color:#9ca3af;"></span>
+  </div>
+  <!-- Account CRM Table -->
+  <div class="table-container" style="max-height:600px;overflow-y:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead style="position:sticky;top:0;background:#f8fafc;z-index:2;">
+              <tr>
+                  <th style="padding:8px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">Account</th>
+                  <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Distributor</th>
+                  <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">State</th>
+                  <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Tags</th>
+                  <th style="padding:8px;text-align:right;border-bottom:2px solid #e2e8f0;">CE</th>
+                  <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">Last Order</th>
+                  <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">Days</th>
+                  <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Next Action</th>
+                  <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">Follow-Up</th>
+                  <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">Notes</th>
+              </tr>
+          </thead>
+          <tbody id="crmTableBody"></tbody>
+      </table>
+  </div>
+  <div id="crmSummary" style="margin-top:8px;font-size:12px;color:#6B7280;"></div>
+</div>
+
+<!-- KEY / LEGEND -->
+<div id="key" class="section">
+  <div class="section-title">Dashboard Key / Legend</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:12px;">
+
+  <div class="chart-card">
+    <h3 style="margin-bottom:14px;color:var(--accent);">Core Metrics</h3>
+    <table style="width:100%;font-size:13px;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;width:160px;">CE (Case Equivalents)</td><td style="padding:8px 4px;">Standard unit of measurement. 1 CE = one 12-bottle case of 750ml wine. All volume figures are expressed in CE for consistency across bottles, cases, and mixed orders.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">13W CE</td><td style="padding:8px 4px;">Total case equivalents depleted (sold through to retail/accounts) over the most recent 13-week period. This is the primary volume metric.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">4W Velocity</td><td style="padding:8px 4px;">Case equivalents depleted in the most recent 4-week window. Used to gauge current momentum vs. the full 13-week picture.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">YoY (Year-over-Year)</td><td style="padding:8px 4px;">Comparison of the current 13-week period vs. the same 13-week period one year ago. Shown as a percentage change. "New" means no comparable prior-year data exists.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">MoM (Month-over-Month)</td><td style="padding:8px 4px;">Direction indicator comparing the most recent 4 weeks vs. the prior 4 weeks. Shows whether volume is accelerating or decelerating.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Revenue (Rev)</td><td style="padding:8px 4px;">Net dollar value of depletions or sales. On the Depletions tab this is distributor sell-through revenue. On the Revenue & Sales tab this is MT's QuickBooks revenue.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Avg Rev/Case</td><td style="padding:8px 4px;">Average revenue per case, calculated from case-only transactions (excludes individual bottle sales). Represents what MT receives per case sold.</td></tr>
+      <tr><td style="padding:8px 4px;font-weight:700;">ROS (Rate of Sale)</td><td style="padding:8px 4px;">Rate of sale per account or per placement. Measures how fast product moves at the retail level.</td></tr>
+    </table>
+  </div>
+
+  <div class="chart-card">
+    <h3 style="margin-bottom:14px;color:var(--accent);">Inventory & Supply</h3>
+    <table style="width:100%;font-size:13px;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;width:160px;">On Hand (OH)</td><td style="padding:8px 4px;">Current inventory held at the distributor, measured in case equivalents.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">DOH (Days on Hand)</td><td style="padding:8px 4px;">Number of days current inventory would last at the current daily depletion rate. DOH = On Hand / Daily Rate of Sales.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Daily Rate</td><td style="padding:8px 4px;">Average daily depletion in CE, calculated from the most recent 90-day period.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Projected Order</td><td style="padding:8px 4px;">Estimated reorder quantity in CE based on projected 90-day sales minus current on-hand inventory. Negative means overstocked.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:8px 4px;font-weight:700;">Inventory Status</td>
+        <td style="padding:8px 4px;">
+          <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:rgba(5,150,105,0.1);color:#059669;margin-right:6px;">Healthy</span> 60-120 DOH<br>
+          <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:rgba(217,119,6,0.1);color:#D97706;margin-right:6px;margin-top:4px;">Low</span> Under 60 DOH - reorder soon<br>
+          <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:rgba(37,99,235,0.1);color:#2563EB;margin-right:6px;margin-top:4px;">Overstocked</span> 120-365 DOH<br>
+          <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:rgba(220,38,38,0.1);color:#DC2626;margin-right:6px;margin-top:4px;">Critical</span> Over 365 DOH or zero velocity
+        </td>
+      </tr>
+      <tr><td style="padding:8px 4px;font-weight:700;">Consistency</td><td style="padding:8px 4px;">Percentage of weeks (out of 13) where a distributor had at least some depletion. 1.0 = sold every week. 0.23 = sold in only 3 of 13 weeks. Measures reliability of sell-through.</td></tr>
+    </table>
+  </div>
+
+  <div class="chart-card">
+    <h3 style="margin-bottom:14px;color:var(--accent);">Placements & Accounts</h3>
+    <table style="width:100%;font-size:13px;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;width:160px;">Effective Placements</td><td style="padding:8px 4px;">Number of retail accounts that have purchased at least once in the measured period. Different from distribution points (which counts locations stocking the product).</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">New Placements</td><td style="padding:8px 4px;">Accounts that purchased in the last 30 days but had NOT purchased in the prior 90 days. These are either brand-new accounts or reactivated accounts.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Lost Placements</td><td style="padding:8px 4px;">Accounts that purchased in the prior 60-day window but have NOT purchased in the most recent 30 days. These are at risk of churning. "Days Since Last Sale" shows how long since their last order.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Net Placements</td><td style="padding:8px 4px;">New placements minus lost placements. Positive = growing account base. Negative = losing more accounts than gaining.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:8px 4px;font-weight:700;">Account Trend</td>
+        <td style="padding:8px 4px;">
+          <span style="color:#059669;font-weight:600;">Accelerating</span> - Monthly CE is increasing over the 4-month period<br>
+          <span style="color:#DC2626;font-weight:600;">Decelerating</span> - Monthly CE is decreasing<br>
+          <span style="color:#64748B;font-weight:600;">Stable</span> - Relatively flat month-to-month
+        </td>
+      </tr>
+      <tr><td style="padding:8px 4px;font-weight:700;">Reorder Cycle</td><td style="padding:8px 4px;">Average number of days between purchases for a given account. Calculated from the 4-month rolling period. Used to predict when an account is "overdue" for their next order.</td></tr>
+    </table>
+  </div>
+
+  <div class="chart-card">
+    <h3 style="margin-bottom:14px;color:var(--accent);">Revenue & Sales (QuickBooks)</h3>
+    <table style="width:100%;font-size:13px;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;width:160px;">Revenue Sources</td><td style="padding:8px 4px;">Revenue & Sales data comes from QuickBooks (MT's accounting system), NOT from distributor depletion reports. This represents what MT actually receives, not what distributors sell through to retailers.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Bottles Sold</td><td style="padding:8px 4px;">Total individual units sold across all transaction types (cases, individual bottles, samples). Includes all channels.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Cases (CE)</td><td style="padding:8px 4px;">Bottles Sold divided by 12. Converts total units to case equivalents for comparison with depletion data.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:8px 4px;font-weight:700;">Customer Channels</td>
+        <td style="padding:8px 4px;">
+          <strong>Distributors</strong> - Sales to distribution partners (Fedway, Breakthru, Republic, etc.)<br>
+          <strong>Direct to Trade - Off Premise</strong> - Direct sales to retail stores, wine shops<br>
+          <strong>Direct to Trade - On Premise</strong> - Direct sales to restaurants, bars, hotels<br>
+          <strong>Website / DTC (FBM)</strong> - Online sales, direct-to-consumer, fulfilled by merchant<br>
+          <strong>Promo</strong> - Promotional orders (samples, events, tastings)<br>
+          <strong>Operations</strong> - Internal/operational transactions
+        </td>
+      </tr>
+      <tr><td style="padding:8px 4px;font-weight:700;">State Filter Note</td><td style="padding:8px 4px;">Revenue data is company-wide and does NOT filter by state. The QuickBooks data does not have state-level breakdowns. Depletion, inventory, placement, and account tabs DO filter by market.</td></tr>
+    </table>
+  </div>
+
+  <div class="chart-card" style="grid-column:1/-1;">
+    <h3 style="margin-bottom:14px;color:var(--accent);">Dashboard Tips</h3>
+    <table style="width:100%;font-size:13px;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;width:160px;">State/Market Filter</td><td style="padding:8px 4px;">Use the dropdown or pill buttons at the top to filter all data by state. Click "All Markets" to reset. Revenue & Sales tab always shows company-wide data regardless of filter.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Click-to-Filter Charts</td><td style="padding:8px 4px;">On the Inventory, Depletions, and Placements tabs, you can click chart segments to filter the table below. For example, click "Critical" on the inventory doughnut to see only critical distributors. Click again or use the X badge to clear the filter.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Pricing Not Reported</td><td style="padding:8px 4px;">Some distributors (marked with "pricing not reported") do not share their sell-through pricing. Their revenue and rev/case columns show dashes to avoid displaying misleading numbers. Their volume data (CE, velocity, etc.) is still accurate.</td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">AI Analysis Cards</td><td style="padding:8px 4px;">Blue cards at the bottom of each tab provide automated insights and recommended actions based on the data. These recalculate when you change the state filter.</td></tr>
+      <tr><td style="padding:8px 4px;font-weight:700;">Data Freshness</td><td style="padding:8px 4px;">Check the "Data as of" date in the header. The dashboard is rebuilt from 7 Excel exports: 6 VIP depletion reports and 1 QuickBooks sales detail export.</td></tr>
+    </table>
+  </div>
+
+  <div class="chart-card" style="grid-column:1/-1;">
+    <h3 style="margin-bottom:14px;color:var(--accent);">Products (5 SKUs)</h3>
+    <table style="width:100%;font-size:13px;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;width:250px;">Missing Thorn Alcohol Removed Red Wine</td><td style="padding:8px 4px;">12/750ml -- Dashboard shorthand: <strong>Still Red</strong></td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Missing Thorn Alcohol Removed Still White Wine</td><td style="padding:8px 4px;">12/750ml -- Dashboard shorthand: <strong>Still White</strong></td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Missing Thorn Alcohol Removed Still Rose</td><td style="padding:8px 4px;">12/750ml -- Dashboard shorthand: <strong>Still Rose</strong></td></tr>
+      <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 4px;font-weight:700;">Missing Thorn Alcohol Removed Sparkling White Wine</td><td style="padding:8px 4px;">12/750ml -- Dashboard shorthand: <strong>Sparkling White</strong></td></tr>
+      <tr><td style="padding:8px 4px;font-weight:700;">Missing Thorn Alcohol Removed Sparkling Rose Wine</td><td style="padding:8px 4px;">12/750ml -- Dashboard shorthand: <strong>Sparkling Rose</strong></td></tr>
+    </table>
+  </div>
+
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  Missing Thorn BI Dashboard &middot; Generated Feb 19, 2026 &middot; Data sources: VIP Depletion Report, QuickBooks Sales Detail, Weekly Operating Dashboard
+</div>
+
+<script>
+// ==================== GLOBALS ====================
+Chart.defaults.color = '#7A6E66';
+Chart.defaults.borderColor = '#E8E0DA';
+Chart.defaults.font.family = "'Catamaran', -apple-system, BlinkMacSystemFont, sans-serif";
+Chart.defaults.font.size = 11;
+const accent = '#B13B34';
+const colors = ['#2563EB','#7C3AED','#0891B2','#059669','#D97706','#DC2626','#4F46E5','#0D9488','#6366F1','#64748B'];
+let charts = {};
+let currentRegion = 'all';
+let currentState = 'all';
+let currentChannel = 'all';
+
+// __DATA_START__
+// DATA INJECTED BY BUILD SCRIPT
+// __DATA_END__
+
+// ==================== HELPERS ====================
+function f$(n) { return '$'+Math.round(n).toLocaleString(); }
+function statusBadge(s) { const c=s==='Healthy'?'green':s==='Low'?'yellow':s==='Overstocked'?'blue':'red'; return `<span class="badge badge-${c}">${s}</span>`; }
+function trendBadge(t) { const c=t==='Accelerating'?'green':t==='Decelerating'?'red':'yellow'; return `<span class="badge badge-${c}">${t}</span>`; }
+function getQbOrderBadge(distName) {
+  if (typeof qbDistOrders === 'undefined') return '';
+  const order = qbDistOrders[distName];
+  if (!order) return '';
+  // Label badge
+  let labelBadge = '';
+  if (order.label === 'Classic') labelBadge = '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;margin-left:4px;">Classic</span>';
+  else if (order.label === 'Contemporary') labelBadge = '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;margin-left:4px;">Contemporary</span>';
+  else if (order.label === 'Both') labelBadge = '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;margin-left:4px;">Classic</span><span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;margin-left:2px;">Contemporary</span>';
+  return `<div style="font-size:11px;color:#6B7280;margin-top:2px;" title="QB Invoice #${order.num} - ${order.items}">Last QB Order: ${order.date} | $${order.total.toLocaleString()}${order.items ? ' | ' + order.items : ''}${labelBadge}</div>`;
+}
+function getLabelBadgeOnly(distName) {
+  if (typeof qbDistOrders === 'undefined') return '';
+  const order = qbDistOrders[distName];
+  if (!order) return '';
+  if (order.label === 'Classic') return '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;">Classic</span>';
+  if (order.label === 'Contemporary') return '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;">Contemporary</span>';
+  if (order.label === 'Both') return '<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#F3E8FF;color:#7C3AED;">Classic</span> <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:#DBEAFE;color:#2563EB;">Contemporary</span>';
+  return '';
+}
+function fmtPct(v) { if(v==='New') return '<span class="badge badge-blue">New</span>'; if(typeof v==='string') return v.startsWith('-')?`<span style="color:var(--red)">${v}</span>`:`<span style="color:var(--green)">${v}</span>`; return v; }
+function conBar(c) { return `<div class="bar-bg" style="width:60px;display:inline-block;vertical-align:middle;"><div class="bar-fill" style="width:${c*100}%;background:${c>=0.7?'var(--green)':c>=0.4?'var(--yellow)':'var(--red)'}"></div></div> ${(c*100).toFixed(0)}%`; }
+
+function destroyChart(id) { if(charts[id]) { charts[id].destroy(); delete charts[id]; } }
+function makeChart(id,cfg) { destroyChart(id); charts[id] = new Chart(document.getElementById(id),cfg); return charts[id]; }
+function filterByState(arr) {
+  let f = arr;
+  if(currentRegion!=='all') f = f.filter(d=>regionMap[d.st]===currentRegion);
+  if(currentState!=='all') f = f.filter(d=>d.st===currentState);
+  if(currentChannel!=='all' && f.length && f[0].hasOwnProperty('ch')) f = f.filter(d=>d.ch===currentChannel);
+  return f;
+}
+function filterByChannel(arr) {
+  if(currentChannel==='all') return arr;
+  return arr.filter(d=>d.ch===currentChannel);
+}
+
+// ==================== CHART CLICK-TO-FILTER ====================
+const chartFilters = {};
+
+function setChartFilter(section, key, value, label) {
+  chartFilters[section] = {key, value, label};
+  applyChartFilter(section);
+}
+
+function clearChartFilter(section) {
+  delete chartFilters[section];
+  applyChartFilter(section);
+}
+
+function applyChartFilter(section) {
+  if(section==='inventory') renderInventoryTable();
+  if(section==='depletion') renderDepletionTable();
+  if(section==='placements') renderPlacementTable();
+}
+
+function renderFilterBadge(containerId, section, label) {
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  if(!chartFilters[section]) { el.innerHTML=''; return; }
+  el.innerHTML = `<span class="chart-filter-badge">Filtered: ${label} <span class="clear-filter" onclick="clearChartFilter('${section}')" title="Clear filter">&times;</span></span>`;
+}
+
+// ==================== NAVIGATION ====================
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ==================== GLOBAL FILTER ====================
+function buildFilterUI() {
+  const states = [...new Set(distScorecard.map(d=>d.st))].sort();
+  const sel = document.getElementById('globalStateFilter');
+  states.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s+' - '+stateNames[s]; sel.appendChild(o); });
+  const pills = document.getElementById('statePills');
+  let html = '<button class="state-pill active" onclick="selectPill(this,\'all\')" data-state="ALL">ALL</button>';
+  states.forEach(s => { html += `<button class="state-pill" onclick="selectPill(this,'${s}')" data-state="${s}">${s}</button>`; });
+  pills.innerHTML = html;
+}
+
+function selectPill(btn, st) {
+  document.querySelectorAll('.state-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('globalStateFilter').value = st;
+  applyGlobalFilter();
+}
+
+function selectChannel(btn, ch) {
+  document.querySelectorAll('#channelPills .state-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  currentChannel = ch;
+  applyGlobalFilter();
+}
+
+function selectRegion(region) {
+  currentRegion = region;
+  currentState = 'all';
+  document.querySelectorAll('#regionPills .state-pill').forEach(p => {
+    p.classList.toggle('active', p.textContent === (region==='all'?'ALL':region.toUpperCase()));
+  });
+  // Show/hide state pills by region
+  document.querySelectorAll('#statePills .state-pill').forEach(p => {
+    const st = p.dataset ? p.dataset.state : p.getAttribute('data-state') || p.textContent;
+    if(st==='ALL' || region==='all') { p.style.display=''; }
+    else { p.style.display = regionMap[st]===region ? '' : 'none'; }
+    p.classList.remove('active');
+  });
+  const allPill = document.querySelector('#statePills .state-pill');
+  if(allPill) allPill.classList.add('active');
+  renderAll();
+}
+
+function applyGlobalFilter() {
+  currentState = document.getElementById('globalStateFilter').value;
+  document.querySelectorAll('.state-pill').forEach(p => {
+    p.classList.toggle('active', (p.textContent===currentState || (currentState==='all' && p.textContent==='ALL')));
+  });
+  const badge = document.getElementById('filterBadge');
+  const chLabel = currentChannel==='ON' ? 'On-Premise' : currentChannel==='OFF' ? 'Off-Premise' : '';
+  const stLabel = currentState!=='all' ? currentState+' - '+stateNames[currentState] : '';
+  const parts = [stLabel, chLabel].filter(Boolean);
+  if(parts.length===0) { badge.style.display='none'; }
+  else { badge.style.display='inline-block'; badge.textContent='Filtered: '+parts.join(' | '); }
+  renderAll();
+}
+
+// ==================== PRINT PREP ====================
+function prepareAndPrint() {
+  // Ensure overview is active before printing
+  const overviewBtn = document.querySelector('.nav button');
+  if(overviewBtn) showSection('overview', overviewBtn);
+  // Small delay to let render complete, then print
+  setTimeout(() => {
+    // Force chart resize for print layout
+    Object.values(Chart.instances).forEach(c => { if(c.canvas) c.resize(); });
+    setTimeout(() => window.print(), 200);
+  }, 100);
+}
+window.addEventListener('afterprint', function() {
+  setTimeout(() => {
+    Object.values(Chart.instances).forEach(c => { if(c.canvas) c.resize(); });
+  }, 300);
+});
+
+// ==================== DYNAMIC DATES ====================
+if(typeof buildDate !== 'undefined') {
+  document.getElementById('headerBuildDate').textContent = buildDate;
+  document.getElementById('headerDataThrough').textContent = dataThrough || '--';
+}
+
+// ==================== TABLE SORTING ====================
+let currentSort = { table: null, col: null, dir: 'desc' };
+
+function sortData(arr, col, dir) {
+  return arr.sort((a,b) => {
+    let va = a[col], vb = b[col];
+    // Handle string numbers with % or +/-
+    if(typeof va === 'string' && va.match(/^[+-]?\d/)) va = parseFloat(va.replace(/[+%,]/g,''));
+    if(typeof vb === 'string' && vb.match(/^[+-]?\d/)) vb = parseFloat(vb.replace(/[+%,]/g,''));
+    if(typeof va === 'string') va = va.toLowerCase();
+    if(typeof vb === 'string') vb = vb.toLowerCase();
+    if(va === vb) return 0;
+    if(va === undefined || va === null || va === 'New') return 1;
+    if(vb === undefined || vb === null || vb === 'New') return -1;
+    return dir === 'asc' ? (va < vb ? -1 : 1) : (va > vb ? -1 : 1);
+  });
+}
+
+document.addEventListener('click', function(e) {
+  const th = e.target.closest('th.sortable');
+  if(!th) return;
+  const table = th.closest('table');
+  const col = th.dataset.col;
+  if(!col) return;
+
+  // Toggle direction
+  if(currentSort.table === table.id && currentSort.col === col) {
+    currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';
+  } else {
+    currentSort = { table: table.id, col: col, dir: 'desc' };
+  }
+
+  // Update header classes
+  table.querySelectorAll('th.sortable').forEach(h => h.classList.remove('sort-asc','sort-desc'));
+  th.classList.add(currentSort.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+
+  // Re-render the appropriate table
+  if(table.id === 'tblAccounts') renderAccounts();
+  else if(table.id === 'tblScorecard') renderDepletionTable();
+  else if(table.id === 'tblInventory') renderInventoryTable();
+  else if(table.id === 'tblReorder') renderReorder();
+});
+
+// ==================== VIEW TOGGLES ====================
+let showAllAccounts = false;
+let showAllReorder = false;
+let showAllNewAcct = false;
+const ACCT_LIMIT = 25;
+const REORDER_LIMIT = 20;
+const NEWACCT_LIMIT = 10;
+
+function toggleAcctView() {
+  showAllAccounts = !showAllAccounts;
+  document.getElementById('btnAcctToggle').textContent = showAllAccounts ? 'Show Top '+ACCT_LIMIT : 'Show All';
+  document.getElementById('btnAcctToggle').classList.toggle('active', showAllAccounts);
+  document.getElementById('acctTableWrap').classList.toggle('expanded', showAllAccounts);
+  renderAccounts();
+}
+function toggleReorderView() {
+  showAllReorder = !showAllReorder;
+  document.getElementById('btnReorderToggle').textContent = showAllReorder ? 'Show Top '+REORDER_LIMIT : 'Show All';
+  document.getElementById('btnReorderToggle').classList.toggle('active', showAllReorder);
+  document.getElementById('reorderTableWrap').classList.toggle('expanded', showAllReorder);
+  renderReorder();
+}
+function toggleNewAcctView() {
+  showAllNewAcct = !showAllNewAcct;
+  document.getElementById('btnNewAcctToggle').textContent = showAllNewAcct ? 'Show Top '+NEWACCT_LIMIT : 'Show All';
+  document.getElementById('btnNewAcctToggle').classList.toggle('active', showAllNewAcct);
+  document.getElementById('newAcctTableWrap').classList.toggle('expanded', showAllNewAcct);
+  renderPlacementTable();
+}
+
+// ==================== EXCEL EXPORT ====================
+function exportTable(which) {
+  let data = [];
+  let filename = 'MT_Export.xlsx';
+  const fa = filterByState(accountsTop);
+  const fd = filterByState(distScorecard);
+  const fi = filterByState(inventoryData);
+  const fr = filterByState(reorderData);
+  const fn = filterByState(newAccounts);
+
+  if(which === 'accounts') {
+    filename = 'MT_Accounts_4M.xlsx';
+    data = fa.map((d,i) => ({'#':i+1, Account:d.acct, Distributor:d.dist, State:d.st, Channel:d.ch, 'Nov CE':d.nov, 'Dec CE':d.dec, 'Jan CE':d.jan, 'Feb CE':d.feb, '4M CE':d.total, '4M Rev':d.rev, Trend:d.trend}));
+  } else if(which === 'reorder') {
+    filename = 'MT_Priority_Reorder.xlsx';
+    data = fr.map((d,i) => ({'#':i+1, Account:d.acct, Distributor:d.dist, State:d.st, '4M CE':d.ce, Purchases:d.purch, 'Avg Cycle (days)':d.cycle, 'Last Order':d.last, 'Days Since':d.days, Status:'Overdue'}));
+  } else if(which === 'newAccounts') {
+    filename = 'MT_New_Accounts_30D.xlsx';
+    data = fn.map(d => ({Account:d.acct, Distributor:d.dist, State:d.st, '30D CE':d.ce, SKUs:d.skus}));
+  } else if(which === 'scorecard') {
+    filename = 'MT_Distributor_Scorecard.xlsx';
+    data = fd.map(d => ({Distributor:d.name, State:d.st, '13W CE':d.ce, '13W Rev':d.rev, 'YoY %':d.yoy, '4W CE':d.w4, '4W MoM':d.mom, 'On Hand':d.oh, DOH:d.doh, 'Net Placements':d.net, 'Consistency':Math.round(d.con*100)+'%'}));
+  } else if(which === 'distDetail') {
+    filename = 'MT_Distributor_SKU_Detail.xlsx';
+    const fdd = filterByState(distDetail);
+    fdd.forEach(d => {
+      d.wines.forEach(w => {
+        data.push({Distributor:d.dist, State:d.st, Wine:w.w, '13W CE':w.ce, '13W Rev':d.noPrice?'N/A':w.rev, 'Prior 13W':w.prior, 'YoY %':w.yoy, '4W CE':w.w4, 'Wkly Avg':w.avg, 'Rev/Case':d.noPrice?'N/A':w.rpc, 'Consistency':Math.round(w.con*100)+'%'});
+      });
+    });
+  } else if(which === 'inventory') {
+    filename = 'MT_Inventory.xlsx';
+    data = fi.map(d => ({Distributor:d.name, State:d.st, 'On Hand (CE)':d.oh, 'Daily Rate':d.rate, DOH:d.doh, '90D Depletion':d.dep90, Status:d.status, 'Proj. Order':d.proj}));
+  } else if(which === 'skuDetail') {
+    filename = 'MT_SKU_Detail.xlsx';
+    const totalRev = productMix.reduce((s,p)=>s+p.rev,0);
+    data = productMix.map(p => ({SKU:p.name, 'Total Revenue':'$'+p.rev.toLocaleString(), 'Bottles Sold':p.units, 'Cases (CE)':Math.round(p.units/12*10)/10, 'Avg Rev/Case':'$'+p.avgCase, '% of Total':totalRev>0?Math.round(p.rev/totalRev*100)+'%':'--'}));
+  }
+
+  if(!data.length) { alert('No data to export'); return; }
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Data');
+  // Auto-size columns
+  const colWidths = Object.keys(data[0]).map(k => Math.max(k.length, ...data.slice(0,50).map(r => String(r[k]||'').length)));
+  ws['!cols'] = colWidths.map(w => ({wch: Math.min(w+2, 40)}));
+  XLSX.writeFile(wb, filename);
+}
+
+// ==================== RENDER ALL ====================
+function renderAll() {
+  renderOverview();
+  renderOverviewAnalysis();
+  renderRevenue();
+  renderRevenueAnalysis();
+  renderDepletion();
+  renderDepletionAnalysis();
+  renderDistDetail();
+  renderInventory();
+  renderInventoryAnalysis();
+  renderAccounts();
+  renderAccountsAnalysis();
+  renderPlacements();
+  renderReorder();
+  renderReorderAnalysis();
+}
+
+// ==================== OVERVIEW ====================
+function renderOverview() {
+  const fd = filterByState(distScorecard);
+  const totalCE = fd.reduce((s,d)=>s+d.ce,0);
+  const priorCE = fd.reduce((s,d)=>s+d.prior,0);
+  const w4Total = fd.reduce((s,d)=>s+d.w4,0);
+  const ohTotal = fd.reduce((s,d)=>s+d.oh,0);
+  const netPl = fd.reduce((s,d)=>s+d.net,0);
+  const distCount = fd.filter(d=>d.ce>0).length;
+  const fi = filterByState(inventoryData);
+  const critCount = fi.filter(d=>d.status==='Critical').length;
+  const avgDoh = fi.length ? Math.round(fi.reduce((s,d)=>s+d.doh,0)/fi.length) : 0;
+  const fp = filterByState(placementData);
+  const yoyPct = priorCE>0 ? (((totalCE-priorCE)/priorCE)*100) : 0;
+  const yoyBadge = yoyPct>=0 ? `<span class="kpi-delta up">+${yoyPct.toFixed(1)}% YoY</span>` : `<span class="kpi-delta down">${yoyPct.toFixed(1)}% YoY</span>`;
+
+  // ---- SNAPSHOT ----
+  const snapMkt = currentState!=='all' ? stateNames[currentState] : 'all markets';
+  let snap = `<div class="snap-label">Weekly Snapshot - ${snapMkt}</div>`;
+  snap += `<strong>${totalCE.toFixed(1)} CE depleted</strong> over 13 weeks across ${distCount} distributors`;
+  snap += yoyPct>=0 ? `, <strong style="color:var(--green)">up ${yoyPct.toFixed(1)}%</strong> YoY.` : `, <strong style="color:var(--red)">down ${Math.abs(yoyPct).toFixed(1)}%</strong> YoY.`;
+  if(typeof revTotal2026!=='undefined' && revTotal2026>0) snap += ` 2026 YTD revenue: <strong>${f$(revTotal2026)}</strong>.`;
+  snap += ` ${critCount} distributors with critical inventory.`;
+  document.getElementById('overviewSnapshot').innerHTML = snap;
+
+  // ---- No-price note ----
+  const npNote = document.getElementById('noPriceNote');
+  const npDists = distDetail.filter(d=>d.noPrice);
+  if(npDists.length) {
+    npNote.style.display = 'block';
+    npNote.innerHTML = '&#9432; <strong>Note:</strong> ' + npDists.map(d=>d.dist).join(', ') + ' - pricing not reported in depletion data. QuickBooks revenue is unaffected.';
+  } else { npNote.style.display = 'none'; }
+
+  // ---- KPIs ----
+  document.getElementById('overviewKPIs').innerHTML = `
+    <div class="card"><h3>13W Depletions</h3><div class="value">${totalCE.toFixed(1)} CE ${yoyBadge}</div><div class="sub">${distCount} active distributors | ${(w4Total/4).toFixed(1)} CE/wk (4W avg)</div></div>
+    <div class="card"><h3>Distributor Inventory</h3><div class="value">${ohTotal.toFixed(1)} CE</div><div class="sub">${avgDoh} avg DOH | <span class="badge badge-yellow">${critCount} critical</span></div></div>
+    <div class="card"><h3>Net Placements (30D)</h3><div class="value" style="color:${netPl>=0?'var(--green)':'var(--red)'};">${netPl>=0?'+':''}${netPl}</div><div class="sub">${fp.filter(d=>d.net<0).length} of ${fp.length} distributors negative</div></div>
+    <div class="card"><h3>2026 YTD Revenue</h3><div class="value">${typeof revTotal2026!=='undefined'?f$(revTotal2026):'--'}</div><div class="sub">${typeof revTxns2026!=='undefined'?revTxns2026.toLocaleString()+' transactions':''}</div></div>`;
+
+  // ---- EXCEPTION ALERTS ----
+  const alertItems = [];
+  fd.forEach(d => {
+    if(d.health !== undefined && d.health < 40) alertItems.push({type:'critical', msg: d.name+' health score: '+d.health+'/100', icon:'⚠️'});
+  });
+  fi.forEach(d => {
+    if(d.doh !== undefined && d.doh < 30 && d.doh > 0) alertItems.push({type:'warning', msg: d.name+' - '+d.wine+': '+d.doh+' days on hand', icon:'📦'});
+    if(d.doh !== undefined && d.doh > 300) alertItems.push({type:'info', msg: d.name+' - '+d.wine+': '+d.doh+' DOH (overstock)', icon:'🔴'});
+  });
+  if(alertItems.length > 0) {
+    let alertHtml = '<div style="margin:18px 0;padding:14px 18px;background:#fff3cd;border-radius:10px;border-left:4px solid #ffc107;"><h4 style="margin:0 0 8px;">⚡ Exception Alerts</h4>';
+    alertItems.slice(0,8).forEach(a => { alertHtml += '<div style="padding:3px 0;font-size:13px;">'+a.icon+' '+a.msg+'</div>'; });
+    if(alertItems.length > 8) alertHtml += '<div style="color:#888;font-size:12px;margin-top:4px;">+'+(alertItems.length-8)+' more alerts</div>';
+    alertHtml += '</div>';
+    const kpisEl = document.getElementById('overviewKPIs');
+    if(kpisEl) kpisEl.insertAdjacentHTML('afterend', alertHtml);
+  }
+
+  // ---- CLASSIC SELLOUT TRACKER ----
+  const panel = document.getElementById('classicSelloutTracker');
+  if(typeof classicTracker!=='undefined' && classicTracker) {
+    const ct = classicTracker;
+    const pctSold = ct.history.length>=2 ? (((ct.history[0].total - ct.trackable) / ct.history[0].total) * 100) : 0;
+    const onTrack = ct.burnRate >= ct.requiredMonthly;
+    const projMonths = ct.burnRate > 0 ? (ct.trackable / ct.burnRate) : 999;
+    const projDate = new Date();
+    projDate.setDate(projDate.getDate() + projMonths * 30.44);
+    const projStr = projDate.toLocaleDateString('en-US', {month:'short',year:'numeric'});
+    const deadline = new Date(2026, 5, 30);
+    const deadlineStr = deadline.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    const barPct = Math.min(100, Math.max(0, 100 - (ct.trackable / (ct.history.length?ct.history[0].total:ct.trackable) * 100)));
+
+    let html = `<h3 style="margin-bottom:12px;">Classic Inventory Sellout Tracker (Batch 1+2) - Deadline: ${deadlineStr}</h3>`;
+    html += `<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:16px;">`;
+    html += `<div class="kpi-mini"><div class="label">Remaining (Trackable)</div><div class="val" style="font-size:24px;">${ct.trackable.toLocaleString()} cases</div></div>`;
+    html += `<div class="kpi-mini"><div class="label">Burn Rate</div><div class="val" style="font-size:24px;">${ct.burnRate.toFixed(0)} cases/mo</div></div>`;
+    html += `<div class="kpi-mini"><div class="label">Required Rate</div><div class="val" style="font-size:24px;color:${onTrack?'var(--green)':'var(--red)'};">${ct.requiredMonthly.toFixed(0)} cases/mo</div></div>`;
+    html += `<div class="kpi-mini"><div class="label">Months to Deadline</div><div class="val" style="font-size:24px;">${ct.monthsRemaining.toFixed(1)}</div></div>`;
+    html += `<div class="kpi-mini"><div class="label">Projected Sellout</div><div class="val" style="font-size:24px;color:${projDate<=deadline?'var(--green)':'var(--red)'};">${projStr}</div></div>`;
+    html += `<div class="kpi-mini"><div class="label">Status</div><div class="val" style="font-size:20px;">${onTrack?'<span style="color:var(--green)">On Track</span>':'<span style="color:var(--red)">Behind Pace</span>'}</div></div>`;
+    html += `</div>`;
+
+    // Progress bar
+    html += `<div style="margin-bottom:14px;">`;
+    html += `<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-bottom:4px;"><span>Sold</span><span>${barPct.toFixed(1)}% complete</span><span>Remaining</span></div>`;
+    html += `<div style="background:#E5E7EB;border-radius:8px;height:24px;overflow:hidden;">`;
+    html += `<div style="background:linear-gradient(90deg,var(--green),#34D399);height:100%;width:${barPct}%;border-radius:8px;transition:width 0.5s;"></div>`;
+    html += `</div></div>`;
+
+    // Wine breakdown
+    const wines = [['Still White','sw'],['Still Rose','sr'],['Red','rd'],['Sparkling White','spw'],['Sparkling Rose','spr']];
+    html += `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">`;
+    wines.forEach(([name,key]) => {
+      const val = ct.byWine[key]||0;
+      if(val > 0) html += `<div style="background:var(--cream);padding:6px 14px;border-radius:8px;font-size:13px;"><strong>${name}:</strong> ${val.toFixed(1)} cases</div>`;
+    });
+    html += `</div>`;
+
+    // Excluded note
+    html += `<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Excludes ${ct.badSpr.toFixed(0)} cases of Sparkling Rose (bad inventory at Zephyr Batch 1, to be destroyed). Data as of ${ct.dataDate}.</div>`;
+    panel.innerHTML = html;
+    panel.style.display = 'block';
+  } else {
+    panel.style.display = 'none';
+  }
+
+  // ---- ALERTS ----
+  const netNeg = fp.filter(d=>d.net<0).length;
+  let alertHtml = '';
+  if(netNeg > 0) alertHtml += `<div class="alert-bar danger">&#9888; Net placements negative for ${netNeg} of ${fp.length} distributors</div>`;
+  if(typeof classicTracker!=='undefined' && classicTracker && classicTracker.burnRate < classicTracker.requiredMonthly) {
+    alertHtml += `<div class="alert-bar danger">&#9888; Classic inventory burn rate (${classicTracker.burnRate.toFixed(0)}/mo) is below required pace (${classicTracker.requiredMonthly.toFixed(0)}/mo) for June 30 deadline</div>`;
+  }
+  document.getElementById('overviewAlerts').innerHTML = alertHtml;
+
+  // ---- CHARTS ----
+  const weekLabels = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W13'];
+  const wkTotals = weekLabels.map((_,i) => fd.reduce((s,d) => s + (d.weekly?d.weekly[i]:0), 0));
+  const gridColor = 'rgba(0,0,0,0.06)';
+  makeChart('chartDepTrend',{type:'line',data:{labels:weekLabels,datasets:[{label:'Total CE',data:wkTotals,borderColor:'#2563EB',backgroundColor:'rgba(37,99,235,0.08)',fill:true,tension:0.3,borderWidth:2,pointRadius:3,pointBackgroundColor:'#2563EB'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:gridColor}},x:{grid:{display:false}}}}});
+
+  const sorted = [...fd].filter(d=>d.ce>0).sort((a,b)=>b.ce-a.ce).slice(0,10);
+  makeChart('chartDistBar',{type:'bar',data:{labels:sorted.map(d=>d.name.split(' - ')[0].replace('Republic Natl','Republic').substring(0,22)),datasets:[{label:'13W CE',data:sorted.map(d=>d.ce),backgroundColor:'rgba(37,99,235,0.65)',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,grid:{color:gridColor}},y:{grid:{display:false}}}}});
+}
+
+// ==================== REVENUE (company-wide) ====================
+function renderRevenue() {
+  const gridColor = 'rgba(0,0,0,0.06)';
+  const channelColors = {'Distributors':'#2563EB','Website / DTC':'#7C3AED','Direct to Trade - Off Premise':'#0891B2','Direct to Trade - On Premise':'#059669','Promo':'#D97706','Operations':'#94A3B8','Other':'#CBD5E1'};
+  const channels = Object.keys(ytdChannelRev);
+
+  // Compute YTD totals
+  let ytdTotal = 0;
+  let ytdBudgetTotalYTD = 0;
+  const channelTotals = {};
+  const channelBudgetTotals = {};
+  channels.forEach(ch => {
+    const actual = (ytdChannelRev[ch]||[]).reduce((s,v)=>s+v,0);
+    const budget = (ytdBudget[ch]||[]).reduce((s,v)=>s+v,0);
+    channelTotals[ch] = actual;
+    channelBudgetTotals[ch] = budget;
+    ytdTotal += actual;
+    ytdBudgetTotalYTD += budget;
+  });
+  // Include budget-only channels not in actuals
+  Object.keys(ytdBudget).forEach(ch => {
+    if (!channelTotals[ch]) {
+      channelBudgetTotals[ch] = (ytdBudget[ch]||[]).reduce((s,v)=>s+v,0);
+      ytdBudgetTotalYTD += channelBudgetTotals[ch];
+    }
+  });
+
+  const ytdPct = ytdBudgetTotalYTD > 0 ? ((ytdTotal / ytdBudgetTotalYTD) * 100).toFixed(1) : '--';
+  const annualBudget = ytdBudgetTotal || 2850000;
+  const annualPct = ((ytdTotal / annualBudget) * 100).toFixed(1);
+  const monthsElapsed = ytdMonths.length;
+  const prorated = annualBudget * (monthsElapsed / 12);
+  const variance = ytdTotal - prorated;
+
+  // KPIs
+  document.getElementById('revKPIs').innerHTML = `
+    <div class="kpi-mini"><div class="label">2026 YTD Revenue</div><div class="val">${f$(ytdTotal)}</div></div>
+    <div class="kpi-mini"><div class="label">YTD Budget</div><div class="val">${f$(ytdBudgetTotalYTD)}</div></div>
+    <div class="kpi-mini"><div class="label">YTD vs Budget</div><div class="val" style="color:${variance>=0?'#059669':'#DC2626'}">${ytdPct}%</div></div>
+    <div class="kpi-mini"><div class="label">Variance</div><div class="val" style="color:${variance>=0?'#059669':'#DC2626'}">${variance>=0?'+':''}${f$(variance)}</div></div>
+    <div class="kpi-mini"><div class="label">Annual Budget</div><div class="val">${f$(annualBudget)}</div></div>
+    <div class="kpi-mini"><div class="label">% of Annual</div><div class="val">${annualPct}%</div></div>`;
+
+  if(currentState!=='all') {
+    document.getElementById('revKPIs').innerHTML += `<div style="width:100%;padding:8px 0;"><div class="alert-bar info">Revenue data is company-wide and does not filter by state.</div></div>`;
+  }
+
+  // ===== YTD CHANNEL TABLE =====
+  const allCh = [...new Set([...channels, ...Object.keys(ytdBudget)])].filter(c=>c!=='Promo'&&c!=='Operations'&&c!=='Other');
+  let tblHtml = '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+  tblHtml += '<thead><tr style="background:var(--accent);color:#fff;"><th style="padding:10px 12px;text-align:left;">Channel</th>';
+  ytdMonthLabels.forEach(m => { tblHtml += `<th style="padding:10px 8px;text-align:right;">${m} Actual</th><th style="padding:10px 8px;text-align:right;">${m} Budget</th><th style="padding:10px 8px;text-align:right;">Var</th>`; });
+  tblHtml += '<th style="padding:10px 8px;text-align:right;">YTD Actual</th><th style="padding:10px 8px;text-align:right;">YTD Budget</th><th style="padding:10px 8px;text-align:right;">YTD %</th><th style="padding:10px 8px;text-align:right;">Annual Budget</th><th style="padding:10px 8px;text-align:right;">Ann %</th></tr></thead><tbody>';
+
+  let grandActualByMonth = ytdMonths.map(()=>0);
+  let grandBudgetByMonth = ytdMonths.map(()=>0);
+  let grandActual = 0, grandBudget = 0, grandAnnual = 0;
+
+  // Annual budget lookup
+  const annBudgets = {'Distributors':1800000,'Website / DTC':500000,'Direct to Trade - Off Premise':500000,'Direct to Trade - On Premise':50000};
+
+  allCh.forEach(ch => {
+    const actuals = ytdChannelRev[ch] || ytdMonths.map(()=>0);
+    const budgets = ytdBudget[ch] || ytdMonths.map(()=>0);
+    const chTotal = actuals.reduce((s,v)=>s+v,0);
+    const chBudget = budgets.reduce((s,v)=>s+v,0);
+    const chAnnual = annBudgets[ch] || 0;
+    const chPct = chBudget > 0 ? ((chTotal/chBudget)*100).toFixed(1) : '--';
+    const chAnnPct = chAnnual > 0 ? ((chTotal/chAnnual)*100).toFixed(1) : '--';
+    const varColor = chTotal >= chBudget ? '#059669' : '#DC2626';
+
+    tblHtml += `<tr style="border-bottom:1px solid var(--border);">`;
+    tblHtml += `<td style="padding:8px 12px;font-weight:600;white-space:nowrap;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${channelColors[ch]||'#94A3B8'};margin-right:6px;"></span>${ch}</td>`;
+    ytdMonths.forEach((m,i) => {
+      const a = actuals[i]||0;
+      const b = budgets[i]||0;
+      const v = a - b;
+      const vc = v >= 0 ? '#059669' : '#DC2626';
+      grandActualByMonth[i] += a;
+      grandBudgetByMonth[i] += b;
+      tblHtml += `<td style="padding:8px;text-align:right;">${f$(a)}</td>`;
+      tblHtml += `<td style="padding:8px;text-align:right;color:#6B7280;">${f$(b)}</td>`;
+      tblHtml += `<td style="padding:8px;text-align:right;color:${vc};font-weight:500;">${v>=0?'+':''}${f$(v)}</td>`;
+    });
+    grandActual += chTotal;
+    grandBudget += chBudget;
+    grandAnnual += chAnnual;
+    tblHtml += `<td style="padding:8px;text-align:right;font-weight:700;">${f$(chTotal)}</td>`;
+    tblHtml += `<td style="padding:8px;text-align:right;color:#6B7280;">${f$(chBudget)}</td>`;
+    tblHtml += `<td style="padding:8px;text-align:right;color:${varColor};font-weight:600;">${chPct}%</td>`;
+    tblHtml += `<td style="padding:8px;text-align:right;color:#6B7280;">${f$(chAnnual)}</td>`;
+    tblHtml += `<td style="padding:8px;text-align:right;">${chAnnPct}%</td>`;
+    tblHtml += '</tr>';
+  });
+
+  // Totals row
+  const totPct = grandBudget > 0 ? ((grandActual/grandBudget)*100).toFixed(1) : '--';
+  const totAnnPct = grandAnnual > 0 ? ((grandActual/grandAnnual)*100).toFixed(1) : '--';
+  const totVarColor = grandActual >= grandBudget ? '#059669' : '#DC2626';
+  tblHtml += `<tr style="background:rgba(37,99,235,0.06);font-weight:700;border-top:2px solid var(--accent);">`;
+  tblHtml += `<td style="padding:10px 12px;">TOTAL</td>`;
+  ytdMonths.forEach((m,i) => {
+    const v = grandActualByMonth[i] - grandBudgetByMonth[i];
+    const vc = v >= 0 ? '#059669' : '#DC2626';
+    tblHtml += `<td style="padding:8px;text-align:right;">${f$(grandActualByMonth[i])}</td>`;
+    tblHtml += `<td style="padding:8px;text-align:right;color:#6B7280;">${f$(grandBudgetByMonth[i])}</td>`;
+    tblHtml += `<td style="padding:8px;text-align:right;color:${vc};">${v>=0?'+':''}${f$(v)}</td>`;
+  });
+  tblHtml += `<td style="padding:8px;text-align:right;">${f$(grandActual)}</td>`;
+  tblHtml += `<td style="padding:8px;text-align:right;color:#6B7280;">${f$(grandBudget)}</td>`;
+  tblHtml += `<td style="padding:8px;text-align:right;color:${totVarColor};">${totPct}%</td>`;
+  tblHtml += `<td style="padding:8px;text-align:right;color:#6B7280;">${f$(grandAnnual)}</td>`;
+  tblHtml += `<td style="padding:8px;text-align:right;">${totAnnPct}%</td>`;
+  tblHtml += '</tr>';
+  tblHtml += '</tbody></table>';
+  document.getElementById('ytdChannelTable').innerHTML = tblHtml;
+
+  // ===== YTD vs Budget bar chart =====
+  const budgetChartChannels = allCh;
+  const actualVals = budgetChartChannels.map(ch => (channelTotals[ch]||0));
+  const budgetVals = budgetChartChannels.map(ch => (channelBudgetTotals[ch]||0));
+  makeChart('chartYtdVsBudget',{type:'bar',data:{
+    labels:budgetChartChannels.map(c=>c.replace('Direct to Trade - ','')),
+    datasets:[
+      {label:'YTD Actual',data:actualVals,backgroundColor:'rgba(37,99,235,0.8)',borderRadius:4},
+      {label:'YTD Budget',data:budgetVals,backgroundColor:'rgba(37,99,235,0.2)',borderColor:'rgba(37,99,235,0.6)',borderWidth:1,borderRadius:4}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:12,color:'#2D2420'}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f$(ctx.raw)}}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{callback:v=>'$'+Math.round(v/1000)+'k'}},x:{grid:{display:false}}}}});
+
+  // ===== Channel doughnut (2026 YTD only) =====
+  const ytdChLabels = allCh;
+  const ytdChData = ytdChLabels.map(ch => channelTotals[ch]||0);
+  const ytdChColors = ytdChLabels.map(ch => channelColors[ch]||'#94A3B8');
+  makeChart('chartCustChannel',{type:'doughnut',data:{labels:ytdChLabels,datasets:[{data:ytdChData,backgroundColor:ytdChColors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{padding:14,usePointStyle:true,color:'#2D2420'}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+f$(ctx.raw)+' ('+((ctx.raw/ytdTotal)*100).toFixed(1)+'%)'}}}}});
+
+  // ===== 2026 SKU monthly trend line =====
+  const skuColors = {'Still Red':'#2563EB','Still White':'#7C3AED','Still Rose':'#0891B2','Sparkling White':'#059669','Sparkling Rose':'#D97706'};
+  const use2026 = typeof revTrend2026 !== 'undefined' && Object.keys(revTrend2026).length > 0;
+  const trendData = use2026 ? revTrend2026 : revTrend;
+  const trendLabels = use2026 ? revMonthLabels2026 : revMonthLabels;
+  const skuDatasets = Object.keys(trendData).map(sku => ({
+    label:sku,data:trendData[sku],borderColor:skuColors[sku],backgroundColor:'transparent',
+    tension:0.3,borderWidth:2,pointRadius:3,pointBackgroundColor:skuColors[sku]
+  }));
+  makeChart('chartSkuTrend',{type:'line',data:{labels:trendLabels,datasets:skuDatasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:10,color:'#2D2420'}}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{callback:v=>'$'+Math.round(v/1000)+'k'}},x:{grid:{display:false}}}}});
+
+  // 2026 Product mix horizontal bar
+  const mixData = (typeof productMix2026 !== 'undefined' && productMix2026.length) ? productMix2026 : productMix;
+  const mixTotal = mixData.reduce((s,p)=>s+p.rev,0);
+  makeChart('chartProductMix',{type:'bar',data:{labels:mixData.map(p=>p.name),datasets:[{label:'Revenue',data:mixData.map(p=>p.rev),backgroundColor:['#2563EB','#7C3AED','#0891B2','#059669','#D97706'],borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>f$(ctx.raw)+' ('+((ctx.raw/mixTotal)*100).toFixed(1)+'%)'}}},scales:{x:{beginAtZero:true,grid:{color:gridColor},ticks:{callback:v=>'$'+Math.round(v/1000)+'k'}},y:{grid:{display:false}}}}});
+
+  // 2026 SKU detail table
+  const tbl = document.querySelector('#tblSkuDetail tbody');
+  tbl.innerHTML = '';
+  mixData.forEach(p => {
+    const pct = mixTotal > 0 ? ((p.rev/mixTotal)*100).toFixed(1) : '0.0';
+    const cases = (p.units/12).toFixed(1);
+    tbl.innerHTML += `<tr>
+      <td style="font-weight:700">${p.name}</td>
+      <td style="font-weight:700">${f$(p.rev)}</td>
+      <td>${p.units.toLocaleString()}</td>
+      <td>${cases}</td>
+      <td>${f$(p.avgCase)}</td>
+      <td>${pct}%</td>
+    </tr>`;
+  });
+}
+
+// ==================== DEPLETION ====================
+function renderDepletion() {
+  const fd = filterByState(distScorecard);
+  const totalCE = fd.reduce((s,d)=>s+d.ce,0);
+  const totalRev = fd.reduce((s,d)=>s+d.rev,0);
+  const w4Total = fd.reduce((s,d)=>s+d.w4,0);
+  const gridColor = 'rgba(0,0,0,0.06)';
+
+  document.getElementById('depKPIs').innerHTML = `
+    <div class="kpi-mini"><div class="label">13W CE</div><div class="val">${totalCE.toFixed(1)}</div></div>
+    <div class="kpi-mini"><div class="label">13W Revenue</div><div class="val">${f$(totalRev)}</div></div>
+    <div class="kpi-mini"><div class="label">4W Velocity</div><div class="val">${w4Total.toFixed(1)} CE</div></div>
+    <div class="kpi-mini"><div class="label">Distributors</div><div class="val">${fd.filter(d=>d.ce>0).length}</div></div>
+    <div class="kpi-mini"><div class="label">Avg Weekly CE</div><div class="val">${(totalCE/13).toFixed(1)}</div></div>`;
+
+  const weekLabels = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W13'];
+  const top4 = [...fd].sort((a,b)=>b.ce-a.ce).slice(0,4);
+  const datasets = top4.map((d,i) => ({label:d.name.split(' - ')[0].substring(0,18),data:d.weekly||new Array(13).fill(0),backgroundColor:colors[i]}));
+  const otherData = weekLabels.map((_,i) => {
+    const top4sum = top4.reduce((s,d)=>s+(d.weekly?d.weekly[i]:0),0);
+    return Math.max(0, fd.reduce((s,d)=>s+(d.weekly?d.weekly[i]:0),0) - top4sum);
+  });
+  datasets.push({label:'Other',data:otherData,backgroundColor:'#CBD5E1'});
+  makeChart('chartDepStack',{type:'bar',data:{labels:weekLabels,datasets},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,elements)=>{
+    if(elements.length){const dsIdx=elements[0].datasetIndex;const distName=datasets[dsIdx].label;
+      if(distName==='Other') return;
+      if(chartFilters.depletion && chartFilters.depletion.value===distName) clearChartFilter('depletion');
+      else setChartFilter('depletion','name',distName,distName);
+    }},plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:10,color:'#2D2420'}},tooltip:{callbacks:{afterLabel:()=>'Click to filter scorecard'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:gridColor}}}}});
+
+  const fdd = filterByState(distDetail);
+  const skuT = {};
+  fdd.forEach(d=>{d.wines.forEach(w=>{skuT[w.w]=(skuT[w.w]||0)+w.ce;});});
+  makeChart('chartSkuMix',{type:'doughnut',data:{labels:Object.keys(skuT),datasets:[{data:Object.values(skuT),backgroundColor:colors.slice(0,Object.keys(skuT).length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{padding:12,usePointStyle:true,color:'#2D2420'}}}}});
+
+  renderDepletionTable();
+}
+
+function renderDepletionTable() {
+  let fd = filterByState(distScorecard);
+  let filtered = chartFilters.depletion ? fd.filter(d=>d.name.split(' - ')[0].substring(0,18)===chartFilters.depletion.value) : fd;
+  renderFilterBadge('depFilterBadge','depletion', chartFilters.depletion ? chartFilters.depletion.label : '');
+  if(currentSort.table === 'tblScorecard' && currentSort.col) {
+    filtered = sortData([...filtered], currentSort.col, currentSort.dir);
+  }
+  const tbl = document.querySelector('#tblScorecard tbody');
+  tbl.innerHTML = '';
+  if(!filtered.length) { tbl.innerHTML='<tr><td colspan="13" class="empty-state">No matching distributors</td></tr>'; return; }
+  let html = '';
+  filtered.forEach((d,idx) => {
+    if(d.isGroup && d.children) {
+      const gid = 'dep-grp-'+idx;
+      const tog = `<span style="cursor:pointer;color:#2563EB;margin-right:4px;font-size:11px;" onclick="toggleRow(this,'${gid}')">&#9654;</span>`;
+      html += `<tr style="background:rgba(37,99,235,0.06);font-weight:600"><td>${tog}${d.name} <span style="font-size:10px;color:#6B7280;font-weight:400">(${d.children.length} locations)</span></td><td><span class="badge badge-blue">${d.st}</span></td><td>${d.ce.toFixed(1)}</td><td>${f$(d.rev)}</td><td>${fmtPct(d.yoy)}</td><td>${d.w4.toFixed(1)}</td><td>${fmtPct(d.mom)}</td><td>${d.oh.toFixed(1)}</td><td>${Math.round(d.doh)}</td><td style="color:${d.net>=0?'var(--green)':'var(--red)'}">${d.net>=0?'+':''}${d.net}</td><td>${conBar(d.con)}</td><td><div style="display:flex;align-items:center;gap:6px;"><div style="width:50px;height:8px;background:#eee;border-radius:4px;overflow:hidden;"><div style="width:${d.health}%;height:100%;background:${d.health>=70?'#10b981':d.health>=40?'#f59e0b':'#ef4444'};border-radius:4px;"></div></div><span style="font-size:11px;">${d.health}</span></div></td><td><span style="padding:2px 8px;border-radius:10px;font-size:11px;background:${d.stage==='Mature'?'#d1fae5':d.stage==='Growth'?'#fef3c7':'#dbeafe'};color:${d.stage==='Mature'?'#065f46':d.stage==='Growth'?'#92400e':'#1e40af'};">${d.stage}</span></td></tr>`;
+      html += `<tr id="${gid}" style="display:none"><td colspan="13" style="padding:0"><table style="width:100%;border:none;margin:0"><tbody>`;
+      d.children.forEach(c => {
+        html += `<tr style="background:#f8f9fa;font-size:12px"><td style="padding:4px 10px 4px 28px;border-bottom:1px solid #e5e7eb">${c.name}${getQbOrderBadge(c.name)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb"><span class="badge badge-blue" style="font-size:9px">${c.st}</span></td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${c.ce.toFixed(1)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${f$(c.rev)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${fmtPct(c.yoy)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${c.w4.toFixed(1)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${fmtPct(c.mom)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${c.oh.toFixed(1)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${Math.round(c.doh)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb;color:${c.net>=0?'var(--green)':'var(--red)'};">${c.net>=0?'+':''}${c.net}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${conBar(c.con)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:50px;height:8px;background:#eee;border-radius:4px;overflow:hidden;"><div style="width:${c.health}%;height:100%;background:${c.health>=70?'#10b981':c.health>=40?'#f59e0b':'#ef4444'};border-radius:4px;"></div></div><span style="font-size:11px;">${c.health}</span></div></td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb;"><span style="padding:2px 8px;border-radius:10px;font-size:11px;background:${c.stage==='Mature'?'#d1fae5':c.stage==='Growth'?'#fef3c7':'#dbeafe'};color:${c.stage==='Mature'?'#065f46':c.stage==='Growth'?'#92400e':'#1e40af'};">${c.stage}</span></td></tr>`;
+      });
+      html += `</tbody></table></td></tr>`;
+    } else {
+      html += `<tr><td style="font-weight:600">${d.name}${getQbOrderBadge(d.name)}</td><td><span class="badge badge-blue">${d.st}</span></td><td>${d.ce.toFixed(1)}</td><td>${f$(d.rev)}</td><td>${fmtPct(d.yoy)}</td><td>${d.w4.toFixed(1)}</td><td>${fmtPct(d.mom)}</td><td>${d.oh.toFixed(1)}</td><td>${Math.round(d.doh)}</td><td style="color:${d.net>=0?'var(--green)':'var(--red)'}">${d.net>=0?'+':''}${d.net}</td><td>${conBar(d.con)}</td><td><div style="display:flex;align-items:center;gap:6px;"><div style="width:50px;height:8px;background:#eee;border-radius:4px;overflow:hidden;"><div style="width:${d.health}%;height:100%;background:${d.health>=70?'#10b981':d.health>=40?'#f59e0b':'#ef4444'};border-radius:4px;"></div></div><span style="font-size:11px;">${d.health}</span></div></td><td><span style="padding:2px 8px;border-radius:10px;font-size:11px;background:${d.stage==='Mature'?'#d1fae5':d.stage==='Growth'?'#fef3c7':'#dbeafe'};color:${d.stage==='Mature'?'#065f46':d.stage==='Growth'?'#92400e':'#1e40af'};">${d.stage}</span></td></tr>`;
+    }
+  });
+  tbl.innerHTML = html;
+}
+
+// ==================== DISTRIBUTOR DETAIL ====================
+function renderDistDetail() {
+  const fdd = filterByState(distDetail);
+  const sel = document.getElementById('distFilter');
+  const curVal = sel.value;
+  sel.innerHTML = '<option value="all">All Distributors</option>';
+  fdd.forEach(d => { const o=document.createElement('option'); o.value=d.dist; o.textContent=d.dist; sel.appendChild(o); });
+  if([...sel.options].some(o=>o.value===curVal)) sel.value=curVal; else sel.value='all';
+  const distVal = sel.value;
+  const filtered = distVal==='all'?fdd:fdd.filter(d=>d.dist===distVal);
+  const tbl = document.querySelector('#tblDistDetail tbody');
+  tbl.innerHTML = '';
+  if(!filtered.length) { tbl.innerHTML = '<tr><td colspan="11" class="empty-state">No distributors in this market</td></tr>'; return; }
+  filtered.forEach(d => {
+    const np = d.noPrice;
+    d.wines.forEach((w,i) => {
+      tbl.innerHTML += `<tr><td style="font-weight:${i===0?600:400}">${i===0?d.dist+(np?' <span style="font-size:10px;color:var(--text-dim);font-weight:400;font-style:italic">(pricing not reported)</span>':''):''}</td><td>${i===0?'<span class="badge badge-blue">'+d.st+'</span>':''}</td><td>${w.w}</td><td>${w.ce.toFixed(1)}</td><td>${np?'-':f$(w.rev)}</td><td>${w.prior.toFixed(1)}</td><td>${fmtPct(w.yoy)}</td><td>${w.w4.toFixed(1)}</td><td>${w.avg.toFixed(2)}</td><td>${np?'-':(w.rpc?f$(w.rpc):'-')}</td><td>${(w.con*100).toFixed(0)}%</td></tr>`;
+    });
+    const tc = d.wines.reduce((s,w)=>s+w.ce,0);
+    const tr = np ? 0 : d.wines.reduce((s,w)=>s+w.rev,0);
+    tbl.innerHTML += `<tr style="background:rgba(37,99,235,0.04);font-weight:700"><td></td><td></td><td>TOTAL</td><td>${tc.toFixed(1)}</td><td>${np?'-':f$(tr)}</td><td colspan="6"></td></tr>`;
+  });
+}
+
+// ==================== INVENTORY ====================
+function renderInventory() {
+  const fi = filterByState(inventoryData);
+  const sc = {Healthy:0,Low:0,Overstocked:0,Critical:0};
+  fi.forEach(d=>sc[d.status]++);
+  const totalOH = fi.reduce((s,d)=>s+d.oh,0);
+  const avgDoh = fi.length?Math.round(fi.reduce((s,d)=>s+d.doh,0)/fi.length):0;
+  const gridColor = 'rgba(0,0,0,0.06)';
+
+  document.getElementById('invKPIs').innerHTML = `
+    <div class="kpi-mini"><div class="label">Total On Hand</div><div class="val">${totalOH.toFixed(1)} CE</div></div>
+    <div class="kpi-mini"><div class="label">Avg DOH</div><div class="val">${avgDoh} days</div></div>
+    <div class="kpi-mini"><div class="label">Healthy</div><div class="val" style="color:var(--green);">${sc.Healthy}</div></div>
+    <div class="kpi-mini"><div class="label">Low</div><div class="val" style="color:var(--yellow);">${sc.Low}</div></div>
+    <div class="kpi-mini"><div class="label">Overstocked</div><div class="val" style="color:var(--blue);">${sc.Overstocked}</div></div>
+    <div class="kpi-mini"><div class="label">Critical</div><div class="val" style="color:var(--red);">${sc.Critical}</div></div>`;
+
+  const invChart = makeChart('chartInvStatus',{type:'doughnut',data:{labels:Object.keys(sc),datasets:[{data:Object.values(sc),backgroundColor:['#059669','#D97706','#2563EB','#DC2626'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,elements)=>{
+    if(elements.length){const idx=elements[0].index;const status=Object.keys(sc)[idx];
+      if(chartFilters.inventory && chartFilters.inventory.value===status) clearChartFilter('inventory');
+      else setChartFilter('inventory','status',status,status+' ('+Object.values(sc)[idx]+')');
+    }},plugins:{legend:{position:'right',labels:{padding:12,usePointStyle:true,color:'#2D2420'}},tooltip:{callbacks:{afterLabel:()=>'Click to filter table below'}}}}});
+
+  const scatterData = fi.filter(d=>d.doh<2000);
+  makeChart('chartInvScatter',{type:'scatter',data:{datasets:[{label:'Distributors',data:scatterData.map(d=>({x:d.doh,y:d.oh})),backgroundColor:scatterData.map(d=>d.status==='Critical'?'#DC2626':d.status==='Overstocked'?'#2563EB':d.status==='Low'?'#D97706':'#059669'),pointRadius:8}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,elements)=>{
+    if(elements.length){const d=scatterData[elements[0].index];
+      if(chartFilters.inventory && chartFilters.inventory.value===d.status) clearChartFilter('inventory');
+      else setChartFilter('inventory','status',d.status,d.status+' - '+d.name.split(' - ')[0]);
+    }},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const d=scatterData[ctx.dataIndex];return d.name.split(' - ')[0]+': '+d.oh+' CE, '+d.doh+' DOH';},afterLabel:()=>'Click to filter by status'}}},scales:{x:{title:{display:true,text:'Days on Hand'},grid:{color:gridColor}},y:{title:{display:true,text:'On Hand (CE)'},grid:{color:gridColor}}}}});
+
+  renderInventoryTable();
+  renderWarehousePanel();
+}
+
+function renderWarehousePanel() {
+  const panel = document.getElementById('warehousePanel');
+  if (!panel) return;
+  if (typeof warehouseInventory === 'undefined' || !warehouseInventory) { panel.style.display='none'; return; }
+  const wh = warehouseInventory;
+  const ct = wh.classic['Warehouse Total'] || {};
+  const nt = wh.contemporary['Warehouse Total'] || {};
+  const gt = wh.grandTotal || {};
+  const wines = ['sw','sr','rd','spw','spr'];
+  const wineNames = ['Still White','Still Rose','Red','Spark White','Spark Rose'];
+  let html = '<h3>Company Warehouse Inventory (by Label Type)</h3>';
+  // Warning for bad Sparkling Rose
+  const classicSpr = ct.spr || 0;
+  if (classicSpr > 0) {
+    html += '<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#991B1B;">Note: Classic Sparkling Rose (' + classicSpr + ' cases) includes Batch 1 sequestered inventory with known quality issues (hard-to-open bottles). Not suitable for normal distribution channels.</div>';
+  }
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
+  // Classic table
+  html += '<div><div style="font-weight:600;margin-bottom:6px;"><span style="display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;background:#F3E8FF;color:#7C3AED;margin-right:6px;">Classic</span> Batch 1+2 - Original Labels</div>';
+  html += '<table style="width:100%;font-size:12px;border-collapse:collapse;">';
+  html += '<thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:4px 6px;">Location</th>';
+  wineNames.forEach(w => html += '<th style="text-align:right;padding:4px 6px;">' + w + '</th>');
+  html += '<th style="text-align:right;padding:4px 6px;font-weight:700;">Total</th></tr></thead><tbody>';
+  for (const [loc, vals] of Object.entries(wh.classic)) {
+    if (loc === 'Warehouse Total' || loc === 'Zephyr Total') {
+      html += '<tr style="font-weight:700;border-top:1px solid #e5e7eb;">';
+    } else {
+      html += '<tr>';
+    }
+    html += '<td style="padding:3px 6px;">' + loc + '</td>';
+    wines.forEach(w => { const v = vals[w] || 0; html += '<td style="text-align:right;padding:3px 6px;' + (w==='spr' && v > 0 ? 'color:#DC2626;' : '') + '">' + v.toLocaleString() + '</td>'; });
+    html += '<td style="text-align:right;padding:3px 6px;font-weight:600;">' + (vals.total||0).toLocaleString() + '</td></tr>';
+  }
+  html += '</tbody></table></div>';
+  // Contemporary table
+  html += '<div><div style="font-weight:600;margin-bottom:6px;"><span style="display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;background:#DBEAFE;color:#2563EB;margin-right:6px;">Contemporary</span> Batch 3+ - New Labels</div>';
+  html += '<table style="width:100%;font-size:12px;border-collapse:collapse;">';
+  html += '<thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:4px 6px;">Location</th>';
+  wineNames.forEach(w => html += '<th style="text-align:right;padding:4px 6px;">' + w + '</th>');
+  html += '<th style="text-align:right;padding:4px 6px;font-weight:700;">Total</th></tr></thead><tbody>';
+  for (const [loc, vals] of Object.entries(wh.contemporary)) {
+    if (loc === 'Warehouse Total') {
+      html += '<tr style="font-weight:700;border-top:1px solid #e5e7eb;">';
+    } else {
+      html += '<tr>';
+    }
+    html += '<td style="padding:3px 6px;">' + loc + '</td>';
+    wines.forEach(w => { const v = vals[w] || 0; html += '<td style="text-align:right;padding:3px 6px;">' + v.toLocaleString() + '</td>'; });
+    html += '<td style="text-align:right;padding:3px 6px;font-weight:600;">' + (vals.total||0).toLocaleString() + '</td></tr>';
+  }
+  html += '</tbody></table></div></div>';
+  // Grand totals bar
+  html += '<div style="margin-top:12px;padding:8px 12px;background:#f9fafb;border-radius:6px;display:flex;gap:24px;font-size:13px;">';
+  html += '<span><strong>Grand Total:</strong> ' + (gt.total||0).toLocaleString() + ' cases</span>';
+  html += '<span>Classic: ' + (ct.total||0).toLocaleString() + ' (' + (ct.total && gt.total ? Math.round(ct.total/gt.total*100) : 0) + '%)</span>';
+  html += '<span>Contemporary: ' + (nt.total||0).toLocaleString() + ' (' + (nt.total && gt.total ? Math.round(nt.total/gt.total*100) : 0) + '%)</span>';
+  if (wh.batch4Est && wh.batch4Est.total) html += '<span style="color:#6B7280;">Batch 4 Est: +' + wh.batch4Est.total.toLocaleString() + ' cases</span>';
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+function _invSkuSubrows(skus, prefix, indent) {
+  const pad = indent || 48;
+  return `<tr id="${prefix}" style="display:none"><td colspan="8" style="padding:0">
+    <table style="width:100%;background:#f0f1f3;border:none;margin:0"><tbody>
+    ${skus.map(s=>`<tr style="font-size:11px"><td style="padding:3px 10px 3px ${pad}px;border-bottom:1px solid #e5e7eb;font-weight:500">${s.w}</td><td></td><td style="padding:3px 6px;border-bottom:1px solid #e5e7eb">${s.oh.toFixed(1)}</td><td style="padding:3px 6px;border-bottom:1px solid #e5e7eb">${s.rate.toFixed(2)}</td><td style="padding:3px 6px;border-bottom:1px solid #e5e7eb">${Math.round(s.doh)}</td><td style="padding:3px 6px;border-bottom:1px solid #e5e7eb"></td><td style="padding:3px 6px;border-bottom:1px solid #e5e7eb">${statusBadge(s.status)}</td><td></td></tr>`).join('')}
+    </tbody></table></td></tr>`;
+}
+
+function renderInventoryTable() {
+  const fi = filterByState(inventoryData);
+  let filtered = chartFilters.inventory ? fi.filter(d=>d.status===chartFilters.inventory.value) : fi;
+  renderFilterBadge('invFilterBadge','inventory', chartFilters.inventory ? chartFilters.inventory.label : '');
+  if(currentSort.table === 'tblInventory' && currentSort.col) {
+    filtered = sortData([...filtered], currentSort.col, currentSort.dir);
+  }
+  const tbl = document.querySelector('#tblInventory tbody');
+  tbl.innerHTML = '';
+  if(!filtered.length) { tbl.innerHTML='<tr><td colspan="8" class="empty-state">'+(chartFilters.inventory?'No '+chartFilters.inventory.value.toLowerCase()+' distributors':'No inventory in this market')+'</td></tr>'; return; }
+  const skuFilter = document.getElementById('invSkuFilter') ? document.getElementById('invSkuFilter').value : 'all';
+  let html = '';
+  filtered.forEach((d, idx) => {
+    if(d.isGroup && d.children) {
+      // -- Parent group row: warehouse dropdown only --
+      if (skuFilter !== 'all') {
+        const sku = (d.skus || []).find(s => s.w === skuFilter);
+        if (!sku) return;
+        html += `<tr style="background:rgba(37,99,235,0.06);font-weight:600"><td>${d.name}</td><td><span class="badge badge-blue">${d.st}</span></td><td>${sku.oh.toFixed(1)}</td><td>${sku.rate.toFixed(2)}</td><td>${Math.round(sku.doh)}</td><td>-</td><td>${statusBadge(sku.status)}</td><td>-</td></tr>`;
+      } else {
+        const gid = 'inv-grp-'+idx;
+        const tog = `<span style="cursor:pointer;color:#2563EB;margin-right:4px;font-size:11px" onclick="toggleRow(this,'${gid}')">&#9654;</span>`;
+        html += `<tr style="background:rgba(37,99,235,0.06);font-weight:600"><td>${tog}${d.name} <span style="font-size:10px;color:#6B7280;font-weight:400">(${d.children.length} locations)</span></td><td><span class="badge badge-blue">${d.st}</span></td><td>${d.oh.toFixed(1)}</td><td>${d.rate.toFixed(2)}</td><td>${Math.round(d.doh)}</td><td>${d.dep90.toFixed(1)}</td><td>${statusBadge(d.status)}</td><td>${d.proj<0?'<span style="color:var(--red)">'+d.proj.toFixed(1)+'</span>':d.proj.toFixed(1)}</td></tr>`;
+        // -- Warehouse children (hidden), each with own wine toggle --
+        html += `<tr id="${gid}" style="display:none"><td colspan="8" style="padding:0"><table style="width:100%;border:none;margin:0"><tbody>`;
+        d.children.forEach((c,ci) => {
+          const cSkuId = 'inv-wh-sku-'+idx+'-'+ci;
+          const cHasSkus = c.skus && c.skus.length > 0;
+          const cSkuIcon = cHasSkus ? `<span style="cursor:pointer;color:#3498db;font-size:11px;margin-right:2px" onclick="toggleRow(this,'${cSkuId}')">&#9654;</span>` : '';
+          html += `<tr style="background:#f8f9fa;font-size:12px"><td style="padding:4px 10px 4px 28px;border-bottom:1px solid #e5e7eb;font-weight:500">${cSkuIcon}${c.name}${getQbOrderBadge(c.name)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb"><span class="badge badge-blue" style="font-size:9px">${c.st}</span></td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${c.oh.toFixed(1)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${c.rate.toFixed(2)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${Math.round(c.doh)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${c.dep90.toFixed(1)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${statusBadge(c.status)}</td><td style="padding:4px 6px;border-bottom:1px solid #e5e7eb">${c.proj<0?'<span style="color:var(--red)">'+c.proj.toFixed(1)+'</span>':c.proj.toFixed(1)}</td></tr>`;
+          if(cHasSkus) html += _invSkuSubrows(c.skus, cSkuId, 48);
+        });
+        html += `</tbody></table></td></tr>`;
+      }
+    } else {
+      // -- Single-location distributor: wine dropdown --
+      if (skuFilter !== 'all') {
+        const sku = (d.skus || []).find(s => s.w === skuFilter);
+        if (!sku) return;
+        html += `<tr><td style="font-weight:600">${d.name}${getQbOrderBadge(d.name)}</td><td><span class="badge badge-blue">${d.st}</span></td><td>${sku.oh.toFixed(1)}</td><td>${sku.rate.toFixed(2)}</td><td>${Math.round(sku.doh)}</td><td>-</td><td>${statusBadge(sku.status)}</td><td>-</td></tr>`;
+      } else {
+        const hasSkus = d.skus && d.skus.length > 0;
+        const expId = 'inv-sku-' + idx;
+        const expIcon = hasSkus ? `<span style="cursor:pointer;color:#3498db;font-size:12px;margin-right:4px;" title="Show wine breakdown" onclick="toggleRow(this,'${expId}')">&#9654;</span>` : '';
+        html += `<tr><td style="font-weight:600">${expIcon}${d.name}${getQbOrderBadge(d.name)}</td><td><span class="badge badge-blue">${d.st}</span></td><td>${d.oh.toFixed(1)}</td><td>${d.rate.toFixed(2)}</td><td>${Math.round(d.doh)}</td><td>${d.dep90.toFixed(1)}</td><td>${statusBadge(d.status)}</td><td>${d.proj<0?'<span style="color:var(--red)">'+d.proj.toFixed(1)+'</span>':d.proj.toFixed(1)}</td></tr>`;
+        if (hasSkus) {
+          html += _invSkuSubrows(d.skus, expId, 28);
+        }
+      }
+    }
+  });
+  tbl.innerHTML = html;
+}
+
+// ==================== ACCOUNTS ====================
+function renderAccounts() {
+  let fa = filterByState(accountsTop);
+
+  // Trend chart
+  const accel = fa.filter(d=>d.trend==='Accelerating').length;
+  const decel = fa.filter(d=>d.trend==='Decelerating').length;
+  const steady = fa.filter(d=>d.trend==='Steady').length;
+  makeChart('chartAcctTrend',{type:'bar',data:{labels:['Accelerating','Steady','Decelerating'],datasets:[{data:[accel,steady,decel],backgroundColor:['rgba(5,150,105,0.7)','rgba(37,99,235,0.5)','rgba(220,38,38,0.7)'],borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw+' accounts'}}},scales:{x:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.06)'}},y:{grid:{display:false}}}}});
+
+  // Risk KPIs
+  const atRisk = fa.filter(d=>(d.jan||0)===0 && (d.feb||0)===0 && ((d.nov||0)>0 || (d.dec||0)>0));
+  const topPct = fa.length>0 ? ((fa.slice(0,5).reduce((s,d)=>s+d.total,0) / fa.reduce((s,d)=>s+d.total,0))*100).toFixed(0) : 0;
+  document.getElementById('acctRiskKPIs').innerHTML = `
+    <div class="kpi-mini"><div class="label">Total Accounts</div><div class="val">${fa.length}</div></div>
+    <div class="kpi-mini"><div class="label">Accelerating</div><div class="val" style="color:var(--green);">${accel}</div></div>
+    <div class="kpi-mini"><div class="label">At-Risk (Silent)</div><div class="val" style="color:var(--red);">${atRisk.length}</div></div>
+    <div class="kpi-mini"><div class="label">Top 5 Concentration</div><div class="val">${topPct}%</div></div>`;
+
+  // Search filter
+  const search = (document.getElementById('acctSearch').value||'').toLowerCase();
+  if(search) fa = fa.filter(d => d.acct.toLowerCase().includes(search) || d.dist.toLowerCase().includes(search) || d.st.toLowerCase().includes(search));
+
+  // Sorting
+  if(currentSort.table === 'tblAccounts' && currentSort.col) {
+    fa = sortData([...fa], currentSort.col, currentSort.dir);
+  }
+
+  const display = showAllAccounts ? fa : fa.slice(0, ACCT_LIMIT);
+  const label = showAllAccounts ? 'All '+fa.length+' Accounts' : 'Top '+Math.min(ACCT_LIMIT,fa.length)+' of '+fa.length+' Accounts';
+  const chSuffix = currentChannel!=='all' ? (currentChannel==='ON' ? ' - On-Premise' : ' - Off-Premise') : '';
+  document.getElementById('acctHeader').textContent = label + (currentState!=='all' ? ' in '+stateNames[currentState] : '') + chSuffix + ' - 4-Month Rolling Period';
+  document.getElementById('acctCount').textContent = (search?'Filtered: ':'') + (showAllAccounts ? 'Showing all '+fa.length : 'Showing '+display.length+' of '+fa.length);
+  const tbl = document.querySelector('#tblAccounts tbody');
+  tbl.innerHTML = '';
+  if(!display.length) { tbl.innerHTML='<tr><td colspan="12" class="empty-state">'+(search?'No accounts matching "'+search+'"':'No accounts in this market')+'</td></tr>'; return; }
+  display.forEach((d,i) => {
+    const chBadge = d.ch==='ON' ? '<span class="badge" style="background:#E0F2FE;color:#0369A1;">On</span>' : '<span class="badge" style="background:#FEF3C7;color:#92400E;">Off</span>';
+    tbl.innerHTML += `<tr><td>${i+1}</td><td style="font-weight:600">${d.acct}</td><td>${d.dist}</td><td><span class="badge badge-blue">${d.st}</span></td><td>${chBadge}</td><td>${d.nov ? d.nov.toFixed(1) : '-'}</td><td>${d.dec ? d.dec.toFixed(1) : '-'}</td><td>${d.jan ? d.jan.toFixed(1) : '-'}</td><td>${d.feb ? d.feb.toFixed(1) : '-'}</td><td style="font-weight:700">${d.total.toFixed(1)}</td><td>${f$(d.rev)}</td><td>${trendBadge(d.trend)}</td></tr>`;
+  });
+}
+
+// ==================== PLACEMENTS + AI ANALYSIS ====================
+function renderPlacements() {
+  const fp = filterByState(placementData);
+  const totalNew = fp.reduce((s,d)=>s+d.newA,0);
+  const totalLost = fp.reduce((s,d)=>s+d.lostA,0);
+  const totalNet = fp.reduce((s,d)=>s+d.net,0);
+  const gridColor = 'rgba(0,0,0,0.06)';
+
+  document.getElementById('placeKPIs').innerHTML = `
+    <div class="kpi-mini"><div class="label">New Accounts (30D)</div><div class="val" style="color:var(--green);">+${totalNew}</div></div>
+    <div class="kpi-mini"><div class="label">Lost Accounts</div><div class="val" style="color:var(--red);">-${totalLost}</div></div>
+    <div class="kpi-mini"><div class="label">Net Placements</div><div class="val" style="color:${totalNet>=0?'var(--green)':'var(--red)'};">${totalNet>=0?'+':''}${totalNet}</div></div>`;
+
+  // AI-driven placement loss analysis
+  const negDists = fp.filter(d=>d.net<0);
+  const highDOH = filterByState(inventoryData).filter(d=>d.doh>300);
+  const lowCon = filterByState(distScorecard).filter(d=>d.con<0.5 && d.ce>0);
+  const newDists = filterByState(distScorecard).filter(d=>d.yoy==='New');
+  const txDists = negDists.filter(d=>d.st==='TX');
+
+  // Correlation: inventory overstocking vs placement losses
+  let invCorrelation = [];
+  negDists.forEach(nd => {
+    const inv = filterByState(inventoryData).find(id => id.name.includes(nd.name.split(' ')[0]) && id.st===nd.st);
+    if(inv && inv.doh > 200) invCorrelation.push({dist:nd.name, net:nd.net, doh:inv.doh});
+  });
+
+  // Fully dynamic AI analysis
+  let aiHTML = `<div class="ai-card">
+    <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Placement Analysis</h3>`;
+
+  aiHTML += `<div class="insight"><strong>Overview:</strong> ${negDists.length} of ${fp.length} distributors have negative net placements (${totalLost} lost vs ${totalNew} new = net ${totalNet}).${totalNet>=0?' Net placements are positive overall.':' This points to multiple contributing factors.'}</div>`;
+
+  // Factor 1: New distributors with losses
+  const newNeg = negDists.filter(d => {
+    const sc = filterByState(distScorecard).find(s => s.name.includes(d.name.replace(/ [A-Z]{2}.*$/,'')) && s.st===d.st);
+    return sc && sc.yoy === 'New';
+  });
+  if(newDists.length) {
+    const worst3New = [...newNeg].sort((a,b)=>a.net-b.net).slice(0,3);
+    aiHTML += `<div class="insight"><strong>Factor: New Market Growing Pains</strong><br>
+      ${newDists.length} distributors are tagged "New" with no prior-year baseline. New relationships typically see attrition after initial placements as accounts decide whether to reorder.${worst3New.length?' Biggest losses among new distributors: '+worst3New.map(d=>d.name+' ('+d.net+')').join(', ')+'.':''}</div>`;
+  }
+
+  // Factor 2: High DOH correlation
+  if(highDOH.length) {
+    const highDohNames = highDOH.sort((a,b)=>b.doh-a.doh).slice(0,3);
+    aiHTML += `<div class="insight"><strong>Factor: Inventory Overstocking</strong><br>
+      ${highDOH.length} distributors have 300+ DOH. When distributors sit on excess stock, reps deprioritize new placements. Worst: ${highDohNames.map(d=>d.name.split(' - ')[0]+' ('+d.doh+' DOH)').join(', ')}.</div>`;
+  }
+
+  // Factor 3: Low consistency
+  if(lowCon.length) {
+    const lowConNames = lowCon.sort((a,b)=>a.con-b.con).slice(0,3);
+    aiHTML += `<div class="insight"><strong>Factor: Low Sales Consistency</strong><br>
+      ${lowCon.length} active distributors sell in fewer than half the weeks. Low consistency means reps are not regularly pitching the brand: ${lowConNames.map(d=>d.name.split(' - ')[0]+' ('+Math.round(d.con*100)+'%)').join(', ')}.</div>`;
+  }
+
+  // Factor 4: Worst individual performer
+  const worst = [...negDists].sort((a,b)=>a.net-b.net)[0];
+  if(worst && worst.net < -15) {
+    const wSc = filterByState(distScorecard).find(s=>s.name.includes(worst.name.replace(/ [A-Z]{2}.*$/,'')) && s.st===worst.st);
+    aiHTML += `<div class="insight"><strong>Spotlight: ${worst.name} (${worst.net} net)</strong><br>
+      ${worst.lostA} lost accounts, ${worst.newA} new.${wSc?' 13W CE: '+wSc.ce+', Consistency: '+Math.round(wSc.con*100)+'%, YoY: '+wSc.yoy+'.':''} ${wSc && wSc.con>=0.8?'Despite strong consistency, accounts are not sticking - investigate competitive displacement or consumer pull-through issues.':'Low engagement may be driving the losses.'}</div>`;
+  }
+
+  // Dynamic actions
+  aiHTML += `<div style="margin-top:14px;padding:12px 14px;background:rgba(27,138,74,0.04);border:1px solid rgba(27,138,74,0.15);border-radius:6px;">
+    <strong style="color:var(--green);">Recommended Actions:</strong>
+    <div style="margin-top:8px;font-size:13px;line-height:1.7;">`;
+  let actNum = 1;
+  if(highDOH.length) { aiHTML += `${actNum++}. <strong>Overstocked markets:</strong> Request inventory correction with ${highDOH[0].name.split(' - ')[0]} and ${highDOH.length-1} other${highDOH.length>2?'s':''} before pushing new placements.<br>`; }
+  if(worst && worst.net < -15) { aiHTML += `${actNum++}. <strong>${worst.name}:</strong> Investigate top lost accounts to determine if switching to competitors or dropping NA wine.<br>`; }
+  if(lowCon.length) { aiHTML += `${actNum++}. <strong>Low consistency markets:</strong> Schedule ride-withs with ${lowCon.slice(0,3).map(d=>d.name.split(' - ')[0]).join(', ')} to build rep pitch confidence.<br>`; }
+  aiHTML += `${actNum}. <strong>All markets:</strong> Track reorder rate separately from new placements. Target 70%+ reorder rate within 60 days before pushing volume.`;
+  aiHTML += `</div></div>`;
+
+  aiHTML += `</div>`;
+  document.getElementById('placementAI').innerHTML = aiHTML;
+
+  makeChart('chartPlacements',{type:'bar',data:{labels:fp.map(d=>d.name),datasets:[
+    {label:'New',data:fp.map(d=>d.newA),backgroundColor:'rgba(5,150,105,0.6)'},
+    {label:'Lost',data:fp.map(d=>-d.lostA),backgroundColor:'rgba(220,38,38,0.6)'}
+  ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,onClick:(evt,elements)=>{
+    if(elements.length){const idx=elements[0].index;const distName=fp[idx].name;
+      if(chartFilters.placements && chartFilters.placements.value===distName) clearChartFilter('placements');
+      else setChartFilter('placements','name',distName,distName+' (net '+fp[idx].net+')');
+    }},plugins:{legend:{position:'top',labels:{usePointStyle:true,color:'#2D2420'}},tooltip:{callbacks:{afterLabel:()=>'Click to filter new accounts table'}}},scales:{x:{grid:{color:gridColor}},y:{grid:{display:false}}}}});
+
+  renderPlacementTable();
+}
+
+function renderPlacementTable() {
+  const fn = filterByState(newAccounts);
+  const fp = filterByState(placementData);
+  const cf = chartFilters.placements;
+  // Match placement short name back to new accounts dist name
+  const filtered = cf ? fn.filter(d=>{ const pd=fp.find(p=>p.name===cf.value); return pd && d.dist.includes(pd.name.replace(/ (NJ|FL|TX|PA|NC|AZ|GA|NV|CT|ME|SC).*$/,'').replace(' Mir','').replace(' Riv','').replace(' LV','').replace(' DAL','').replace(' HOU','').replace(' SA','')); }) : fn;
+  renderFilterBadge('placeFilterBadge','placements', cf ? cf.label : '');
+  const display = showAllNewAcct ? filtered : filtered.slice(0, NEWACCT_LIMIT);
+  const countEl = document.getElementById('newAcctCount');
+  if(countEl) countEl.textContent = showAllNewAcct ? 'Showing all '+filtered.length : 'Showing '+display.length+' of '+filtered.length;
+  const tbl = document.querySelector('#tblNewAccts tbody');
+  tbl.innerHTML = '';
+  if(!display.length) { tbl.innerHTML='<tr><td colspan="5" class="empty-state">'+(cf?'No new accounts for '+cf.value:'No new accounts')+'</td></tr>'; return; }
+  display.forEach(d => { tbl.innerHTML += `<tr><td style="font-weight:600">${d.acct}</td><td>${d.dist}</td><td><span class="badge badge-blue">${d.st}</span></td><td>${d.ce.toFixed(1)}</td><td>${d.skus}</td></tr>`; });
+}
+
+// ==================== REORDER ====================
+function renderReorder() {
+  let fr = filterByState(reorderData);
+  const gridColor = 'rgba(0,0,0,0.06)';
+
+  // Dynamic KPIs from actual data
+  const overdue = fr.filter(d=>d.days > d.cycle).length;
+  const dueThisWeek = fr.filter(d=>d.days >= d.cycle - 7 && d.days <= d.cycle).length;
+  const dueSoon = fr.filter(d=>d.days >= d.cycle - 14 && d.days < d.cycle - 7).length;
+  const onTrack = fr.filter(d=>d.days < d.cycle - 14).length;
+  const avgDaysSince = fr.length ? Math.round(fr.reduce((s,d)=>s+d.days,0)/fr.length) : 0;
+
+  document.getElementById('reorderKPIs').innerHTML = `
+    <div class="kpi-mini"><div class="label">Overdue</div><div class="val" style="color:var(--red);">${overdue}</div></div>
+    <div class="kpi-mini"><div class="label">Due This Week</div><div class="val" style="color:var(--yellow);">${dueThisWeek}</div></div>
+    <div class="kpi-mini"><div class="label">Due Soon (14D)</div><div class="val" style="color:var(--orange);">${dueSoon}</div></div>
+    <div class="kpi-mini"><div class="label">On Track</div><div class="val" style="color:var(--green);">${onTrack}</div></div>
+    <div class="kpi-mini"><div class="label">Avg Days Since Order</div><div class="val">${avgDaysSince}</div></div>`;
+
+  makeChart('chartReorderPie',{type:'doughnut',data:{labels:[`Overdue (${overdue})`,`Due This Week (${dueThisWeek})`,`Due Soon (${dueSoon})`,`On Track (${onTrack})`],datasets:[{data:[overdue,dueThisWeek,dueSoon,onTrack],backgroundColor:['#DC2626','#D97706','#FCD34D','#059669'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{padding:12,usePointStyle:true,color:'#2D2420'}}}}});
+
+  // Sorting
+  if(currentSort.table === 'tblReorder' && currentSort.col) {
+    fr = sortData([...fr], currentSort.col, currentSort.dir);
+  }
+
+  const skuFilter = document.getElementById('reorderSkuFilter') ? document.getElementById('reorderSkuFilter').value : 'all';
+  let skuFiltered = fr;
+  if (skuFilter !== 'all') {
+    skuFiltered = fr.filter(d => d.skus && d.skus.some(s => s.w === skuFilter));
+  }
+  const display = showAllReorder ? skuFiltered : skuFiltered.slice(0, REORDER_LIMIT);
+  const rchSuffix = currentChannel!=='all' ? (currentChannel==='ON' ? ' - On-Premise' : ' - Off-Premise') : '';
+  document.getElementById('reorderHeader').textContent = (showAllReorder ? 'All '+skuFiltered.length : 'Top '+Math.min(REORDER_LIMIT,skuFiltered.length)) + ' Priority Reorder' + (currentState!=='all' ? ' in '+stateNames[currentState] : '') + rchSuffix;
+  document.getElementById('reorderCount').textContent = showAllReorder ? 'Showing all '+skuFiltered.length : 'Showing '+display.length+' of '+skuFiltered.length;
+  const tbl = document.querySelector('#tblReorder tbody');
+  tbl.innerHTML = '';
+  if(!display.length) { tbl.innerHTML='<tr><td colspan="11" class="empty-state">No accounts in this market</td></tr>'; return; }
+  let html = '';
+  display.forEach((d,i) => {
+    if (skuFilter !== 'all') {
+      const sku = d.skus.find(s => s.w === skuFilter);
+      if (!sku) return;
+      const ss = sku.days > sku.cycle && sku.cycle > 0 ? '<span class="badge badge-red">Overdue</span>' : sku.days >= sku.cycle-7 && sku.cycle > 0 ? '<span class="badge badge-yellow">Due</span>' : '<span class="badge badge-green">On Track</span>';
+      const rchBadge = d.ch==='ON' ? '<span class="badge" style="background:#E0F2FE;color:#0369A1;">On</span>' : '<span class="badge" style="background:#FEF3C7;color:#92400E;">Off</span>';
+      html += `<tr><td>${i+1}</td><td style="font-weight:600">${d.acct}</td><td>${d.dist}${getQbOrderBadge(d.dist)}</td><td><span class="badge badge-blue">${d.st}</span></td><td>${rchBadge}</td><td>${sku.ce.toFixed(1)}</td><td>${sku.purch}</td><td>${sku.cycle}d</td><td>${sku.last}</td><td style="color:${sku.days>sku.cycle?'var(--red)':'var(--text)'};font-weight:600">${sku.days}</td><td>${ss}</td></tr>`;
+    } else {
+      const statusBdg = d.days > d.cycle ? '<span class="badge badge-red">Overdue</span>' : d.days >= d.cycle-7 ? '<span class="badge badge-yellow">Due</span>' : '<span class="badge badge-green">On Track</span>';
+      const rchBadge = d.ch==='ON' ? '<span class="badge" style="background:#E0F2FE;color:#0369A1;">On</span>' : '<span class="badge" style="background:#FEF3C7;color:#92400E;">Off</span>';
+      const hasSkus = d.skus && d.skus.length > 0;
+      const expandId = 'sku-exp-' + i;
+      const expandIcon = hasSkus ? `<span style="cursor:pointer;color:#2563EB;font-size:12px;margin-right:4px;" title="Show SKU breakdown" onclick="toggleRow(this,'${expandId}')">&#9654;</span>` : '';
+      html += `<tr><td>${i+1}</td><td style="font-weight:600">${expandIcon}${d.acct}</td><td>${d.dist}${getQbOrderBadge(d.dist)}</td><td><span class="badge badge-blue">${d.st}</span></td><td>${rchBadge}</td><td>${d.ce.toFixed(1)}</td><td>${d.purch.toFixed(1)}</td><td>${Math.round(d.cycle)}d</td><td>${d.last}</td><td style="color:${d.days>d.cycle?'var(--red)':'var(--text)'};font-weight:600">${Math.round(d.days)}</td><td>${statusBdg}</td></tr>`;
+      if (hasSkus) {
+        let skuHtml = d.skus.map(s => {
+          const ss = s.days > s.cycle && s.cycle > 0 ? '<span class="badge badge-red">Overdue</span>' : s.days >= s.cycle-7 && s.cycle > 0 ? '<span class="badge badge-yellow">Due</span>' : '<span class="badge badge-green">On Track</span>';
+          return `<tr style="font-size:12px;"><td style="padding:4px 10px;border:none;"></td><td style="padding:4px 10px;border:none;font-weight:500;">${s.w}</td><td style="padding:4px 10px;border:none;"></td><td style="padding:4px 10px;border:none;"></td><td style="padding:4px 10px;border:none;"></td><td style="padding:4px 10px;border:none;">${s.ce.toFixed(1)}</td><td style="padding:4px 10px;border:none;">${s.purch}</td><td style="padding:4px 10px;border:none;">${s.cycle}d</td><td style="padding:4px 10px;border:none;">${s.last}</td><td style="padding:4px 10px;border:none;">${s.days}</td><td style="padding:4px 10px;border:none;">${ss}</td></tr>`;
+        }).join('');
+        html += `<tr id="${expandId}" style="display:none;"><td colspan="11" style="padding:0;"><table style="width:100%;background:#f8f9fa;border:none;margin:0;"><thead style="font-size:11px;color:#7f8c8d;"><tr><th style="padding:6px 10px;border:none;"></th><th style="padding:6px 10px;border:none;">Wine</th><th style="padding:6px 10px;border:none;"></th><th style="padding:6px 10px;border:none;"></th><th style="padding:6px 10px;border:none;"></th><th style="padding:6px 10px;border:none;">CE</th><th style="padding:6px 10px;border:none;">Orders</th><th style="padding:6px 10px;border:none;">Cycle</th><th style="padding:6px 10px;border:none;">Last Order</th><th style="padding:6px 10px;border:none;">Days</th><th style="padding:6px 10px;border:none;">Status</th></tr></thead><tbody>${skuHtml}</tbody></table></td></tr>`;
+      }
+    }
+  });
+  tbl.innerHTML = html;
+}
+
+function toggleRow(btn, id) {
+  const row = document.getElementById(id);
+  if (!row) return;
+  const isHidden = row.style.display === 'none';
+  row.style.display = isHidden ? 'table-row' : 'none';
+  if (btn) btn.innerHTML = isHidden ? '&#9660;' : '&#9654;';
+}
+
+// ==================== QUICK ANALYSIS SECTIONS ====================
+function aiCard(title, insights, actions) {
+  let h = `<div class="ai-card"><h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> ${title}</h3>`;
+  insights.forEach(ins => { h += `<div class="insight">${ins}</div>`; });
+  if(actions && actions.length) {
+    h += `<div style="margin-top:14px;padding:12px 14px;background:rgba(5,150,105,0.04);border:1px solid rgba(5,150,105,0.15);border-radius:6px;"><strong style="color:var(--green);">Action Items:</strong><div style="margin-top:8px;font-size:13px;line-height:1.7;">`;
+    actions.forEach((a,i) => { h += `${i+1}. ${a}<br>`; });
+    h += `</div></div>`;
+  }
+  return h + '</div>';
+}
+
+function renderOverviewAnalysis() {
+  const fd = filterByState(distScorecard);
+  const fi = filterByState(inventoryData);
+  const fp = filterByState(placementData);
+  const totalCE = fd.reduce((s,d)=>s+d.ce,0);
+  const w4 = fd.reduce((s,d)=>s+d.w4,0);
+  const w4prior = fd.reduce((s,d)=>s+d.ce-d.w4,0); // rough 9W
+  const w4rate = totalCE>0 ? (w4/(totalCE)*100) : 0;
+  const critInv = fi.filter(d=>d.doh>500);
+  const hotDists = fd.filter(d=>d.w4>0).sort((a,b)=>b.w4-a.w4).slice(0,3);
+  const coldDists = fd.filter(d=>d.ce>5 && d.w4===0);
+  const netPl = fp.reduce((s,d)=>s+d.net,0);
+  const worstPl = [...fp].sort((a,b)=>a.net-b.net)[0];
+
+  const insights = [];
+  insights.push(`<strong>Velocity Check:</strong> 4-week velocity is ${w4.toFixed(1)} CE, representing ${w4rate.toFixed(0)}% of 13W volume. ${w4rate>35?'Velocity is accelerating -- recent weeks are pulling harder than the 13W average.':'Velocity has slowed -- recent 4 weeks are underperforming the 13W pace. Investigate why pull-through is dropping.'}`);
+
+  if(hotDists.length) insights.push(`<strong>Top Movers (4W):</strong> ${hotDists.map(d=>d.name.split(' - ')[0]+' ('+d.w4+' CE)').join(', ')}. These distributors are driving the majority of recent volume.`);
+
+  if(coldDists.length) insights.push(`<strong>Stalled Distributors:</strong> ${coldDists.map(d=>d.name.split(' - ')[0]).join(', ')} had 13W volume but zero 4W velocity. These relationships may be going dormant.`);
+
+  if(critInv.length) insights.push(`<strong>Inventory Concern:</strong> ${critInv.length} distributor${critInv.length>1?'s have':' has'} 500+ days on hand. Overstocked distributors deprioritize selling your brand. Worst: ${critInv[0].name.split(' - ')[0]} at ${critInv[0].doh} DOH.`);
+
+  const actions = [];
+  if(coldDists.length) actions.push(`<strong>Reactivate stalled distributors:</strong> Contact ${coldDists[0].name.split(' - ')[0]} -- they moved ${fd.find(d=>d.name===coldDists[0].name)?.ce||0} CE in 13W but nothing recently.`);
+  if(worstPl && worstPl.net<-10) actions.push(`<strong>Address placement losses:</strong> ${worstPl.name} has net ${worstPl.net} placements. Prioritize understanding which accounts left and why.`);
+  if(critInv.length>2) actions.push(`<strong>Inventory correction:</strong> Request stock adjustments with ${critInv.length} overstocked distributors before pushing new placements.`);
+
+  const el = document.getElementById('overviewAnalysis');
+  if(el) el.innerHTML = aiCard('Weekly Priority Summary', insights, actions);
+}
+
+function renderRevenueAnalysis() {
+  const topSku = productMix[0];
+  const bottomSku = productMix[productMix.length-1];
+  const topPct = ((topSku.rev/revTotal)*100).toFixed(1);
+  const bottomPct = ((bottomSku.rev/revTotal)*100).toFixed(1);
+  const distShare = ((customerRevenue[0].rev/revTotal)*100).toFixed(1);
+  const dtcShare = ((customerRevenue[2].rev/revTotal)*100).toFixed(1);
+  const recent3 = revTotalByMonth.slice(-3).reduce((s,v)=>s+v,0);
+  const prior3 = revTotalByMonth.slice(-6,-3).reduce((s,v)=>s+v,0);
+  const momPct = prior3>0 ? (((recent3-prior3)/prior3)*100).toFixed(1) : 'N/A';
+  const avgPerCase = (revTotal / (revUnits/12)).toFixed(2);
+
+  const insights = [];
+  insights.push(`<strong>Revenue Concentration:</strong> ${topSku.name} drives ${topPct}% of total revenue ($${Math.round(topSku.rev).toLocaleString()}), while ${bottomSku.name} contributes only ${bottomPct}%. Consider whether the bottom SKUs need promotional support or if the mix is intentional.`);
+  insights.push(`<strong>Channel Mix:</strong> Distributors account for ${distShare}% of revenue. DTC/Website is ${dtcShare}%. Growing the DTC channel would improve margins since you capture the full retail price vs. distributor pricing.`);
+  insights.push(`<strong>3-Month Momentum:</strong> Last 3 months generated ${f$(recent3)} vs ${f$(prior3)} in the prior 3 months (${momPct}% change). ${parseFloat(momPct)>0?'Revenue trajectory is positive.':'Revenue is declining -- investigate whether this is seasonal or structural.'}`);
+  insights.push(`<strong>Avg Revenue per CE:</strong> Blended across all channels, you are averaging ${f$(parseFloat(avgPerCase))} per case equivalent. Your highest-margin SKU is ${productMix.reduce((a,b)=>a.avgCase>b.avgCase?a:b).name} at ${f$(productMix.reduce((a,b)=>a.avgCase>b.avgCase?a:b).avgCase)}/case.`);
+
+  const actions = [];
+  actions.push(`<strong>Push ${topSku.name}:</strong> It is the clear revenue leader. Ensure distributors have adequate stock and rep awareness for this SKU specifically.`);
+  if(parseFloat(dtcShare)<15) actions.push(`<strong>Grow DTC channel:</strong> At ${dtcShare}% of revenue, there is significant room to grow direct sales which carry better margins than distributor pricing.`);
+  actions.push(`<strong>Review ${bottomSku.name} strategy:</strong> At only ${bottomPct}% of revenue, evaluate whether additional marketing spend or distributor incentives would move the needle or if resources are better focused on top performers.`);
+
+  document.getElementById('revenueAnalysis').innerHTML = aiCard('Revenue Insights', insights, actions);
+}
+
+function renderDepletionAnalysis() {
+  const fd = filterByState(distScorecard);
+  const totalCE = fd.reduce((s,d)=>s+d.ce,0);
+  const top3 = [...fd].sort((a,b)=>b.ce-a.ce).slice(0,3);
+  const top3pct = totalCE>0 ? ((top3.reduce((s,d)=>s+d.ce,0)/totalCE)*100).toFixed(0) : 0;
+  const lowCon = fd.filter(d=>d.ce>0 && d.con<0.5);
+  const declining = fd.filter(d=>typeof d.yoy==='string' && d.yoy.startsWith('-'));
+  const growing = fd.filter(d=>typeof d.yoy==='string' && d.yoy.startsWith('+'));
+
+  const insights = [];
+  insights.push(`<strong>Volume Concentration:</strong> Top 3 distributors (${top3.map(d=>d.name.split(' - ')[0]).join(', ')}) account for ${top3pct}% of total CE. ${parseInt(top3pct)>70?'Heavy concentration -- a loss of any top distributor would significantly impact volume.':'Reasonably diversified across your distributor base.'}`);
+
+  if(lowCon.length) insights.push(`<strong>Low Consistency Alert:</strong> ${lowCon.length} active distributor${lowCon.length>1?'s sell':' sells'} in fewer than half the weeks: ${lowCon.map(d=>d.name.split(' - ')[0]+' ('+Math.round(d.con*100)+'%)').join(', ')}. This means reps are not regularly pitching the brand.`);
+
+  if(declining.length) insights.push(`<strong>YoY Declines:</strong> ${declining.length} distributor${declining.length>1?'s are':' is'} down year-over-year: ${declining.map(d=>d.name.split(' - ')[0]+' ('+d.yoy+')').join(', ')}. Investigate if this is competitive pressure, inventory issues, or rep disengagement.`);
+
+  if(growing.length) insights.push(`<strong>Growth Stars:</strong> ${growing.map(d=>d.name.split(' - ')[0]+' ('+d.yoy+')').join(', ')} -- these distributors are building momentum and may benefit from additional marketing or sales support.`);
+
+  const actions = [];
+  if(lowCon.length) actions.push(`<strong>Schedule ride-withs:</strong> With ${lowCon[0].name.split(' - ')[0]} and other low-consistency distributors to build rep confidence and regular pitching habits.`);
+  if(declining.length) actions.push(`<strong>Investigate declines:</strong> ${declining[0].name.split(' - ')[0]} is trending ${declining[0].yoy} YoY. Determine if root cause is competitive, inventory, or execution related.`);
+  actions.push(`<strong>Protect top 3:</strong> These distributors drive ${top3pct}% of volume. Ensure they have priority on inventory allocation and marketing co-op dollars.`);
+
+  document.getElementById('depletionAnalysis').innerHTML = aiCard('Depletion Insights', insights, actions);
+}
+
+function renderInventoryAnalysis() {
+  const fi = filterByState(inventoryData);
+  const totalOH = fi.reduce((s,d)=>s+d.oh,0);
+  const crit = fi.filter(d=>d.status==='Critical');
+  const low = fi.filter(d=>d.status==='Low');
+  const over = fi.filter(d=>d.status==='Overstocked');
+  const zeroDep = fi.filter(d=>d.dep90===0 && d.oh>0);
+  const highDoh = fi.filter(d=>d.doh>500);
+  const avgDoh = fi.length?Math.round(fi.reduce((s,d)=>s+d.doh,0)/fi.length):0;
+
+  const insights = [];
+  insights.push(`<strong>Overall Health:</strong> ${totalOH.toFixed(1)} CE across ${fi.length} distributors with ${avgDoh} avg DOH. ${crit.length} critical, ${low.length} low, ${over.length} overstocked. ${crit.length>fi.length/2?'More than half your distributors are in critical status -- this is a systemic issue requiring immediate attention.':'Inventory health is mixed.'}`);
+
+  if(zeroDep.length) insights.push(`<strong>Dead Stock:</strong> ${zeroDep.length} distributor${zeroDep.length>1?'s have':' has'} inventory but zero depletions in 90 days: ${zeroDep.map(d=>d.name.split(' - ')[0]+' ('+d.oh+' CE)').join(', ')}. This stock is aging and may become unsellable.`);
+
+  if(highDoh.length) insights.push(`<strong>Severely Overstocked:</strong> ${highDoh.length} distributors with 500+ DOH. Total tied-up inventory: ${highDoh.reduce((s,d)=>s+d.oh,0).toFixed(1)} CE. Distributors sitting on excess stock will not actively push new placements.`);
+
+  if(low.length) insights.push(`<strong>Restock Needed:</strong> ${low.map(d=>d.name.split(' - ')[0]+' ('+d.doh+' DOH, '+d.oh+' CE left)').join(', ')} -- these are selling through and will run out soon. Trigger reorders now to avoid stock-outs.`);
+
+  const actions = [];
+  if(zeroDep.length) actions.push(`<strong>Dead stock resolution:</strong> Contact ${zeroDep[0].name.split(' - ')[0]} about returning or redistributing ${zeroDep[0].oh} CE of idle inventory.`);
+  if(low.length) actions.push(`<strong>Urgent reorders:</strong> ${low.map(d=>d.name.split(' - ')[0]).join(', ')} will stock out within ${Math.min(...low.map(d=>d.doh))} days at current velocity. Place orders this week.`);
+  if(highDoh.length>2) actions.push(`<strong>Inventory correction plan:</strong> Work with ${highDoh.length} overstocked distributors to pause new shipments until existing inventory drops below 180 DOH.`);
+
+  document.getElementById('inventoryAnalysis').innerHTML = aiCard('Inventory Insights', insights, actions);
+}
+
+function renderAccountsAnalysis() {
+  const fa = filterByState(accountsTop);
+  if(!fa.length) { document.getElementById('accountsAnalysis').innerHTML=''; return; }
+  const accel = fa.filter(d=>d.trend==='Accelerating');
+  const decel = fa.filter(d=>d.trend==='Decelerating');
+  const atRisk = fa.filter(d=>(d.jan||0)===0 && (d.feb||0)===0 && ((d.nov||0)>0 || (d.dec||0)>0));
+  const topAcct = fa[0];
+  const totalCE = fa.reduce((s,d)=>s+d.total,0);
+
+  const insights = [];
+  insights.push(`<strong>Account Health:</strong> ${accel.length} accelerating, ${decel.length} decelerating, ${fa.length-accel.length-decel.length} steady among your top accounts. ${decel.length>accel.length?'More accounts are slowing down than speeding up -- this needs attention.':'Growth trend is positive with more accounts accelerating.'}`);
+
+  if(atRisk.length) insights.push(`<strong>At-Risk Accounts (${atRisk.length}):</strong> These accounts bought in Nov/Dec but went quiet in Jan/Feb: ${atRisk.slice(0,5).map(d=>d.acct).join(', ')}${atRisk.length>5?', and '+(atRisk.length-5)+' more':''}. They may be churning.`);
+
+  if(topAcct) insights.push(`<strong>Top Account:</strong> ${topAcct.acct} (${topAcct.dist}) leads with ${topAcct.total} CE over 4 months. Your top 5 accounts represent ${((fa.slice(0,5).reduce((s,d)=>s+d.total,0)/totalCE)*100).toFixed(0)}% of tracked volume.`);
+
+  if(decel.length) insights.push(`<strong>Decelerating:</strong> ${decel.slice(0,4).map(d=>d.acct+' ('+d.dist.split(' - ')[0]+')').join(', ')} are losing momentum. These were once strong buyers and are worth a direct outreach.`);
+
+  const actions = [];
+  if(atRisk.length) actions.push(`<strong>Win-back campaign:</strong> Contact ${Math.min(atRisk.length,5)} at-risk accounts that have not reordered in 2+ months. A targeted follow-up can prevent permanent churn.`);
+  if(decel.length) actions.push(`<strong>Support decelerating accounts:</strong> Offer promotional pricing or tastings at ${decel[0].acct} and similar accounts to reverse the decline.`);
+  actions.push(`<strong>Protect top accounts:</strong> Ensure ${topAcct.acct} and your top 5 have reliable supply and personal attention from distributor reps.`);
+
+  document.getElementById('accountsAnalysis').innerHTML = aiCard('Account Insights', insights, actions);
+}
+
+function renderReorderAnalysis() {
+  const fr = filterByState(reorderData);
+  if(!fr.length) { document.getElementById('reorderAnalysis').innerHTML=''; return; }
+  const urgent = fr.filter(d=>d.days>40);
+  const highVal = [...fr].sort((a,b)=>b.ce-a.ce).slice(0,3);
+  const avgDays = Math.round(fr.reduce((s,d)=>s+d.days,0)/fr.length);
+  const byDist = {};
+  fr.forEach(d=>{ byDist[d.dist]=(byDist[d.dist]||0)+1; });
+  const worstDist = Object.entries(byDist).sort((a,b)=>b[1]-a[1])[0];
+
+  const insights = [];
+  insights.push(`<strong>Urgency Level:</strong> ${fr.length} overdue accounts, averaging ${avgDays} days past their reorder cycle. ${urgent.length} accounts are 40+ days overdue and at high risk of permanent loss.`);
+
+  if(highVal.length) insights.push(`<strong>Highest-Value Overdue:</strong> ${highVal.map(d=>d.acct+' ('+d.ce+' CE, '+d.days+'d overdue)').join(', ')}. These are your biggest reorder opportunities by volume.`);
+
+  if(worstDist) insights.push(`<strong>Distributor Concentration:</strong> ${worstDist[0]} has ${worstDist[1]} overdue accounts -- the most of any distributor. This could signal a rep coverage gap or follow-up process issue at that distributor.`);
+
+  insights.push(`<strong>Recovery Window:</strong> Industry data suggests accounts overdue by 30+ days have a 40% chance of never reordering. At 60+ days, that drops to under 20%. Speed matters -- every week of delay reduces win-back probability.`);
+
+  const actions = [];
+  if(urgent.length) actions.push(`<strong>This week:</strong> Prioritize the ${urgent.length} accounts that are 40+ days overdue. These are closest to permanent loss.`);
+  if(highVal.length) actions.push(`<strong>High-value outreach:</strong> ${highVal[0].acct} (${highVal[0].ce} CE) should get a personal call from the distributor rep or your team directly.`);
+  if(worstDist) actions.push(`<strong>Distributor escalation:</strong> Raise the ${worstDist[1]} overdue accounts with ${worstDist[0]}. Ask for a committed follow-up schedule from their rep team.`);
+
+  document.getElementById('reorderAnalysis').innerHTML = aiCard('Reorder Insights', insights, actions);
+}
+
+// ==================== INIT ====================
+buildFilterUI();
+renderAll();
+</script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script>
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyC958VfAkRbtxFHXlmtTONtyvTJWUlq83g",
+    authDomain: "mt-dashboard-dab8e.firebaseapp.com",
+    projectId: "mt-dashboard-dab8e",
+    storageBucket: "mt-dashboard-dab8e.firebasestorage.app",
+    messagingSenderId: "252962457560",
+    appId: "1:252962457560:web:06475f8801ff2ed50a54ad"
+};
+
+let db = null;
+let firebaseReady = false;
+try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    firebaseReady = true;
+} catch(e) {
+    firebaseReady = false;
+}
+
+const AccountStore = {
+    _localKey(acctId) { return 'mt_acct_' + acctId; },
+    _sanitizeId(name) { return name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 100); },
+
+    async getNotes(acctId) {
+        const id = this._sanitizeId(acctId);
+        if(firebaseReady) {
+            const snap = await db.collection('accounts').doc(id).collection('notes').orderBy('ts','desc').get();
+            return snap.docs.map(d => ({id:d.id, ...d.data()}));
+        }
+        const data = JSON.parse(localStorage.getItem(this._localKey(id)) || '{}');
+        return (data.notes || []).sort((a,b) => b.ts - a.ts);
+    },
+
+    async addNote(acctId, text, author) {
+        const id = this._sanitizeId(acctId);
+        const note = {text, author, ts: Date.now(), date: new Date().toLocaleDateString()};
+        if(firebaseReady) {
+            await db.collection('accounts').doc(id).collection('notes').add(note);
+            return;
+        }
+        const data = JSON.parse(localStorage.getItem(this._localKey(id)) || '{}');
+        if(!data.notes) data.notes = [];
+        data.notes.push(note);
+        localStorage.setItem(this._localKey(id), JSON.stringify(data));
+    },
+
+    async getMeta(acctId) {
+        const id = this._sanitizeId(acctId);
+        if(firebaseReady) {
+            const doc = await db.collection('accounts').doc(id).get();
+            return doc.exists ? doc.data() : {};
+        }
+        const data = JSON.parse(localStorage.getItem(this._localKey(id)) || '{}');
+        return {tags: data.tags || [], status: data.status || '', followUp: data.followUp || '', nextAction: data.nextAction || ''};
+    },
+
+    async setMeta(acctId, meta) {
+        const id = this._sanitizeId(acctId);
+        if(firebaseReady) {
+            await db.collection('accounts').doc(id).set(meta, {merge: true});
+            return;
+        }
+        const data = JSON.parse(localStorage.getItem(this._localKey(id)) || '{}');
+        Object.assign(data, meta);
+        localStorage.setItem(this._localKey(id), JSON.stringify(data));
+    }
+};
+</script>
+
+<style>
+.account-panel-overlay { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:999;opacity:0;pointer-events:none;transition:opacity 0.2s; }
+.account-panel-overlay.active { opacity:1;pointer-events:auto; }
+.account-panel { position:fixed;top:0;right:-480px;width:460px;height:100%;background:#fff;z-index:1000;box-shadow:-4px 0 24px rgba(0,0,0,0.15);transition:right 0.25s ease;overflow-y:auto;font-family:inherit; }
+.account-panel.active { right:0; }
+.ap-header { padding:20px 24px 16px;border-bottom:1px solid #e5e7eb;position:sticky;top:0;background:#fff;z-index:2; }
+.ap-close { position:absolute;right:16px;top:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#6B7280;padding:4px 8px;border-radius:4px; }
+.ap-close:hover { background:#f3f4f6; }
+.ap-sub { font-size:13px;color:#6B7280;margin-top:4px; }
+.ap-section { padding:16px 24px;border-bottom:1px solid #f3f4f6; }
+.ap-section h3 { font-size:13px;font-weight:700;color:#374151;margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px; }
+.ap-kpi-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px; }
+.ap-kpi { text-align:center;padding:8px;background:#f8fafc;border-radius:8px; }
+.ap-kpi .val { font-size:18px;font-weight:700;color:#1a1a2e; }
+.ap-kpi .label { font-size:10px;color:#6B7280;margin-top:2px; }
+.ap-tags { display:flex;flex-wrap:wrap;gap:6px; }
+.ap-tag { padding:4px 12px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer;background:#f3f4f6;color:#374151;border:2px solid transparent;transition:all 0.15s; }
+.ap-tag:hover { background:#e5e7eb; }
+.ap-tag.selected { background:#7C3AED;color:#fff;border-color:#7C3AED; }
+.ap-notes-list { max-height:200px;overflow-y:auto;margin-bottom:10px; }
+.ap-note { padding:8px 12px;background:#f8fafc;border-radius:8px;margin-bottom:6px;font-size:13px; }
+.ap-note .meta { font-size:11px;color:#9ca3af;margin-bottom:2px; }
+.ap-note-input { display:flex;gap:8px; }
+.ap-note-input textarea { flex:1;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;resize:none;height:36px;font-family:inherit; }
+.ap-note-input button { padding:8px 16px;background:#7C3AED;color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px; }
+.ap-action-row { display:flex;gap:8px; }
+.ap-action-row select, .ap-action-row input { padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px; }
+.ap-sparkline { display:flex;align-items:flex-end;gap:4px;height:36px; }
+.ap-sparkline .bar { width:16px;background:#7C3AED;border-radius:2px 2px 0 0;min-height:2px; }
+.ap-status-badge { display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600; }
+.ap-sku-table { width:100%;font-size:12px;border-collapse:collapse; }
+.ap-sku-table th { text-align:left;padding:4px 8px;color:#6B7280;font-weight:600;border-bottom:1px solid #e5e7eb; }
+.ap-sku-table td { padding:4px 8px;border-bottom:1px solid #f3f4f6; }
+</style>
+
+<script>
+// ==================== ACCOUNT PANEL ====================
+let currentRepName = localStorage.getItem('mt_rep_name') || '';
+
+function openAccountPanel(acctName) {
+    if(!currentRepName) {
+        currentRepName = prompt('Enter your name (for notes attribution):') || 'Unknown';
+        localStorage.setItem('mt_rep_name', currentRepName);
+    }
+
+    const topData = typeof accountsTop !== 'undefined' ? accountsTop.find(a => a.acct === acctName) : null;
+    const reorderInfo = typeof reorderData !== 'undefined' ? reorderData.find(r => r.acct === acctName) : null;
+
+    const dist = topData?.dist || reorderInfo?.dist || '--';
+    const st = topData?.st || reorderInfo?.st || '--';
+    const ch = topData?.ch || reorderInfo?.ch || '--';
+
+    document.getElementById('apName').textContent = acctName;
+    document.getElementById('apSub').innerHTML = `${dist} &bull; ${st} &bull; ${ch === 'ON' ? 'On-Premise' : ch === 'OFF' ? 'Off-Premise' : ch}`;
+
+    let html = '';
+
+    const totalCE = topData?.total || reorderInfo?.ce || 0;
+    const purchases = reorderInfo?.purch || 0;
+    const cycle = reorderInfo?.cycle || 0;
+    const lastOrder = reorderInfo?.last || '--';
+    const daysSince = reorderInfo?.days || '--';
+    const priority = reorderInfo?.priority || 0;
+
+    html += `<div class="ap-section"><h3>Performance</h3><div class="ap-kpi-grid">
+        <div class="ap-kpi"><div class="val">${totalCE.toFixed?totalCE.toFixed(1):totalCE}</div><div class="label">Total CE</div></div>
+        <div class="ap-kpi"><div class="val">${purchases}</div><div class="label">Purchases</div></div>
+        <div class="ap-kpi"><div class="val">${cycle}w</div><div class="label">Avg Cycle</div></div>
+        <div class="ap-kpi"><div class="val">${lastOrder}</div><div class="label">Last Order</div></div>
+        <div class="ap-kpi"><div class="val">${daysSince}</div><div class="label">Days Since</div></div>
+        <div class="ap-kpi"><div class="val">${priority}</div><div class="label">Priority</div></div>
+    </div></div>`;
+
+    // Tags
+    html += `<div class="ap-section"><h3>Tags</h3>
+        <div class="ap-tags" id="apTags">
+            ${['VIP','At Risk','Hot Lead','Needs Visit','Seasonal','Chain','Independent','Follow Up'].map(t =>
+                `<span class="ap-tag" data-tag="${t}">${t}</span>`
+            ).join('')}
+        </div></div>`;
+
+    // Notes
+    html += `<div class="ap-section"><h3>Notes & Activity</h3>
+        <div class="ap-notes-list" id="apNotes"><div style="color:#9ca3af;font-size:13px;">Loading notes...</div></div>
+        <div class="ap-note-input">
+            <textarea id="apNoteText" placeholder="Add a note about this account..."></textarea>
+            <button id="apAddNoteBtn">Add</button>
+        </div>
+    </div>`;
+
+    // Next Action
+    html += `<div class="ap-section"><h3>Next Action</h3>
+        <div class="ap-action-row">
+            <select id="apActionType" style="flex:1;">
+                <option value="">Select action...</option>
+                <option value="Call">Call</option>
+                <option value="Email">Email</option>
+                <option value="Visit">Visit</option>
+                <option value="Send Samples">Send Samples</option>
+                <option value="Follow Up">Follow Up</option>
+                <option value="Reorder Check">Reorder Check</option>
+            </select>
+            <input type="date" id="apFollowDate" style="flex:1;">
+        </div>
+        <div id="apActionStatus" style="margin-top:8px;font-size:12px;color:#6B7280;"></div>
+    </div>`;
+
+    document.getElementById('apContent').innerHTML = html;
+
+    // Wire up event listeners
+    document.querySelectorAll('#apTags .ap-tag').forEach(tagEl => {
+        tagEl.addEventListener('click', function() {
+            this.classList.toggle('selected');
+            const selectedTags = [...document.querySelectorAll('#apTags .ap-tag.selected')].map(t => t.dataset.tag);
+            AccountStore.setMeta(acctName, {tags: selectedTags}).catch(e => console.warn('Could not save tags:', e));
+        });
+    });
+
+    const addNoteBtn = document.getElementById('apAddNoteBtn');
+    if (addNoteBtn) addNoteBtn.addEventListener('click', function() { addAccountNote(acctName); });
+
+    const actionType = document.getElementById('apActionType');
+    const followDate = document.getElementById('apFollowDate');
+    if (actionType) actionType.addEventListener('change', function() { saveAccountAction(acctName); });
+    if (followDate) followDate.addEventListener('change', function() { saveAccountAction(acctName); });
+
+    document.getElementById('apOverlay').classList.add('active');
+    document.getElementById('accountPanel').classList.add('active');
+
+    loadAccountMeta(acctName);
+    loadAccountNotes(acctName);
+}
+
+function closeAccountPanel() {
+    document.getElementById('apOverlay').classList.remove('active');
+    document.getElementById('accountPanel').classList.remove('active');
+}
+
+async function loadAccountMeta(acctName) {
+    try {
+        const meta = await AccountStore.getMeta(acctName);
+        if(meta.tags && meta.tags.length) {
+            meta.tags.forEach(t => {
+                const el = document.querySelector(`.ap-tag[data-tag="${t}"]`);
+                if(el) el.classList.add('selected');
+            });
+        }
+        if(meta.nextAction) document.getElementById('apActionType').value = meta.nextAction;
+        if(meta.followUp) document.getElementById('apFollowDate').value = meta.followUp;
+        if(meta.nextAction || meta.followUp) {
+            document.getElementById('apActionStatus').innerHTML = `<span style="color:#10b981;">Saved: ${meta.nextAction || ''} ${meta.followUp ? 'by ' + meta.followUp : ''}</span>`;
+        }
+    } catch(e) { console.warn('Could not load account meta:', e); }
+}
+
+async function loadAccountNotes(acctName) {
+    try {
+        const notes = await AccountStore.getNotes(acctName);
+        const container = document.getElementById('apNotes');
+        if(!notes.length) {
+            container.innerHTML = '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:12px;">No notes yet.</div>';
+            return;
+        }
+        container.innerHTML = notes.map(n => `<div class="ap-note">
+            <div class="meta">${n.author || 'Unknown'} - ${n.date || new Date(n.ts).toLocaleDateString()}</div>
+            <div>${n.text}</div>
+        </div>`).join('');
+    } catch(e) {
+        document.getElementById('apNotes').innerHTML = '<div style="color:#ef4444;font-size:12px;">Could not load notes.</div>';
+    }
+}
+
+async function addAccountNote(acctName) {
+    const textarea = document.getElementById('apNoteText');
+    const text = textarea.value.trim();
+    if(!text) return;
+    try {
+        await AccountStore.addNote(acctName, text, currentRepName);
+        textarea.value = '';
+        loadAccountNotes(acctName);
+    } catch(e) { alert('Failed to save note: ' + e.message); }
+}
+
+async function saveAccountAction(acctName) {
+    const action = document.getElementById('apActionType').value;
+    const date = document.getElementById('apFollowDate').value;
+    try {
+        await AccountStore.setMeta(acctName, {nextAction: action, followUp: date});
+        document.getElementById('apActionStatus').innerHTML = `<span style="color:#10b981;">Saved</span>`;
+    } catch(e) { console.warn('Could not save action:', e); }
+}
+
+// ==================== CRM MANAGER VIEW ====================
+let crmDataLoaded = false;
+let crmAccountMeta = {};
+
+async function loadAllCRMData() {
+    const status = document.getElementById('crmLoadStatus');
+    if (status) status.textContent = 'Loading CRM data...';
+    crmAccountMeta = {};
+
+    const allAccounts = new Set();
+    if (typeof accountsTop !== 'undefined') accountsTop.forEach(a => allAccounts.add(a.acct));
+    if (typeof reorderData !== 'undefined') reorderData.forEach(r => allAccounts.add(r.acct));
+
+    if (firebaseReady && db) {
+        try {
+            const snap = await db.collection('accounts').get();
+            const fbAccounts = {};
+            snap.forEach(doc => { fbAccounts[doc.id] = doc.data(); });
+
+            for (const acctName of allAccounts) {
+                const id = AccountStore._sanitizeId(acctName);
+                const meta = fbAccounts[id] || {};
+                let noteCount = 0;
+                try {
+                    const notesSnap = await db.collection('accounts').doc(id).collection('notes').get();
+                    noteCount = notesSnap.size;
+                } catch(e) {}
+                crmAccountMeta[acctName] = {
+                    tags: meta.tags || [],
+                    nextAction: meta.nextAction || '',
+                    followUp: meta.followUp || '',
+                    noteCount: noteCount,
+                };
+            }
+        } catch(e) {
+            console.warn('Firebase CRM load failed, falling back to localStorage', e);
+            loadCRMFromLocalStorage(allAccounts);
+        }
+    } else {
+        loadCRMFromLocalStorage(allAccounts);
+    }
+
+    crmDataLoaded = true;
+    if (status) status.textContent = 'Loaded ' + allAccounts.size + ' accounts';
+
+    const stateFilter = document.getElementById('crmStateFilter');
+    if (stateFilter && stateFilter.options.length <= 1) {
+        const states = [...new Set(accountsTop.map(a => a.st))].sort();
+        states.forEach(st => {
+            const opt = document.createElement('option');
+            opt.value = st; opt.textContent = st;
+            stateFilter.appendChild(opt);
+        });
+    }
+
+    renderCRMReport();
+}
+
+function loadCRMFromLocalStorage(allAccounts) {
+    for (const acctName of allAccounts) {
+        const id = AccountStore._sanitizeId(acctName);
+        const key = 'mt_acct_' + id;
+        const data = JSON.parse(localStorage.getItem(key) || '{}');
+        crmAccountMeta[acctName] = {
+            tags: data.tags || [],
+            nextAction: data.nextAction || '',
+            followUp: data.followUp || '',
+            noteCount: (data.notes || []).length,
+        };
+    }
+}
+
+function refreshCRMData() { loadAllCRMData(); }
+
+function renderCRMReport() {
+    if (!crmDataLoaded) return;
+
+    const tagFilter = document.getElementById('crmTagFilter')?.value || '';
+    const stateFilter = document.getElementById('crmStateFilter')?.value || '';
+    const sortBy = document.getElementById('crmSortBy')?.value || 'priority';
+
+    let rows = [];
+    const allAccounts = new Set();
+    if (typeof accountsTop !== 'undefined') accountsTop.forEach(a => allAccounts.add(a.acct));
+    if (typeof reorderData !== 'undefined') reorderData.forEach(r => allAccounts.add(r.acct));
+
+    for (const acctName of allAccounts) {
+        const top = accountsTop.find(a => a.acct === acctName) || {};
+        const reorder = reorderData.find(r => r.acct === acctName) || {};
+        const meta = crmAccountMeta[acctName] || {tags:[], nextAction:'', followUp:'', noteCount:0};
+
+        rows.push({
+            acct: acctName,
+            dist: top.dist || reorder.dist || '--',
+            st: top.st || reorder.st || '',
+            ce: top.total || reorder.ce || 0,
+            lastOrder: reorder.last || '--',
+            daysSince: reorder.days || 999,
+            priority: reorder.priority || 0,
+            tags: meta.tags,
+            nextAction: meta.nextAction,
+            followUp: meta.followUp,
+            noteCount: meta.noteCount,
+        });
+    }
+
+    if (stateFilter) rows = rows.filter(r => r.st === stateFilter);
+    if (tagFilter === '__tagged__') rows = rows.filter(r => r.tags.length > 0);
+    else if (tagFilter === '__untagged__') rows = rows.filter(r => r.tags.length === 0);
+    else if (tagFilter === '__action__') rows = rows.filter(r => r.nextAction || r.followUp);
+    else if (tagFilter) rows = rows.filter(r => r.tags.includes(tagFilter));
+
+    if (sortBy === 'priority') rows.sort((a,b) => b.priority - a.priority);
+    else if (sortBy === 'daysSince') rows.sort((a,b) => b.daysSince - a.daysSince);
+    else if (sortBy === 'ce') rows.sort((a,b) => b.ce - a.ce);
+    else if (sortBy === 'tags') rows.sort((a,b) => b.tags.length - a.tags.length || b.ce - a.ce);
+
+    const allMeta = Object.values(crmAccountMeta);
+    const taggedCount = allMeta.filter(m => m.tags.length > 0).length;
+    const vipCount = allMeta.filter(m => m.tags.includes('VIP')).length;
+    const atRiskCount = allMeta.filter(m => m.tags.includes('At Risk')).length;
+    const needsVisitCount = allMeta.filter(m => m.tags.includes('Needs Visit')).length;
+    const actionCount = allMeta.filter(m => m.nextAction).length;
+    const notesTotal = allMeta.reduce((s,m) => s + m.noteCount, 0);
+
+    document.getElementById('crmKpis').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Tagged Accounts</div><div class="kpi-value">${taggedCount}</div></div>
+        <div class="kpi-card" style="border-left:3px solid #7C3AED;"><div class="kpi-label">VIP</div><div class="kpi-value" style="color:#7C3AED;">${vipCount}</div></div>
+        <div class="kpi-card" style="border-left:3px solid #DC2626;"><div class="kpi-label">At Risk</div><div class="kpi-value" style="color:#DC2626;">${atRiskCount}</div></div>
+        <div class="kpi-card" style="border-left:3px solid #F59E0B;"><div class="kpi-label">Needs Visit</div><div class="kpi-value" style="color:#F59E0B;">${needsVisitCount}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Active Actions</div><div class="kpi-value">${actionCount}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Total Notes</div><div class="kpi-value">${notesTotal}</div></div>
+    `;
+
+    const today = new Date().toISOString().split('T')[0];
+    const alertsDiv = document.getElementById('crmAlerts');
+    let alerts = '';
+    const vipStale = rows.filter(r => r.tags.includes('VIP') && r.daysSince > 30);
+    if (vipStale.length > 0) {
+        alerts += '<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;color:#991B1B;">';
+        alerts += '<strong>Attention:</strong> ' + vipStale.length + ' VIP account(s) with no order in 30+ days: ';
+        alerts += vipStale.map(r => '<span style="font-weight:600;cursor:pointer;text-decoration:underline;" onclick="openAccountPanel(\'' + r.acct.replace(/'/g,"\\'") + '\')">' + r.acct + '</span> (' + r.daysSince + 'd)').join(', ');
+        alerts += '</div>';
+    }
+    const atRiskAccts = rows.filter(r => r.tags.includes('At Risk'));
+    if (atRiskAccts.length > 0) {
+        alerts += '<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;color:#9A3412;">';
+        alerts += '<strong>At Risk:</strong> ' + atRiskAccts.length + ' account(s) flagged. ';
+        alerts += atRiskAccts.slice(0,5).map(r => r.acct).join(', ');
+        if (atRiskAccts.length > 5) alerts += ' + ' + (atRiskAccts.length - 5) + ' more';
+        alerts += '</div>';
+    }
+    const overdue = rows.filter(r => r.followUp && r.followUp < today);
+    if (overdue.length > 0) {
+        alerts += '<div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;color:#92400E;">';
+        alerts += '<strong>Overdue:</strong> ' + overdue.length + ' follow-up(s) past due. ';
+        alerts += overdue.slice(0,5).map(r => r.acct + ' (due ' + r.followUp + ')').join(', ');
+        alerts += '</div>';
+    }
+    alertsDiv.innerHTML = alerts;
+
+    const tagColors = {
+        'VIP': '#7C3AED', 'At Risk': '#DC2626', 'Hot Lead': '#F59E0B',
+        'Needs Visit': '#2563EB', 'Seasonal': '#059669', 'Chain': '#6B7280',
+        'Independent': '#8B5CF6', 'Follow Up': '#EC4899'
+    };
+    const tbody = document.getElementById('crmTableBody');
+    tbody.innerHTML = rows.map(r => {
+        const tagBadges = r.tags.map(t =>
+            '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;color:#fff;background:' + (tagColors[t]||'#6B7280') + ';margin-right:3px;">' + t + '</span>'
+        ).join('');
+        const dayColor = r.daysSince > 60 ? '#DC2626' : r.daysSince > 30 ? '#F59E0B' : '#059669';
+        const isOverdue = r.followUp && r.followUp < today;
+        return '<tr style="border-bottom:1px solid #f1f5f9;cursor:pointer;" onclick="openAccountPanel(\'' + r.acct.replace(/'/g,"\\'") + '\')">' +
+            '<td style="padding:8px 12px;font-weight:600;color:#1a1a2e;">' + r.acct + '</td>' +
+            '<td style="padding:8px;color:#6B7280;font-size:11px;">' + r.dist + '</td>' +
+            '<td style="padding:8px;text-align:center;">' + r.st + '</td>' +
+            '<td style="padding:8px;">' + (tagBadges || '<span style="color:#d1d5db;">--</span>') + '</td>' +
+            '<td style="padding:8px;text-align:right;font-weight:600;">' + (r.ce > 0 ? r.ce.toFixed(1) : '--') + '</td>' +
+            '<td style="padding:8px;text-align:center;font-size:11px;">' + r.lastOrder + '</td>' +
+            '<td style="padding:8px;text-align:center;font-weight:600;color:' + dayColor + ';">' + (r.daysSince < 999 ? r.daysSince : '--') + '</td>' +
+            '<td style="padding:8px;font-size:11px;">' + (r.nextAction || '<span style="color:#d1d5db;">--</span>') + '</td>' +
+            '<td style="padding:8px;text-align:center;font-size:11px;' + (isOverdue ? 'color:#DC2626;font-weight:700;' : '') + '">' + (r.followUp || '--') + '</td>' +
+            '<td style="padding:8px;text-align:center;">' + (r.noteCount > 0 ? '<span style="background:#EEF2FF;color:#4338CA;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;">' + r.noteCount + '</span>' : '--') + '</td>' +
+            '</tr>';
+    }).join('');
+
+    document.getElementById('crmSummary').textContent = 'Showing ' + rows.length + ' accounts' + (tagFilter ? ' (filtered)' : '');
+}
+
+// Auto-load CRM data when CRM tab is first shown
+const origShowSection = window.showSection;
+window.showSection = function(id, btn) {
+    origShowSection(id, btn);
+    if (id === 'crm' && !crmDataLoaded) {
+        loadAllCRMData();
+    }
+};
+</script>
+
+<div class="account-panel-overlay" id="apOverlay" onclick="closeAccountPanel()"></div>
+<div class="account-panel" id="accountPanel">
+    <div class="ap-header">
+        <button class="ap-close" onclick="closeAccountPanel()">&times;</button>
+        <h2 id="apName">--</h2>
+        <div class="ap-sub" id="apSub">--</div>
+    </div>
+    <div id="apContent"></div>
+</div>
+</body>
+</html>
