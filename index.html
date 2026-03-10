@@ -710,6 +710,7 @@
             <button class="tab" data-tab="opportunities">Opportunities</button>
             <button class="tab" data-tab="reorder">Reorder Forecast</button>
             <button class="tab" data-tab="action-items" style="background:#7C3AED;color:#fff;border-radius:6px;">My Action Items</button>
+            <button class="tab" data-tab="pipeline" style="background:#059669;color:#fff;border-radius:6px;">Target Accounts</button>
             <button class="tab" data-tab="key">Key / Legend</button>
         </div>
 
@@ -1229,6 +1230,57 @@
             <!-- Action Items List -->
             <div id="actionItemsList"></div>
             <div id="actionSummary" style="margin-top:12px;font-size:12px;color:#6B7280;"></div>
+        </div>
+
+        <!-- Tab: Target Accounts Pipeline -->
+        <div id="pipeline" class="tab-content">
+            <div class="kpi-row" id="pipelineKpis" style="margin-bottom:12px;"></div>
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <label style="font-size:12px;font-weight:600;color:#6B7280;">Stage:</label>
+                    <select id="pipelineStageFilter" onchange="renderPipelineTable()" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                        <option value="">All Stages</option>
+                        <option value="Prospecting">Prospecting</option>
+                        <option value="Contacted">Contacted</option>
+                        <option value="Pitched">Pitched</option>
+                        <option value="Negotiating">Negotiating</option>
+                        <option value="Won">Won</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <label style="font-size:12px;font-weight:600;color:#6B7280;">Channel:</label>
+                    <select id="pipelineChannelFilter" onchange="renderPipelineTable()" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                        <option value="">All</option>
+                        <option value="ON">On-Premise</option>
+                        <option value="OFF">Off-Premise</option>
+                    </select>
+                </div>
+                <button onclick="openAddTargetModal()" style="padding:6px 14px;background:#059669;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">+ Add Target</button>
+                <button onclick="loadPipelineData()" style="padding:6px 14px;background:#7C3AED;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Refresh</button>
+                <span id="pipelineLoadStatus" style="font-size:11px;color:#9ca3af;"></span>
+            </div>
+            <div id="pipelineStageSummary" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;"></div>
+            <div class="table-container" style="max-height:600px;overflow-y:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead style="position:sticky;top:0;background:#f8fafc;z-index:2;">
+                        <tr>
+                            <th style="padding:8px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">Target Account</th>
+                            <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Location</th>
+                            <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">State</th>
+                            <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">Channel</th>
+                            <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">Stage</th>
+                            <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Distributor</th>
+                            <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Contact</th>
+                            <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">Added</th>
+                            <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">Mapped To</th>
+                            <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pipelineTableBody"></tbody>
+                </table>
+            </div>
+            <div id="pipelineSummary" style="margin-top:8px;font-size:12px;color:#6B7280;"></div>
         </div>
 
         <!-- Tab: Key / Legend -->
@@ -4517,6 +4569,9 @@ const dataThrough = '3/8/2026';
                 if (this.dataset.tab === 'action-items' && !actionItemsLoaded) {
                     loadRepActionItems();
                 }
+                if (this.dataset.tab === 'pipeline' && !pipelineLoaded) {
+                    loadPipelineData();
+                }
             });
         });
     })();
@@ -4531,5 +4586,242 @@ const dataThrough = '3/8/2026';
         </div>
         <div id="apContent"></div>
     </div>
+
+    <!-- Add Target Account Modal -->
+    <div id="addTargetOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1100;display:none;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:12px;padding:28px;width:480px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3 style="font-size:18px;font-weight:700;color:#1a1a2e;">Add Target Account</h3>
+            <button onclick="closeAddTargetModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#6B7280;">&times;</button>
+        </div>
+        <div style="display:grid;gap:12px;">
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Account Name *</label>
+                <input id="tgtName" type="text" placeholder="e.g., Joe's Bar & Grill" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                    <label style="font-size:12px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">City / Location</label>
+                    <input id="tgtLocation" type="text" placeholder="e.g., Miami, FL" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;">
+                </div>
+                <div>
+                    <label style="font-size:12px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">State</label>
+                    <input id="tgtState" type="text" placeholder="FL" maxlength="2" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;text-transform:uppercase;">
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                    <label style="font-size:12px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Channel</label>
+                    <select id="tgtChannel" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;">
+                        <option value="ON">On-Premise</option>
+                        <option value="OFF">Off-Premise</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:12px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Stage</label>
+                    <select id="tgtStage" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;">
+                        <option value="Prospecting">Prospecting</option>
+                        <option value="Contacted">Contacted</option>
+                        <option value="Pitched">Pitched</option>
+                        <option value="Negotiating">Negotiating</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Expected Distributor</label>
+                <input id="tgtDistributor" type="text" placeholder="e.g., Breakthru FL" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                    <label style="font-size:12px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Contact Name</label>
+                    <input id="tgtContact" type="text" placeholder="Name" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;">
+                </div>
+                <div>
+                    <label style="font-size:12px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Contact Phone/Email</label>
+                    <input id="tgtContactInfo" type="text" placeholder="Phone or email" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;">
+                </div>
+            </div>
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Notes</label>
+                <textarea id="tgtNotes" rows="2" placeholder="Initial notes about this prospect..." style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;resize:none;"></textarea>
+            </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
+            <button onclick="closeAddTargetModal()" style="padding:8px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:14px;">Cancel</button>
+            <button onclick="saveNewTarget()" style="padding:8px 20px;background:#059669;color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:14px;">Add Target</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Target Account Detail Panel -->
+    <div id="tgtPanelOverlay" class="account-panel-overlay" onclick="closeTargetPanel()"></div>
+    <div id="targetPanel" class="account-panel">
+        <div class="ap-header">
+            <button class="ap-close" onclick="closeTargetPanel()">&times;</button>
+            <h2 id="tgtPanelName">--</h2>
+            <div class="ap-sub" id="tgtPanelSub">--</div>
+        </div>
+        <div id="tgtPanelContent"></div>
+    </div>
+
+    <style>
+    .pipeline-stage-card { text-align:center;padding:12px 8px;border-radius:8px;border:2px solid #e5e7eb;cursor:default; }
+    .pipeline-stage-card .stage-count { font-size:24px;font-weight:700;line-height:1; }
+    .pipeline-stage-card .stage-label { font-size:11px;font-weight:600;color:#6B7280;margin-top:4px; }
+    .mapping-select { padding:4px 6px;border:1px solid #d1d5db;border-radius:4px;font-size:11px;max-width:150px;font-family:inherit; }
+    .mapping-badge { display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:#DCFCE7;color:#166534;cursor:pointer; }
+    .stage-badge { display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;color:#fff; }
+    </style>
+
+    <script>
+    const PIPELINE_STAGES = ['Prospecting','Contacted','Pitched','Negotiating','Won','Lost'];
+    const STAGE_COLORS = {
+        'Prospecting':'#6B7280','Contacted':'#2563EB','Pitched':'#7C3AED',
+        'Negotiating':'#D97706','Won':'#059669','Lost':'#DC2626'
+    };
+    let pipelineData = [];
+    let pipelineLoaded = false;
+
+    const TargetStore = {
+        _collection: 'targetAccounts', _localKey: 'mt_target_accounts',
+        async getAll() {
+            if (firebaseReady && db) { try { const snap = await db.collection(this._collection).orderBy('createdAt','desc').get(); return snap.docs.map(d => ({id: d.id, ...d.data()})); } catch(e) {} }
+            const data = JSON.parse(localStorage.getItem(this._localKey) || '[]');
+            return data.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+        },
+        async add(target) {
+            target.createdAt = Date.now(); target.updatedAt = Date.now();
+            if (firebaseReady && db) { try { const ref = await db.collection(this._collection).add(target); return ref.id; } catch(e) {} }
+            target.id = 'tgt_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
+            const data = JSON.parse(localStorage.getItem(this._localKey) || '[]'); data.push(target);
+            localStorage.setItem(this._localKey, JSON.stringify(data)); return target.id;
+        },
+        async update(id, updates) {
+            updates.updatedAt = Date.now();
+            if (firebaseReady && db) { try { await db.collection(this._collection).doc(id).update(updates); return; } catch(e) {} }
+            const data = JSON.parse(localStorage.getItem(this._localKey) || '[]');
+            const idx = data.findIndex(t => t.id === id);
+            if (idx >= 0) { Object.assign(data[idx], updates); localStorage.setItem(this._localKey, JSON.stringify(data)); }
+        },
+        async delete(id) {
+            if (firebaseReady && db) { try { await db.collection(this._collection).doc(id).delete(); return; } catch(e) {} }
+            let data = JSON.parse(localStorage.getItem(this._localKey) || '[]');
+            data = data.filter(t => t.id !== id); localStorage.setItem(this._localKey, JSON.stringify(data));
+        },
+        async addNote(id, text, author) {
+            const note = {text, author, ts: Date.now(), date: new Date().toLocaleDateString()};
+            if (firebaseReady && db) { try { await db.collection(this._collection).doc(id).collection('notes').add(note); return; } catch(e) {} }
+            const data = JSON.parse(localStorage.getItem(this._localKey) || '[]');
+            const target = data.find(t => t.id === id);
+            if (target) { if (!target.notes) target.notes = []; target.notes.push(note); localStorage.setItem(this._localKey, JSON.stringify(data)); }
+        },
+        async getNotes(id) {
+            if (firebaseReady && db) { try { const snap = await db.collection(this._collection).doc(id).collection('notes').orderBy('ts','desc').get(); return snap.docs.map(d => ({id:d.id, ...d.data()})); } catch(e) {} }
+            const data = JSON.parse(localStorage.getItem(this._localKey) || '[]');
+            const target = data.find(t => t.id === id);
+            return (target?.notes || []).sort((a,b) => b.ts - a.ts);
+        }
+    };
+
+    function openAddTargetModal() { document.getElementById('addTargetOverlay').style.display = 'flex'; }
+    function closeAddTargetModal() {
+        document.getElementById('addTargetOverlay').style.display = 'none';
+        ['tgtName','tgtLocation','tgtState','tgtChannel','tgtStage','tgtDistributor','tgtContact','tgtContactInfo','tgtNotes'].forEach(id => {
+            const el = document.getElementById(id); if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = '';
+        });
+    }
+    async function saveNewTarget() {
+        const name = document.getElementById('tgtName').value.trim();
+        if (!name) { alert('Account name is required.'); return; }
+        const target = { name, location: document.getElementById('tgtLocation').value.trim(), state: document.getElementById('tgtState').value.trim().toUpperCase(), channel: document.getElementById('tgtChannel').value, stage: document.getElementById('tgtStage').value, distributor: document.getElementById('tgtDistributor').value.trim(), contact: document.getElementById('tgtContact').value.trim(), contactInfo: document.getElementById('tgtContactInfo').value.trim(), initialNotes: document.getElementById('tgtNotes').value.trim(), mappedTo: '', addedBy: currentRepName || 'Unknown' };
+        await TargetStore.add(target);
+        if (target.initialNotes) { const all = await TargetStore.getAll(); const newest = all.find(t => t.name === name); if (newest) await TargetStore.addNote(newest.id, target.initialNotes, target.addedBy); }
+        closeAddTargetModal(); loadPipelineData();
+    }
+    async function loadPipelineData() {
+        const status = document.getElementById('pipelineLoadStatus');
+        if (status) status.textContent = 'Loading pipeline...';
+        pipelineData = await TargetStore.getAll(); pipelineLoaded = true;
+        if (status) status.textContent = pipelineData.length + ' targets loaded';
+        renderPipelineKpis(); renderPipelineStageSummary(); renderPipelineTable();
+    }
+    function renderPipelineKpis() {
+        const total = pipelineData.length, active = pipelineData.filter(t => !['Won','Lost'].includes(t.stage)).length, won = pipelineData.filter(t => t.stage === 'Won').length, mapped = pipelineData.filter(t => t.stage === 'Won' && t.mappedTo).length, lost = pipelineData.filter(t => t.stage === 'Lost').length, convRate = total > 0 ? ((won / total) * 100).toFixed(0) : '0';
+        document.getElementById('pipelineKpis').innerHTML = `
+            <div class="kpi-card"><div class="kpi-label">Total Targets</div><div class="kpi-value">${total}</div></div>
+            <div class="kpi-card" style="border-left:3px solid #2563EB;"><div class="kpi-label">Active Pipeline</div><div class="kpi-value" style="color:#2563EB;">${active}</div></div>
+            <div class="kpi-card" style="border-left:3px solid #059669;"><div class="kpi-label">Won</div><div class="kpi-value" style="color:#059669;">${won}</div></div>
+            <div class="kpi-card" style="border-left:3px solid #10b981;"><div class="kpi-label">Mapped</div><div class="kpi-value" style="color:#10b981;">${mapped} / ${won}</div></div>
+            <div class="kpi-card" style="border-left:3px solid #DC2626;"><div class="kpi-label">Lost</div><div class="kpi-value" style="color:#DC2626;">${lost}</div></div>
+            <div class="kpi-card"><div class="kpi-label">Win Rate</div><div class="kpi-value">${convRate}%</div></div>`;
+    }
+    function renderPipelineStageSummary() {
+        document.getElementById('pipelineStageSummary').innerHTML = PIPELINE_STAGES.map(stage => {
+            const count = pipelineData.filter(t => t.stage === stage).length, color = STAGE_COLORS[stage];
+            return `<div class="pipeline-stage-card" style="border-color:${color};"><div class="stage-count" style="color:${color};">${count}</div><div class="stage-label">${stage}</div></div>`;
+        }).join('');
+    }
+    function escHtml(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function truncate(str, len) { if (!str) return ''; return str.length > len ? str.substring(0, len) + '...' : str; }
+    function renderPipelineTable() {
+        if (!pipelineLoaded) return;
+        const stageFilter = document.getElementById('pipelineStageFilter')?.value || '', channelFilter = document.getElementById('pipelineChannelFilter')?.value || '';
+        let rows = [...pipelineData];
+        if (stageFilter) rows = rows.filter(t => t.stage === stageFilter);
+        if (channelFilter) rows = rows.filter(t => t.channel === channelFilter);
+        const depletionAccounts = typeof accountsTop !== 'undefined' ? accountsTop.map(a => a.acct).sort() : [];
+        document.getElementById('pipelineTableBody').innerHTML = rows.map(t => {
+            const stageColor = STAGE_COLORS[t.stage] || '#6B7280', addedDate = t.createdAt ? new Date(t.createdAt).toLocaleDateString() : '--', chLabel = t.channel === 'ON' ? 'On' : t.channel === 'OFF' ? 'Off' : t.channel || '--';
+            let mappedCell = '<span style="color:#d1d5db;">--</span>';
+            if (t.stage === 'Won' && t.mappedTo) mappedCell = `<span class="mapping-badge" onclick="openAccountPanel('${t.mappedTo.replace(/'/g,"\\'")}')" title="Click to view depletion data">${truncate(t.mappedTo, 20)}</span>`;
+            else if (t.stage === 'Won' && !t.mappedTo) mappedCell = `<select class="mapping-select" onchange="mapTargetToAccount('${t.id}', this.value)"><option value="">Map to account...</option>${depletionAccounts.map(a => `<option value="${escHtml(a)}">${truncate(a, 30)}</option>`).join('')}</select>`;
+            return `<tr style="border-bottom:1px solid #f1f5f9;cursor:pointer;" onclick="openTargetPanel('${t.id}')"><td style="padding:8px 12px;font-weight:600;color:#1a1a2e;">${escHtml(t.name)}</td><td style="padding:8px;color:#6B7280;font-size:12px;">${escHtml(t.location || '--')}</td><td style="padding:8px;text-align:center;">${escHtml(t.state || '--')}</td><td style="padding:8px;text-align:center;font-size:11px;">${chLabel}</td><td style="padding:8px;text-align:center;"><span class="stage-badge" style="background:${stageColor};">${t.stage}</span></td><td style="padding:8px;font-size:12px;color:#6B7280;">${escHtml(t.distributor || '--')}</td><td style="padding:8px;font-size:12px;">${escHtml(t.contact || '--')}</td><td style="padding:8px;text-align:center;font-size:11px;">${addedDate}</td><td style="padding:8px;text-align:center;" onclick="event.stopPropagation();">${mappedCell}</td><td style="padding:8px;text-align:center;"><span style="background:#EEF2FF;color:#4338CA;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;">view</span></td></tr>`;
+        }).join('');
+        document.getElementById('pipelineSummary').textContent = 'Showing ' + rows.length + ' target accounts';
+    }
+    async function mapTargetToAccount(targetId, depletionName) {
+        if (!depletionName) return;
+        await TargetStore.update(targetId, {mappedTo: depletionName, mappedAt: Date.now()});
+        await TargetStore.addNote(targetId, `Mapped to depletion account: "${depletionName}"`, currentRepName || 'System');
+        loadPipelineData();
+    }
+    async function openTargetPanel(targetId) {
+        if (!currentRepName) { currentRepName = prompt('Enter your name (for notes attribution):') || 'Unknown'; localStorage.setItem('mt_rep_name', currentRepName); }
+        const target = pipelineData.find(t => t.id === targetId); if (!target) return;
+        document.getElementById('tgtPanelName').textContent = target.name;
+        document.getElementById('tgtPanelSub').innerHTML = `${escHtml(target.location || '--')} &bull; ${target.state || '--'} &bull; ${target.channel === 'ON' ? 'On-Premise' : 'Off-Premise'}`;
+        let html = '';
+        html += `<div class="ap-section"><h3>Pipeline Stage</h3><div style="display:flex;gap:6px;flex-wrap:wrap;">${PIPELINE_STAGES.map(s => { const active = s === target.stage; return `<button onclick="updateTargetStage('${targetId}','${s}')" style="padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid ${STAGE_COLORS[s]};background:${active ? STAGE_COLORS[s] : '#fff'};color:${active ? '#fff' : STAGE_COLORS[s]};font-family:inherit;transition:all 0.15s;">${s}</button>`; }).join('')}</div></div>`;
+        if (target.stage === 'Won') {
+            const depletionAccounts = typeof accountsTop !== 'undefined' ? accountsTop.map(a => a.acct).sort() : [];
+            html += `<div class="ap-section"><h3>Account Mapping</h3>`;
+            if (target.mappedTo) {
+                const depAcct = typeof accountsTop !== 'undefined' ? accountsTop.find(a => a.acct === target.mappedTo) : null;
+                html += `<div style="background:#DCFCE7;border:1px solid #86EFAC;border-radius:8px;padding:12px;"><div style="font-size:12px;color:#166534;font-weight:600;margin-bottom:4px;">Mapped to Depletion Account:</div><div style="font-size:15px;font-weight:700;color:#166534;cursor:pointer;text-decoration:underline;" onclick="closeTargetPanel();setTimeout(()=>openAccountPanel('${target.mappedTo.replace(/'/g,"\\'")}'),300);">${escHtml(target.mappedTo)}</div>${depAcct ? `<div style="margin-top:8px;display:flex;gap:16px;font-size:12px;color:#166534;"><span>CE: ${depAcct.total?.toFixed(1) || '--'}</span><span>Trend: ${depAcct.trend || '--'}</span></div>` : ''}<button onclick="unmapTarget('${targetId}')" style="margin-top:8px;padding:4px 12px;background:#fff;color:#DC2626;border:1px solid #DC2626;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Remove Mapping</button></div>`;
+            } else {
+                html += `<div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;padding:12px;"><div style="font-size:12px;color:#92400E;font-weight:600;margin-bottom:8px;">Map to a depletion account (distributor may have named it differently).</div><input id="tgtMapSearch" type="text" placeholder="Search depletion accounts..." oninput="filterMappingOptions(this.value)" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;margin-bottom:6px;font-family:inherit;"><div id="tgtMapOptions" style="max-height:200px;overflow-y:auto;">${depletionAccounts.map(a => `<div class="mapping-option" onclick="mapTargetToAccount('${targetId}','${a.replace(/'/g,"\\'")}')" style="padding:6px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid #f3f4f6;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background=''"><span>${escHtml(a)}</span></div>`).join('')}</div></div>`;
+            }
+            html += `</div>`;
+        }
+        html += `<div class="ap-section"><h3>Details</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;"><div><span style="color:#6B7280;">Distributor:</span> <strong>${escHtml(target.distributor || '--')}</strong></div><div><span style="color:#6B7280;">Channel:</span> <strong>${target.channel === 'ON' ? 'On-Premise' : 'Off-Premise'}</strong></div><div><span style="color:#6B7280;">Contact:</span> <strong>${escHtml(target.contact || '--')}</strong></div><div><span style="color:#6B7280;">Info:</span> <strong>${escHtml(target.contactInfo || '--')}</strong></div><div><span style="color:#6B7280;">Added:</span> <strong>${target.createdAt ? new Date(target.createdAt).toLocaleDateString() : '--'}</strong></div><div><span style="color:#6B7280;">Added by:</span> <strong>${escHtml(target.addedBy || '--')}</strong></div></div></div>`;
+        html += `<div class="ap-section"><h3>Notes & Activity</h3><div class="ap-notes-list" id="tgtNotes"><div style="color:#9ca3af;font-size:13px;">Loading notes...</div></div><div class="ap-note-input"><textarea id="tgtNoteText" placeholder="Add a note about this target..."></textarea><button onclick="addTargetNote('${targetId}')">Add</button></div></div>`;
+        html += `<div class="ap-section" style="border:none;"><button onclick="if(confirm('Delete this target account?')){deleteTarget('${targetId}')}" style="padding:6px 14px;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Delete Target Account</button></div>`;
+        document.getElementById('tgtPanelContent').innerHTML = html;
+        document.getElementById('tgtPanelOverlay').classList.add('active');
+        document.getElementById('targetPanel').classList.add('active');
+        loadTargetNotes(targetId);
+    }
+    function closeTargetPanel() { document.getElementById('tgtPanelOverlay').classList.remove('active'); document.getElementById('targetPanel').classList.remove('active'); }
+    function filterMappingOptions(query) { const q = query.toLowerCase(); document.querySelectorAll('#tgtMapOptions .mapping-option').forEach(el => { el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none'; }); }
+    async function updateTargetStage(targetId, newStage) { await TargetStore.update(targetId, {stage: newStage}); await TargetStore.addNote(targetId, `Stage changed to: ${newStage}`, currentRepName || 'System'); await loadPipelineData(); openTargetPanel(targetId); }
+    async function unmapTarget(targetId) { await TargetStore.update(targetId, {mappedTo: '', mappedAt: null}); await TargetStore.addNote(targetId, 'Account mapping removed', currentRepName || 'System'); await loadPipelineData(); openTargetPanel(targetId); }
+    async function addTargetNote(targetId) { const textarea = document.getElementById('tgtNoteText'); const text = textarea.value.trim(); if (!text) return; await TargetStore.addNote(targetId, text, currentRepName || 'Unknown'); textarea.value = ''; loadTargetNotes(targetId); }
+    async function loadTargetNotes(targetId) {
+        try { const notes = await TargetStore.getNotes(targetId); const container = document.getElementById('tgtNotes'); if (!notes.length) { container.innerHTML = '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:12px;">No notes yet.</div>'; return; } container.innerHTML = notes.map(n => `<div class="ap-note"><div class="meta">${escHtml(n.author || 'Unknown')} - ${n.date || new Date(n.ts).toLocaleDateString()}</div><div>${escHtml(n.text)}</div></div>`).join(''); }
+        catch(e) { document.getElementById('tgtNotes').innerHTML = '<div style="color:#ef4444;font-size:12px;">Could not load notes.</div>'; }
+    }
+    async function deleteTarget(targetId) { await TargetStore.delete(targetId); closeTargetPanel(); loadPipelineData(); }
+    </script>
+
 </body>
 </html>
